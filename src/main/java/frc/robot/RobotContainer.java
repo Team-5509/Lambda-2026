@@ -60,10 +60,10 @@ public class RobotContainer {
             () ->
                 drive
                     .withVelocityX(
-                        -MathUtil.applyDeadband(joystick.getLeftY(), 0.05)
+                        MathUtil.applyDeadband(joystick.getLeftY(), 0.05)
                             * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(
-                        -MathUtil.applyDeadband(joystick.getLeftX(), 0.05)
+                        MathUtil.applyDeadband(joystick.getLeftX(), 0.05)
                             * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(
                         -MathUtil.applyDeadband(joystick.getRightX(), 0.05)
