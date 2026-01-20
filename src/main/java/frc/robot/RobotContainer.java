@@ -14,10 +14,16 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.MusicSubsystem;
+
+import java.util.ArrayList;
+import java.util.List;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 public class RobotContainer {
   private double MaxSpeed =
@@ -38,10 +44,22 @@ public class RobotContainer {
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+  /* Music subsystem for playing CHRP files through a Kraken motor */
+  private final MusicSubsystem musicSubsystem;
+
   /* Path follower */
   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
+    // Initialize music subsystem with ALL drivetrain motors for louder/fuller sound
+    // This will use all 8 motors (4 drive + 4 steer) from your swerve drivetrain
+    List<TalonFX> allMotors = new ArrayList<>();
+    for (int i = 0; i < 4; i++) {
+      allMotors.add(drivetrain.getModule(i).getDriveMotor());
+      allMotors.add(drivetrain.getModule(i).getSteerMotor());
+    }
+    musicSubsystem = new MusicSubsystem(allMotors, "songs/output.chrp");
+
     autoChooser = AutoBuilder.buildAutoChooser("Tests");
     SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -75,6 +93,11 @@ public class RobotContainer {
     final var idle = new SwerveRequest.Idle();
     RobotModeTriggers.disabled()
         .whileTrue(drivetrain.applyRequest(() -> idle).ignoringDisable(true));
+
+    // Music controls - bind controller buttons to play/stop music
+    // TODO: Customize button bindings as needed
+    joystick.a().onTrue(new InstantCommand(() -> musicSubsystem.play()));
+    joystick.b().onTrue(new InstantCommand(() -> musicSubsystem.stop()));
 
     drivetrain.registerTelemetry(logger::telemeterize);
   }
