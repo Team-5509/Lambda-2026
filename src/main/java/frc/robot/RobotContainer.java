@@ -21,10 +21,6 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.MusicSubsystem;
 
-import java.util.ArrayList;
-import java.util.List;
-import com.ctre.phoenix6.hardware.TalonFX;
-
 public class RobotContainer {
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -51,14 +47,13 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
-    // Initialize music subsystem with ALL drivetrain motors for louder/fuller sound
-    // This will use all 8 motors (4 drive + 4 steer) from your swerve drivetrain
-    List<TalonFX> allMotors = new ArrayList<>();
-    for (int i = 0; i < 4; i++) {
-      allMotors.add(drivetrain.getModule(i).getDriveMotor());
-      allMotors.add(drivetrain.getModule(i).getSteerMotor());
-    }
-    musicSubsystem = new MusicSubsystem(allMotors, "songs/output.chrp");
+    // Initialize music subsystem
+    // TODO: Replace with your actual TalonFX CAN ID, CAN bus name, and CHRP file name
+    musicSubsystem = new MusicSubsystem(
+        99,                    // TalonFX CAN ID for your Kraken motor
+        "rio",                 // CAN bus name ("rio" for roboRIO bus, or your CANivore name)
+        "output.chrp"  // Path relative to deploy directory
+    );
 
     autoChooser = AutoBuilder.buildAutoChooser("Tests");
     SmartDashboard.putData("Auto Mode", autoChooser);
