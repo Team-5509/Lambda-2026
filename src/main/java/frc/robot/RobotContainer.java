@@ -14,10 +14,12 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.MusicSubsystem;
 
 public class RobotContainer {
   private double MaxSpeed =
@@ -38,10 +40,21 @@ public class RobotContainer {
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+  /* Music subsystem for playing CHRP files through a Kraken motor */
+  private final MusicSubsystem musicSubsystem;
+
   /* Path follower */
   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
+    // Initialize music subsystem
+    // TODO: Replace with your actual TalonFX CAN ID, CAN bus name, and CHRP file name
+    musicSubsystem = new MusicSubsystem(
+        99,                    // TalonFX CAN ID for your Kraken motor
+        "rio",                 // CAN bus name ("rio" for roboRIO bus, or your CANivore name)
+        "output.chrp"  // Path relative to deploy directory
+    );
+
     autoChooser = AutoBuilder.buildAutoChooser("Tests");
     SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -75,6 +88,11 @@ public class RobotContainer {
     final var idle = new SwerveRequest.Idle();
     RobotModeTriggers.disabled()
         .whileTrue(drivetrain.applyRequest(() -> idle).ignoringDisable(true));
+
+    // Music controls - bind controller buttons to play/stop music
+    // TODO: Customize button bindings as needed
+    joystick.a().onTrue(new InstantCommand(() -> musicSubsystem.play()));
+    joystick.b().onTrue(new InstantCommand(() -> musicSubsystem.stop()));
 
     drivetrain.registerTelemetry(logger::telemeterize);
   }
