@@ -50,7 +50,7 @@ public class RobotContainer {
     // Initialize music subsystem
     // TODO: Replace with your actual TalonFX CAN ID, CAN bus name, and CHRP file name
     musicSubsystem = new MusicSubsystem(
-        99,                    // TalonFX CAN ID for your Kraken motor
+        3,                    // TalonFX CAN ID for your Kraken motor
         "rio",                 // CAN bus name ("rio" for roboRIO bus, or your CANivore name)
         "output.chrp"  // Path relative to deploy directory
     );
