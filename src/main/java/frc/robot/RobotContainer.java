@@ -14,10 +14,13 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.RobotBase;
 
 public class RobotContainer {
   private double MaxSpeed =
@@ -26,6 +29,7 @@ public class RobotContainer {
       RotationsPerSecond.of(0.75)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
+          
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
@@ -37,6 +41,11 @@ public class RobotContainer {
   private final CommandXboxController joystick = new CommandXboxController(0);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+
+   private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   /* Path follower */
   private final SendableChooser<Command> autoChooser;
@@ -69,9 +78,25 @@ public class RobotContainer {
                         -MathUtil.applyDeadband(joystick.getRightX(), 0.05)
                             * MaxAngularRate) // Drive counterclockwise with negative X (left)
             ));
+    joystick.y().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
+    joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
+
+     joystick.povUp().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0.5).withVelocityY(0))
+        );
+        joystick.povDown().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
+        );
+ joystick.povRight().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(-0.5))
+        );
+        joystick.povLeft().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(0.5))
+        );
+
 
     // Idle while the robot is disabled. This ensures the configured
-    // neutral mode is applied to the drive motors while disabled.
+    // neutral mode) is applied to the drive motors while disabled.
     final var idle = new SwerveRequest.Idle();
     RobotModeTriggers.disabled()
         .whileTrue(drivetrain.applyRequest(() -> idle).ignoringDisable(true));
@@ -83,4 +108,6 @@ public class RobotContainer {
     /* Run the path selected from the auto chooser */
     return autoChooser.getSelected();
   }
+  
+   
 }
