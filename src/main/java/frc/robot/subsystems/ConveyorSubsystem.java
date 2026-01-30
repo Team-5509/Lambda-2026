@@ -4,13 +4,15 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ExampleSubsystem extends SubsystemBase {
+public class ConveyorSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   public ConveyorSubsystem() {}
-private TalonFX conveyorMotor=new TalonFX(15);
+  private TalonFX conveyorMotor = new TalonFX(15);
   /**
    * Example command factory method.
    *

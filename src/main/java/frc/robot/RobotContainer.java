@@ -17,12 +17,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.commands.RunTurret;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.TurretSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public class RobotContainer {
+    private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate =
@@ -38,7 +41,8 @@ public class RobotContainer {
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
-  private final CommandXboxController joystick = new CommandXboxController(0);
+  private final CommandXboxController driverXbox = new CommandXboxController(0);
+  private final CommandXboxController auxXbox = new CommandXboxController(1);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -61,6 +65,7 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+        Command runTurret = new RunTurret(m_turretSubsystem, () -> auxXbox.getLeftX());
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
     drivetrain.setDefaultCommand(
@@ -69,32 +74,31 @@ public class RobotContainer {
             () ->
                 drive
                     .withVelocityX(
-                        MathUtil.applyDeadband(joystick.getLeftY(), 0.05)
+                        MathUtil.applyDeadband(driverXbox.getLeftY(), 0.05)
                             * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(
-                        MathUtil.applyDeadband(joystick.getLeftX(), 0.05)
+                        MathUtil.applyDeadband(driverXbox.getLeftX(), 0.05)
                             * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(
-                        -MathUtil.applyDeadband(joystick.getRightX(), 0.05)
+                        -MathUtil.applyDeadband(driverXbox.getRightX(), 0.05)
                             * MaxAngularRate) // Drive counterclockwise with negative X (left)
             ));
-    joystick.y().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
-    joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
-
-     joystick.povUp().whileTrue(drivetrain.applyRequest(() ->
+    driverXbox.y().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
+    driverXbox.x().whileTrue(drivetrain.applyRequest(() -> brake));
+     driverXbox.povUp().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
-        joystick.povDown().whileTrue(drivetrain.applyRequest(() ->
+        driverXbox.povDown().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
- joystick.povRight().whileTrue(drivetrain.applyRequest(() ->
+        driverXbox.povRight().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0).withVelocityY(-0.5))
         );
-        joystick.povLeft().whileTrue(drivetrain.applyRequest(() ->
+        driverXbox.povLeft().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
 
-
+    auxXbox.axisMagnitudeGreaterThan(1, 0.2).whileTrue(runTurret);
     // Idle while the robot is disabled. This ensures the configured
     // neutral mode) is applied to the drive motors while disabled.
     final var idle = new SwerveRequest.Idle();
