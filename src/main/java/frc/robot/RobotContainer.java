@@ -17,15 +17,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.commands.RunKicker;
 import frc.robot.commands.RunTurret;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.KickerSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public class RobotContainer {
     private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
+    private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate =
@@ -66,6 +69,7 @@ public class RobotContainer {
 
   private void configureBindings() {
         Command runTurret = new RunTurret(m_turretSubsystem, () -> auxXbox.getLeftX());
+        Command runKicker = new RunKicker(m_kickerSubsystem);
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
     drivetrain.setDefaultCommand(
@@ -99,6 +103,7 @@ public class RobotContainer {
         );
 
     auxXbox.axisMagnitudeGreaterThan(1, 0.2).whileTrue(runTurret);
+    auxXbox.a().whileTrue(runKicker );
     // Idle while the robot is disabled. This ensures the configured
     // neutral mode) is applied to the drive motors while disabled.
     final var idle = new SwerveRequest.Idle();
