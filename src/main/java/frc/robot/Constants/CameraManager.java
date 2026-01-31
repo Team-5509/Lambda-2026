@@ -13,25 +13,25 @@ public class CameraManager {
         // Front Left Camera
         CAM_FL("CAM_FL",
             // Cam mounted facing forward, half a meter forward of center, half a meter up from center. 
-            new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0)), 
+            new Transform3d(new Translation3d(0.276225, 0.276225, 0.19), new Rotation3d(0, Math.toRadians(-20), 45)), 
             VecBuilder.fill(4, 4, 8), 
             VecBuilder.fill(0.5, 0.5, 1)),
         
         // Front Right Camera
         CAM_FR("CAM_FR", 
-            new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0)), 
+            new Transform3d(new Translation3d(0.276225, -0.276225, 0.19), new Rotation3d(0, Math.toRadians(-20), -45)), 
             VecBuilder.fill(4, 4, 8), 
             VecBuilder.fill(0.5, 0.5, 1)),
         
         // Rear Left Camera
         CAM_RL("CAM_RL", 
-            new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0)), 
+            new Transform3d(new Translation3d(-0.276225, 0.276225, 0.19), new Rotation3d(0, Math.toRadians(20), 135)), 
             VecBuilder.fill(4, 4, 8), 
             VecBuilder.fill(0.5, 0.5, 1)),
         
         // Rear Right Camera
         CAM_RR("CAM_RR", 
-            new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0)), 
+            new Transform3d(new Translation3d(-0.276225, -0.276225, 0.19), new Rotation3d(0, Math.toRadians(20), -135)), 
             VecBuilder.fill(4, 4, 8), 
             VecBuilder.fill(0.5, 0.5, 1));
 

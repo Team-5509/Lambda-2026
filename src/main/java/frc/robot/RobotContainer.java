@@ -25,6 +25,9 @@ import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.KickerSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.subsystems.Vision;
+import frc.robot.Constants.CameraManager;
+import frc.robot.Constants.CameraManager.CameraProperties;
 
 public class RobotContainer {
     private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
@@ -48,6 +51,11 @@ public class RobotContainer {
   private final CommandXboxController auxXbox = new CommandXboxController(1);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
+  public final Vision visionFL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_FL);
+  public final Vision visionFR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_FR);
+  public final Vision visionRL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RL);
+  public final Vision visionRR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RR);
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
