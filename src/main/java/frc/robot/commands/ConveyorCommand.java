@@ -31,7 +31,10 @@ public class ConveyorCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.SetConveyorMotor(m_speed);
+    // Use Motion Magic position control from ConveyorSubsystem.
+    // Interpret m_speed as a fraction of one rotation (0..1). Convert to degrees.
+    double targetDegrees = m_speed * 360.0;
+    m_subsystem.setConveyorPositionDegrees(targetDegrees);
   }
    
   

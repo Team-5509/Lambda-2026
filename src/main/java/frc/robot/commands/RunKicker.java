@@ -35,7 +35,11 @@ public class RunKicker extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_kickerSubsystem.setKickerMoter(m_speed);
+    // Use Motion Magic position control from KickerSubsystem.
+    // Interpretation: m_speed is treated as a fraction of one rotation (0..1).
+    // For example, m_speed = 0.5 -> 0.5 rotations -> 180 degrees.
+    double targetDegrees = m_speed * 360.0;
+    m_kickerSubsystem.setKickerPositionDegrees(targetDegrees);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

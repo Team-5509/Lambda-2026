@@ -31,7 +31,10 @@ public class IntakeCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.setIntakeMotor(m_speed);
+    // Use Motion Magic position control from IntakeSubsystem.
+    // Interpret m_speed as a fraction of one rotation (0..1). Convert to degrees.
+    double targetDegrees = m_speed * 360.0;
+    m_subsystem.setIntakePositionDegrees(targetDegrees);
   }
 
   // Called once the command ends or is interrupted.
