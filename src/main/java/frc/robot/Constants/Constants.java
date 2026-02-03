@@ -26,4 +26,27 @@ import edu.wpi.first.math.VecBuilder;
         public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
         public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
      }
+
+     public static class Ids {
+
+// Intake
+    private static final int kIntakeMotorId = 14;
+
+    //Conveyor
+    private static final int kConveyorMotorId = 15;
+
+    // Kicker
+    private static final int kKickerMotorId = 16;
+
+    //Turret
+    private static final int kTurretMotorId = 17;
+
+    //Launcher 
+    private static final int kLauncherMotorId = 18;
+    private static final int kLauncher2MotorId = 19;
+
+    //Climber
+
+     }
  }
+

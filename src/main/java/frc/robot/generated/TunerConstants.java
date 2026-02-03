@@ -169,23 +169,6 @@ public class TunerConstants {
     private static final Distance kBackRightXPos = Inches.of(-10.875);
     private static final Distance kBackRightYPos = Inches.of(-10.875);
 
-    // Intake
-    private static final int kIntakeMotorId = 14;
-
-    //Conveyor
-    private static final int kConveyorMotorId = 15;
-
-    // Kicker
-    private static final int kKickerMotorId = 16;
-
-    //Turret
-    private static final int kTurretMotorId = 17;
-
-    //Launcher 
-    private static final int kLauncherMotorId = 18;
-    private static final int kLauncher2MotorId = 19;
-
-    //Climber
 
     public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FrontLeft =
         ConstantCreator.createModuleConstants(
