@@ -10,6 +10,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,8 +31,13 @@ import frc.robot.subsystems.Vision;
 import frc.robot.Constants.CameraManager;
 import frc.robot.Constants.CameraManager.CameraProperties;
 
+
+import frc.robot.commands.ConveyorCommand;
+import frc.robot.subsystems.ConveyorSubsystem;
+
 public class RobotContainer {
     private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
+    private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
     private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -79,6 +85,7 @@ public class RobotContainer {
   private void configureBindings() {
         Command runTurret = new RunTurret(m_turretSubsystem, () -> auxXbox.getLeftX());
         Command runKicker = new RunKicker(m_kickerSubsystem);
+        Command conveyorCommand = new ConveyorCommand(m_conveyorSubsystem,0.75);
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
     drivetrain.setDefaultCommand(
@@ -113,6 +120,7 @@ public class RobotContainer {
 
     auxXbox.axisMagnitudeGreaterThan(1, 0.2).whileTrue(runTurret);
     auxXbox.a().whileTrue(runKicker );
+    auxXbox.b().whileTrue(conveyorCommand);
     // Idle while the robot is disabled. This ensures the configured
     // neutral mode) is applied to the drive motors while disabled.
     final var idle = new SwerveRequest.Idle();
