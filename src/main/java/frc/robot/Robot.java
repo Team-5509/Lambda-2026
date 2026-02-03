@@ -20,6 +20,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+
+    m_robotContainer.visionFL.periodic();
+    m_robotContainer.visionFR.periodic();
+    m_robotContainer.visionRL.periodic();
+    m_robotContainer.visionRR.periodic();
   }
 
   @Override
@@ -69,4 +74,29 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testExit() {}
+
+  @Override
+  public void simulationPeriodic() {
+
+    m_robotContainer.visionFL.simulationPeriodic(m_robotContainer.drivetrain.getState().Pose);
+    m_robotContainer.visionFL.simulationPeriodic(m_robotContainer.drivetrain.getState().Pose);
+    var debugFieldFL = m_robotContainer.visionFL.getSimDebugField();
+    debugFieldFL.getObject("EstimatedRobot").setPose(m_robotContainer.drivetrain.getState().Pose);
+
+    m_robotContainer.visionFR.simulationPeriodic(m_robotContainer.drivetrain.getState().Pose);
+    m_robotContainer.visionFR.simulationPeriodic(m_robotContainer.drivetrain.getState().Pose);
+    var debugFieldFR = m_robotContainer.visionFL.getSimDebugField();
+    debugFieldFR.getObject("EstimatedRobot").setPose(m_robotContainer.drivetrain.getState().Pose);
+
+    m_robotContainer.visionRL.simulationPeriodic(m_robotContainer.drivetrain.getState().Pose);
+    m_robotContainer.visionRL.simulationPeriodic(m_robotContainer.drivetrain.getState().Pose);
+    var debugFieldRL = m_robotContainer.visionFL.getSimDebugField();
+    debugFieldRL.getObject("EstimatedRobot").setPose(m_robotContainer.drivetrain.getState().Pose);
+
+    m_robotContainer.visionRR.simulationPeriodic(m_robotContainer.drivetrain.getState().Pose);
+    m_robotContainer.visionRR.simulationPeriodic(m_robotContainer.drivetrain.getState().Pose);
+    var debugFieldRR = m_robotContainer.visionFL.getSimDebugField();
+    debugFieldRR.getObject("EstimatedRobot").setPose(m_robotContainer.drivetrain.getState().Pose);
+  }
+
 }
