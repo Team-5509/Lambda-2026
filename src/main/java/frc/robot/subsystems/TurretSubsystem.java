@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,7 +14,24 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class TurretSubsystem extends SubsystemBase {
 
   /** Creates a new TurretSubsystem. */
-  public TurretSubsystem() {}
+  public TurretSubsystem() {
+    TalonFXConfiguration config = new TalonFXConfiguration();
+
+    /* Feedback */
+    config.Feedback.SensorToMechanismRatio = 1.0;
+
+    /* Position/Velocity PID (tune these values for your turret) */
+    config.Slot0.kP = 0.6;
+    config.Slot0.kI = 0.0;
+    config.Slot0.kD = 0.0;
+    config.Slot0.kV = 0.0;
+
+    /* Motion Magic */
+    config.MotionMagic.MotionMagicAcceleration = 120.0;
+    config.MotionMagic.MotionMagicJerk = 600.0;
+
+    turretMotor.getConfigurator().apply(config);
+  }
 
   private TalonFX turretMotor = new TalonFX(16);
   /**
@@ -51,5 +70,35 @@ public class TurretSubsystem extends SubsystemBase {
 
   public void setTurretMotor(double speed) {
     turretMotor.set(speed);
+  }
+
+  /**
+   * Move turret to a target position (rotations) using Motion Magic.
+   * @param targetRotations rotations of the feedback sensor (motor rotations)
+   */
+  public void setTurretPosition(double targetRotations) {
+    MotionMagicVoltage posRequest = new MotionMagicVoltage(0);
+    posRequest.withPosition(targetRotations);
+    turretMotor.setControl(posRequest);
+  }
+
+
+  /**
+   * Convenience helper: move turret to a target angle in degrees using Motion Magic position control.
+   * Assumes 1 motor rotation == 360 degrees. If your mechanism has gearing or a different
+   * sensor scale, adjust the conversion accordingly or set Feedback.SensorToMechanismRatio.
+   * @param degrees target degrees
+   */
+  public void setTurretPositionDegrees(double degrees) {
+    double rotations = degrees / 360.0;
+    setTurretPosition(rotations);
+  }
+
+  public double getTurretPosition() {
+    return turretMotor.getPosition().getValueAsDouble();
+  }
+
+  public double getTurretVelocity() {
+    return turretMotor.getVelocity().getValueAsDouble();
   }
 }

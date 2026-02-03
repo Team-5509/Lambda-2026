@@ -35,7 +35,11 @@ public class RunTurret extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_turretSubsystem.setTurretMotor(m_controllerInput.getAsDouble());
+    // Map controller axis (-1..1) to turret angle in degrees.
+    // Change maxAngleDegrees to the safe range for your turret (e.g. 180 for +/-180°).
+    double maxAngleDegrees = 180.0;
+    double targetDegrees = m_controllerInput.getAsDouble() * maxAngleDegrees;
+    m_turretSubsystem.setTurretPositionDegrees(targetDegrees);
   }
 
   // Called once the command ends or is interrupted.
