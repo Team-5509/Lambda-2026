@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.swerveDrive;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
