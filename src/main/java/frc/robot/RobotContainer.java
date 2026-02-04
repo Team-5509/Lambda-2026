@@ -78,10 +78,10 @@ public class RobotContainer {
             () ->
                 drive
                     .withVelocityX(
-                        MathUtil.applyDeadband(driverXbox.getLeftY(), 0.05)
+                        -MathUtil.applyDeadband(driverXbox.getLeftY(), 0.05)
                             * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(
-                        MathUtil.applyDeadband(driverXbox.getLeftX(), 0.05)
+                        -MathUtil.applyDeadband(driverXbox.getLeftX(), 0.05)
                             * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(
                         -MathUtil.applyDeadband(driverXbox.getRightX(), 0.05)
@@ -89,6 +89,7 @@ public class RobotContainer {
             ));
     driverXbox.y().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
     driverXbox.x().whileTrue(drivetrain.applyRequest(() -> brake));
+    
      driverXbox.povUp().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
