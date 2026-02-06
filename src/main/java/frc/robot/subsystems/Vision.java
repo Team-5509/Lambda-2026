@@ -122,7 +122,6 @@ public class Vision extends SubsystemBase {
             }
             updateEstimationStdDevs(visionEst, change.getTargets());
 
-            var Items = change.getTargets();
 
             if (Robot.isSimulation()) {
                 visionEst.ifPresentOrElse(
