@@ -60,18 +60,11 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-<<<<<<< Updated upstream
-=======
 
-    
-
-    
-
-    m_robotContainer.visionFL.periodic();
-    m_robotContainer.visionFR.periodic();
-    m_robotContainer.visionRL.periodic();
-    m_robotContainer.visionRR.periodic();
->>>>>>> Stashed changes
+    // m_robotContainer.visionFL.periodic();
+    // m_robotContainer.visionFR.periodic();
+    // m_robotContainer.visionRL.periodic();
+    // m_robotContainer.visionRR.periodic();
   }
 
   @Override
@@ -121,4 +114,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testExit() {}
+
+  
 }

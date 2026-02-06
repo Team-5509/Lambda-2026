@@ -68,7 +68,7 @@ public class Vision extends SubsystemBase {
     Matrix<N3, N1> kSingleTagStdDevs;
     Matrix<N3, N1> kMultiTagStdDevs;
 
-    AprilTagFieldLayout kTagLayout = Constants.Vision.kTagLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+    AprilTagFieldLayout kTagLayout = Constants.Vision.kTagLayout;
 
     /**
       * @param estConsumer Lamba that will accept a pose estimate and pass it to your desired {@link

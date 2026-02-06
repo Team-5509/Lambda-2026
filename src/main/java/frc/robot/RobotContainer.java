@@ -17,11 +17,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.commands.RunKicker;
 import frc.robot.commands.RunTurret;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.KickerSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -48,6 +50,11 @@ public class RobotContainer {
   private final CommandXboxController auxXbox = new CommandXboxController(1);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
+  public final Vision visionFL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_FL);
+  public final Vision visionFR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_FR);
+  public final Vision visionRL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RL);
+  public final Vision visionRR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RR);
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
@@ -89,6 +96,7 @@ public class RobotContainer {
             ));
     driverXbox.y().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
     driverXbox.x().whileTrue(drivetrain.applyRequest(() -> brake));
+    driverXbox.b().onTrue(drivetrain.runOnce(()-> drivetrain.addFakeVisionReading()));
     
      driverXbox.povUp().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
