@@ -19,7 +19,7 @@ import edu.wpi.first.math.VecBuilder;
 
         // The layout of the AprilTags on the field
         public static final AprilTagFieldLayout kTagLayout =
-                AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
+                AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
         // The standard deviations of our vision estimated poses, which affect correction rate
         // (Fake values. Experiment and determine estimation noise on an actual robot.)
