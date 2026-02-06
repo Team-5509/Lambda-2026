@@ -115,8 +115,14 @@ public class Vision extends SubsystemBase {
     public void periodic() {
         Optional<EstimatedRobotPose> visionEst = Optional.empty();
         for (var change : camera.getAllUnreadResults()) {
-            visionEst = photonEstimator.update(change);
+            //visionEst = photonEstimator.update(change);
+            visionEst = photonEstimator.estimateCoprocMultiTagPose(change);
+            if (visionEst.isEmpty()) {
+                visionEst = photonEstimator.estimateLowestAmbiguityPose(change);
+            }
             updateEstimationStdDevs(visionEst, change.getTargets());
+
+            var Items = change.getTargets();
 
             if (Robot.isSimulation()) {
                 visionEst.ifPresentOrElse(
