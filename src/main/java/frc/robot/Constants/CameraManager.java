@@ -11,27 +11,28 @@ import edu.wpi.first.math.numbers.N3;
 public class CameraManager {
     public enum CameraProperties {
         // Front Left Camera
-        CAM_FL("CAM_FL",
+        
+        CAM_FL("Apple",
             // Cam mounted facing forward, half a meter forward of center, half a meter up from center. 
-            new Transform3d(new Translation3d(0.276225, 0.276225, 0.19), new Rotation3d(0, Math.toRadians(-20), 45)), 
-            VecBuilder.fill(4, 4, 8), 
-            VecBuilder.fill(0.5, 0.5, 1)),
+            new Transform3d(new Translation3d(0.276225, 0.276225, 0.19), new Rotation3d(0, Math.toRadians(-20), Math.toRadians(45))), 
+            VecBuilder.fill(0, 0, 0), 
+            VecBuilder.fill(0.0, 0.0, 0)),
         
         // Front Right Camera
-        CAM_FR("CAM_FR", 
-            new Transform3d(new Translation3d(0.276225, -0.276225, 0.19), new Rotation3d(0, Math.toRadians(-20), -45)), 
+        CAM_FR("Basil", 
+            new Transform3d(new Translation3d(0.276225, -0.276225, 0.19), new Rotation3d(0, Math.toRadians(-20), Math.toRadians(-45))), 
             VecBuilder.fill(4, 4, 8), 
             VecBuilder.fill(0.5, 0.5, 1)),
         
         // Rear Left Camera
-        CAM_RL("CAM_RL", 
-            new Transform3d(new Translation3d(-0.276225, 0.276225, 0.19), new Rotation3d(0, Math.toRadians(20), 135)), 
+        CAM_RL("Dragonfruit", 
+            new Transform3d(new Translation3d(-0.276225, 0.276225, 0.19), new Rotation3d(0, Math.toRadians(20), Math.toRadians(135))), 
             VecBuilder.fill(4, 4, 8), 
             VecBuilder.fill(0.5, 0.5, 1)),
         
         // Rear Right Camera
-        CAM_RR("CAM_RR", 
-            new Transform3d(new Translation3d(-0.276225, -0.276225, 0.19), new Rotation3d(0, Math.toRadians(20), -135)), 
+        CAM_RR("Banana", 
+            new Transform3d(new Translation3d(-0.276225, -0.276225, 0.19), new Rotation3d(0, Math.toRadians(20), Math.toRadians(-135))), 
             VecBuilder.fill(4, 4, 8), 
             VecBuilder.fill(0.5, 0.5, 1));
 
