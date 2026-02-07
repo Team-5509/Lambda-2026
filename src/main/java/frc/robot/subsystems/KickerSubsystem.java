@@ -8,9 +8,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Constants.KickerSubsystemConstants;
 
 public class KickerSubsystem extends SubsystemBase {
-  private TalonFX kickerMoter = new TalonFX(16);
+  private TalonFX kickerMoter = new TalonFX(KickerSubsystemConstants.kKickerMotorId);
   
 
 
