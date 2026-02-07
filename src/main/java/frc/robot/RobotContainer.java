@@ -32,6 +32,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.subsystems.Vision;
+import frc.robot.Algorithms.ShootingArc;
 import frc.robot.Constants.CameraManager;
 import frc.robot.Constants.CameraManager.CameraProperties;
 
@@ -131,6 +132,40 @@ public class RobotContainer {
     auxXbox.b().whileTrue(conveyorCommand);
 
     auxXbox.x().whileTrue(intakeCommand);
+
+    //testing alignment with the center of the goal cone
+    auxXbox.rightTrigger().whileTrue(
+        drivetrain.applyRequest(() -> {
+            var robotPose = drivetrain.getState().Pose;
+            // Add 90 degree (pi/2 rad) counterclockwise offset to the target angle
+            var targetAngle = ShootingArc.TestShooting1.getAngle(robotPose) - Math.PI / 2.0;
+            var currentAngle = robotPose.getRotation().getRadians();
+            var angleError = MathUtil.angleModulus(targetAngle - currentAngle);
+
+            // More aggressive P controller + small feed to overcome stiction for faster convergence
+            double kP = 6.0; // increased proportional gain for faster response
+            double feed = 0.05 * Math.signum(angleError); // small constant feedforward
+            double rotationalSpeed = kP * angleError + feed;
+
+            // Allow a bit more top speed to reach the final position faster
+            double maxRate = MaxAngularRate * 1.5;
+            rotationalSpeed = MathUtil.clamp(rotationalSpeed, -maxRate, maxRate);
+
+            // Tighter angle tolerance: consider aligned when within ~0.57 degrees (0.01 rad)
+            if (Math.abs(angleError) < 0.01) {
+              rotationalSpeed = 0.0;
+            }
+
+            return new SwerveRequest.RobotCentric()
+                .withDriveRequestType(DriveRequestType.Velocity)
+                .withVelocityX(0) // no translation, just rotation
+                .withVelocityY(0)
+                .withRotationalRate(rotationalSpeed);
+        })
+    );
+
+
+
     // Idle while the robot is disabled. This ensures the configured
     // neutral mode) is applied to the drive motors while disabled.
     final var idle = new SwerveRequest.Idle();
