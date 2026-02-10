@@ -36,6 +36,7 @@ import frc.robot.subsystems.Vision;
 import frc.robot.Constants.CameraManager;
 import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.Constants.Constants.IntakeSubsystemConstants;
+import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.commands.ConveyorCommand;
 import frc.robot.subsystems.ConveyorSubsystem;
 
@@ -99,8 +100,9 @@ public class RobotContainer {
                         // Supplier<Translation2d> (FIELD-RELATIVE)
                         this::getFieldRelativeVelocity,
 
-                        IntakeSubsystemConstants.speakerPose,
-                        22.0
+                        TurretSubsystemConstants.speakerPose,
+
+                        TurretSubsystemConstants.ballSpeed
                 );
         Command runKicker = new RunKicker(m_kickerSubsystem);
         Command conveyorCommand = new ConveyorCommand(m_conveyorSubsystem,0.75);

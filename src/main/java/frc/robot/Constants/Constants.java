@@ -41,7 +41,7 @@ public static final class IntakeSubsystemConstants{
     public static final class ConveyorSubsystemConstants{
     public static final int kConveyorMotorId = 15;
     }
-
+                                                                                                                                                                                                 
     // Kicker
     public static final class KickerSubsystemConstants{
     public static final int kKickerMotorId = 16;
@@ -51,6 +51,7 @@ public static final class IntakeSubsystemConstants{
     public static final class TurretSubsystemConstants{
         public static final Translation2d speakerPose = new Translation2d(16.54, 5.55); // example field coords
     public static final int kTurretMotorId = 17;
+    public static final Double ballSpeed = 22.0;
     }
     //Launcher 
     public static final class LauncherSubsystemConstants{
