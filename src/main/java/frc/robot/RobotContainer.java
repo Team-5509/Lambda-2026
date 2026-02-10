@@ -76,7 +76,7 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
-    autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
+    autoChooser = AutoBuilder.buildAutoChooser("AutoCloseHang");
     SmartDashboard.putData("Auto Mode", autoChooser);
 
     configureBindings();
