@@ -18,11 +18,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.commands.RunKicker;
 import frc.robot.commands.RunTurret;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.commands.IntakeCommand;
@@ -98,10 +100,10 @@ public class RobotContainer {
             () ->
                 drive
                     .withVelocityX(
-                        MathUtil.applyDeadband(driverXbox.getLeftY(), 0.05)
+                        -MathUtil.applyDeadband(driverXbox.getLeftY(), 0.05)
                             * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(
-                        MathUtil.applyDeadband(driverXbox.getLeftX(), 0.05)
+                        -MathUtil.applyDeadband(driverXbox.getLeftX(), 0.05)
                             * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(
                         -MathUtil.applyDeadband(driverXbox.getRightX(), 0.05)
@@ -109,6 +111,8 @@ public class RobotContainer {
             ));
     driverXbox.y().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
     driverXbox.x().whileTrue(drivetrain.applyRequest(() -> brake));
+    driverXbox.b().onTrue(drivetrain.runOnce(()-> drivetrain.addFakeVisionReading()));
+    
      driverXbox.povUp().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
