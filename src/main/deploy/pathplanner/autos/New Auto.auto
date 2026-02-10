@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StartToShootMiddle"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ShootToCloseWall"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CloseWallToDroper"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DropperToClimb"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
