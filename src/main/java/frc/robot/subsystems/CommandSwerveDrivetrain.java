@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
@@ -208,6 +209,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   @Override
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds));
+   // super.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
+
   }
 
   /**
@@ -230,5 +233,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       Matrix<N3, N1> visionMeasurementStdDevs) {
     super.addVisionMeasurement(
         visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
+        //visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+
   }
+
+  public void addFakeVisionReading() {
+    addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
+  }
+
 }
