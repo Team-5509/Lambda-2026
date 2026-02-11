@@ -105,7 +105,7 @@ public class RobotContainer {
                         TurretSubsystemConstants.ballSpeed
                 );
         Command runKicker = new RunKicker(m_kickerSubsystem);
-        Command conveyorCommand = new ConveyorCommand(m_conveyorSubsystem,0.75);
+        //Command conveyorCommand = new ConveyorCommand(m_conveyorSubsystem,0.75);
         Command intakeCommand = new IntakeCommand(m_intakeSubsystem, .75);
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
@@ -138,11 +138,21 @@ public class RobotContainer {
         driverXbox.povLeft().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
+    
+    //auxXbox.y().whileTrue(trackHub);
+    //auxXbox.x().whileTrue(intakeCommand);
 
-    auxXbox.a().whileTrue(runKicker );
-    auxXbox.b().whileTrue(conveyorCommand);
-    auxXbox.y().whileTrue(trackHub);
-    auxXbox.x().whileTrue(intakeCommand);
+    auxXbox.b().onTrue(m_conveyorSubsystem.RunConveyorCommand());
+    auxXbox.x().onTrue(m_conveyorSubsystem.StopConveyorCommand());
+    auxXbox.povRight().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedUp());
+    auxXbox.povLeft().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedDown());
+
+    auxXbox.a().onTrue(m_kickerSubsystem.RunKickerCommand());
+    auxXbox.y().onTrue(m_kickerSubsystem.StopKickerCommand());
+    auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp());
+    auxXbox.povDown().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown());
+    
+
     // Idle while the robot is disabled. This ensures the configured
     // neutral mode) is applied to the drive motors while disabled.
     final var idle = new SwerveRequest.Idle();
