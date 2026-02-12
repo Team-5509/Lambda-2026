@@ -12,6 +12,8 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,7 +22,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.commands.RunKicker;
-import frc.robot.commands.RunTurret;
+import frc.robot.commands.TrackFieldPoseCommand;
+import frc.robot.commands.TrackTargetCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.TurretSubsystem;
@@ -34,8 +37,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.subsystems.Vision;
 import frc.robot.Constants.CameraManager;
 import frc.robot.Constants.CameraManager.CameraProperties;
-
-
+import frc.robot.Constants.Constants.IntakeSubsystemConstants;
+import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.commands.ConveyorCommand;
 import frc.robot.subsystems.ConveyorSubsystem;
 
@@ -44,6 +47,8 @@ public class RobotContainer {
     private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
     private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
     private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+ // CCW+, field-relative
+
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate =
@@ -88,9 +93,21 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-        Command runTurret = new RunTurret(m_turretSubsystem, () -> auxXbox.getLeftX());
+    
+        Command trackHub = new TrackFieldPoseCommand(
+                        m_turretSubsystem,
+                         // Supplier<Pose2d>
+                        () -> drivetrain.getState().Pose,
+
+                        // Supplier<Translation2d> (FIELD-RELATIVE)
+                        this::getFieldRelativeVelocity,
+
+                        TurretSubsystemConstants.speakerPose,
+
+                        TurretSubsystemConstants.ballSpeed
+                );
         Command runKicker = new RunKicker(m_kickerSubsystem);
-        Command conveyorCommand = new ConveyorCommand(m_conveyorSubsystem,0.75);
+        //Command conveyorCommand = new ConveyorCommand(m_conveyorSubsystem,0.75);
         Command intakeCommand = new IntakeCommand(m_intakeSubsystem, .75);
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
@@ -125,12 +142,21 @@ public class RobotContainer {
         driverXbox.povLeft().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
+    
+    //auxXbox.y().whileTrue(trackHub);
+    //auxXbox.x().whileTrue(intakeCommand);
 
-    auxXbox.axisMagnitudeGreaterThan(1, 0.2).whileTrue(runTurret);
-    auxXbox.a().whileTrue(runKicker );
-    auxXbox.b().whileTrue(conveyorCommand);
+    auxXbox.b().onTrue(m_conveyorSubsystem.RunConveyorCommand());
+    auxXbox.x().onTrue(m_conveyorSubsystem.StopConveyorCommand());
+    auxXbox.povRight().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedUp());
+    auxXbox.povLeft().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedDown());
 
-    auxXbox.x().whileTrue(intakeCommand);
+    auxXbox.a().onTrue(m_kickerSubsystem.RunKickerCommand());
+    auxXbox.y().onTrue(m_kickerSubsystem.StopKickerCommand());
+    auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp());
+    auxXbox.povDown().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown());
+    
+
     // Idle while the robot is disabled. This ensures the configured
     // neutral mode) is applied to the drive motors while disabled.
     final var idle = new SwerveRequest.Idle();
@@ -144,6 +170,19 @@ public class RobotContainer {
     /* Run the path selected from the auto chooser */
     return autoChooser.getSelected();
   }
-  
+    private Translation2d getFieldRelativeVelocity() {
+        ChassisSpeeds robotRelative = drivetrain.getState().Speeds;
+
+        ChassisSpeeds fieldRelative =
+                ChassisSpeeds.fromRobotRelativeSpeeds(
+                        robotRelative,
+                        drivetrain.getState().Pose.getRotation()
+                );
+
+        return new Translation2d(
+                fieldRelative.vxMetersPerSecond,
+                fieldRelative.vyMetersPerSecond
+        );
+    }
    
 }

@@ -8,11 +8,12 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Constants.IntakeSubsystemConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {}
-    private TalonFX intakeMotor = new TalonFX(4);
+    private TalonFX intakeMotor = new TalonFX(IntakeSubsystemConstants.kIntakeMotorId);
 
   /**
    * Example command factory method.
