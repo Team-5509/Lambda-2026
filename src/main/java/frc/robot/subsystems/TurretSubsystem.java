@@ -1,18 +1,16 @@
 package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
-
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.Units;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class TurretSubsystem extends SubsystemBase {
@@ -28,15 +26,14 @@ public class TurretSubsystem extends SubsystemBase {
     /* ==================== Constants ==================== */
     // Turret rotations (1 rotation = 360 degrees)
     private static final double MIN_TURRET_ROT = -0.5;
-    private static final double MAX_TURRET_ROT =  0.5;
+    private static final double MAX_TURRET_ROT = 0.5;
 
     private DoubleSupplier robotHeadingDegSupplier = () -> 0.0;
 
-
     // Motion Magic
-    private static final double MM_CRUISE_VEL = 2.0;   // rot/s
-    private static final double MM_ACCEL      = 6.0;   // rot/s^2
-    private static final double MM_JERK       = 60.0;  // rot/s^3
+    private static final double MM_CRUISE_VEL = 2.0; // rot/s
+    private static final double MM_ACCEL = 6.0; // rot/s^2
+    private static final double MM_JERK = 60.0; // rot/s^3
 
     /* ==================== Hardware ==================== */
     private final TalonFX turretMotor = new TalonFX(TURRET_MOTOR_ID);
@@ -59,12 +56,10 @@ public class TurretSubsystem extends SubsystemBase {
         CANcoderConfiguration config = new CANcoderConfiguration();
 
         // CANcoder always reports ±0.5 rotations (±180°) in Phoenix 6
-        config.MagnetSensor.SensorDirection =
-                SensorDirectionValue.CounterClockwise_Positive;
+        config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
 
         turretEncoder.getConfigurator().apply(config);
     }
-
 
     private void configureMotor() {
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -99,40 +94,49 @@ public class TurretSubsystem extends SubsystemBase {
         turretMotor.getConfigurator().apply(config);
     }
 
-        public void aimFieldRelativeWithPrediction(
+    /**
+     * Command that sets the turret position with magic motion (closed loop
+     * control).
+     *
+     * @return a command
+     */
+    public Command SetTurretPositionMM(DoubleSupplier positionSupplier) {
+        return runOnce(() -> {
+            turretMotor.setControl(
+                    motionMagic.withPosition(positionSupplier.getAsDouble())
+                            .withSlot(0));
+        });
+    }
+
+    public void aimFieldRelativeWithPrediction(
             Pose2d robotPose,
             Translation2d robotVelocity,
             Translation2d targetPosition,
-            double projectileSpeed
-    ) {
+            double projectileSpeed) {
         Translation2d robotPos = robotPose.getTranslation();
         Translation2d toTarget = targetPosition.minus(robotPos);
 
         double distance = toTarget.getNorm();
         double flightTime = distance / projectileSpeed;
 
-        Translation2d predictedRobotPos =
-                robotPos.plus(robotVelocity.times(flightTime));
+        Translation2d predictedRobotPos = robotPos.plus(robotVelocity.times(flightTime));
 
-        Translation2d predictedVector =
-                targetPosition.minus(predictedRobotPos);
+        Translation2d predictedVector = targetPosition.minus(predictedRobotPos);
 
-        double angleDeg =
-                Math.toDegrees(Math.atan2(
-                        predictedVector.getY(),
-                        predictedVector.getX()
-                ));
+        double angleDeg = Math.toDegrees(Math.atan2(
+                predictedVector.getY(),
+                predictedVector.getX()));
 
         aimFieldRelative(angleDeg);
     }
 
-    
     /* ==================== Control ==================== */
 
     public void setTurretAngleDegrees(double degrees) {
         degrees = Math.max(-180.0, Math.min(180.0, degrees));
         double rotations = degrees / 360.0;
-        turretMotor.setControl(motionMagic.withPosition(rotations));
+        turretMotor.setControl(
+                motionMagic.withPosition(rotations));
     }
 
     public void stop() {
@@ -153,7 +157,7 @@ public class TurretSubsystem extends SubsystemBase {
         return turretMotor.getPosition().getValue().in(Units.Degrees);
     }
 
-        /** Robot heading in field coordinates (CCW+, degrees, 0 = field forward) */
+    /** Robot heading in field coordinates (CCW+, degrees, 0 = field forward) */
     public void setRobotHeadingSupplier(DoubleSupplier supplier) {
         this.robotHeadingDegSupplier = supplier;
     }
@@ -162,6 +166,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     /**
      * Aim turret at a field-relative angle
+     * 
      * @param fieldAngleDeg CCW+, degrees
      */
     public void aimFieldRelative(double fieldAngleDeg) {
@@ -171,11 +176,12 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     private double wrapDegrees(double degrees) {
-        while (degrees > 180) degrees -= 360;
-        while (degrees < -180) degrees += 360;
+        while (degrees > 180)
+            degrees -= 360;
+        while (degrees < -180)
+            degrees += 360;
         return degrees;
     }
-
 
     public boolean isAtNegativeLimit() {
         return !negLimit.get();

@@ -18,19 +18,18 @@ public class TrackFieldPoseCommand extends Command {
     private final double projectileSpeed;
 
     /**
-     * @param turret Turret subsystem
-     * @param robotPoseSupplier Robot pose (field-relative)
+     * @param turret                Turret subsystem
+     * @param robotPoseSupplier     Robot pose (field-relative)
      * @param robotVelocitySupplier Robot velocity (field-relative, m/s)
-     * @param targetPosition Fixed field target position
-     * @param projectileSpeed Projectile speed (m/s)
+     * @param targetPosition        Fixed field target position
+     * @param projectileSpeed       Projectile speed (m/s)
      */
     public TrackFieldPoseCommand(
             TurretSubsystem turret,
             Supplier<Pose2d> robotPoseSupplier,
             Supplier<Translation2d> robotVelocitySupplier,
             Translation2d targetPosition,
-            double projectileSpeed
-    ) {
+            double projectileSpeed) {
         this.turret = turret;
         this.robotPoseSupplier = robotPoseSupplier;
         this.robotVelocitySupplier = robotVelocitySupplier;
@@ -46,8 +45,7 @@ public class TrackFieldPoseCommand extends Command {
                 robotPoseSupplier.get(),
                 robotVelocitySupplier.get(),
                 targetPosition,
-                projectileSpeed
-        );
+                projectileSpeed);
     }
 
     @Override
