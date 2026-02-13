@@ -20,5 +20,10 @@ if [ "$PRE_COMMIT_SKIP_GRADLE_BUILD" = "true" ]; then
     echo "[pre-commit] Skipping Gradle builds"
 else
     echo "[pre-commit] Running Gradle check..."
-    ./gradlew check
+    # On Windows, use the batch file to avoid cygpath/exec issues in minimal bash environments
+    if [ -f "gradlew.bat" ]; then
+        ./gradlew.bat check
+    else
+        ./gradlew check
+    fi
 fi
