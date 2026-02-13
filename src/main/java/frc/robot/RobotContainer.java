@@ -154,11 +154,12 @@ public class RobotContainer {
         auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp().andThen(m_kickerSubsystem.RunKickerMM()));
         auxXbox.povDown().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown().andThen(m_kickerSubsystem.RunKickerMM()));
 
-        //Intake
+        //Intake Speed
         auxXbox.rightBumper().onTrue(m_intakeSubsystem.RunIntakeMM());
         auxXbox.leftBumper().onTrue(m_intakeSubsystem.StopIntakeMM());
         auxXbox.povUp().onTrue(m_intakeSubsystem.IncrementIntakeSpeedUp().andThen(m_intakeSubsystem.RunIntakeMM()));
         auxXbox.povDown().onTrue(m_intakeSubsystem.IncrementIntakeSpeedDown().andThen(m_intakeSubsystem.RunIntakeMM()));
+        //Intake Deployment
         auxXbox.a().onTrue(m_intakeSubsystem.DeployIntakeMM());
         auxXbox.y().onTrue(m_intakeSubsystem.RetractIntakeMM());
         auxXbox.povUp().onTrue(m_intakeSubsystem.IncrementDeployPositionUp().andThen(m_intakeSubsystem.DeployIntakeMM()));

@@ -101,7 +101,7 @@ private void configureDeployMotor() {
   
   
 /**
-   * Command that stops the kicker motor with magic motion (closed loop control).
+   * Command that stops the intake motor with magic motion (closed loop control).
    *
    * @return a command
    */
@@ -114,7 +114,7 @@ private void configureDeployMotor() {
   }
 
   /**
-   * Command that runs the kicker motor with magic motion (closed loop control) at
+   * Command that runs the intake motor with magic motion (closed loop control) at
    * speed from constants.
    *
    * @return a command
@@ -128,8 +128,8 @@ private void configureDeployMotor() {
   }
 
   /**
-   * Command that runs the kicker motor with magic motion (closed loop control) at
-   * Supplied speed.
+   * Command that runs the intake motor with magic motion (closed loop control) at
+   * supplied speed.
    *
    * @return a command
    */
@@ -141,6 +141,12 @@ private void configureDeployMotor() {
     });
   }
 
+  /**
+   * Command that sets the deployIntake motor deployed posistion with magic motion 
+   * (closed loop control) using posistion variable.
+   *
+   * @return a command
+   */
   public Command DeployIntakeMM() {
     return runOnce(() -> {
       MotionMagicVoltage pos = new MotionMagicVoltage(0);
@@ -149,6 +155,12 @@ private void configureDeployMotor() {
     });
   }
 
+  /**
+   * Command that sets the deployIntake motor retracted posistion with magic motion 
+   * (closed loop control) using posistion variable.
+   *
+   * @return a command
+   */
    public Command RetractIntakeMM() {
     return runOnce(() -> {
       MotionMagicVoltage pos = new MotionMagicVoltage(0);
@@ -157,6 +169,12 @@ private void configureDeployMotor() {
     });
   }
 
+  /**
+   * Command that runs the deployIntake motor deployed posistion with magic motion 
+   * (closed loop control) to supplied posistion.
+   *
+   * @return a command
+   */
 public Command DeployIntakeMM(DoubleSupplier position) {
     return runOnce(() -> {
       MotionMagicVoltage pos = new MotionMagicVoltage(0);

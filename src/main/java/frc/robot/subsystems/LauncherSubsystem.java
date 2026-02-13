@@ -20,7 +20,7 @@ import frc.robot.Constants.Constants.LauncherSubsystemConstants;
 public class LauncherSubsystem extends SubsystemBase {
 
     private final TalonFX launcher = new TalonFX(LauncherSubsystemConstants.kLauncherMotorId); // Velocity motor
-    private final TalonFX angle = new TalonFX(LauncherSubsystemConstants.kLauncher2MotorId); 
+    private final TalonFX angle = new TalonFX(LauncherSubsystemConstants.kHoodMotorId); 
     
 
     public LauncherSubsystem() {

@@ -39,7 +39,7 @@ public class Constants {
     // Launcher
     public static final class LauncherSubsystemConstants {
         public static final int kLauncherMotorId = 18;
-        public static final int kLauncher2MotorId = 19;
+        public static final int kHoodMotorId = 19;
     }
 
     // Climber
