@@ -45,6 +45,7 @@ public class RobotContainer {
     private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
     private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
     private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+    private final LauncherSubsystem m_launcherSubsystem = new LauncherSubsystem();
  // CCW+, field-relative
 
   private double MaxSpeed =
@@ -142,15 +143,21 @@ public class RobotContainer {
     //auxXbox.y().whileTrue(trackHub);
     //auxXbox.x().whileTrue(intakeCommand);
 
+    // Conveyor controls
     auxXbox.b().onTrue(m_conveyorSubsystem.RunConveyorCommand());
     auxXbox.x().onTrue(m_conveyorSubsystem.StopConveyorCommand());
     auxXbox.povRight().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedUp());
     auxXbox.povLeft().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedDown());
 
+    // Kicker controls
     auxXbox.a().onTrue(m_kickerSubsystem.RunKickerCommand());
     auxXbox.y().onTrue(m_kickerSubsystem.StopKickerCommand());
     auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp());
     auxXbox.povDown().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown());
+    
+    // Intake controls
+    auxXbox.rightBumper().onTrue(m_intakeSubsystem.RunIntakeCommand());
+    auxXbox.leftBumper().onTrue(m_intakeSubsystem.StopIntakeCommand());
     
 
     // Idle while the robot is disabled. This ensures the configured

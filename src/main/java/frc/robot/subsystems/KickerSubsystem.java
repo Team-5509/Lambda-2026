@@ -32,7 +32,7 @@ public class KickerSubsystem extends SubsystemBase {
     private static final double MM_ACCEL      = 6.0;   // rot/s^2
     private static final double MM_JERK       = 60.0;  // rot/s^3
 
-  // Conveyor Speed
+  // Kicker Speed
   private double speed = 100.0;
   private double speedIncrement = 10.0;
     /* ==================== Hardware ==================== */
@@ -68,7 +68,7 @@ public class KickerSubsystem extends SubsystemBase {
   }
   
   /**
-   * Command that runs the conveyor motor at a certain speed.
+   * Command that runs the kicker motor at a certain speed.
    *
    * @return a command
    */
@@ -83,7 +83,7 @@ public class KickerSubsystem extends SubsystemBase {
   }
 
   /**
-   * Command that stops the conveyor motor at 0 speed.
+   * Command that stops the kicker motor at 0 speed.
    *
    * @return a command
    */
@@ -98,7 +98,7 @@ public class KickerSubsystem extends SubsystemBase {
   }
 
   /**
-   * Command that stops the conveyor motor at 0 speed.
+   * Command that stops the kicker motor at 0 speed.
    *
    * @return a command
    */

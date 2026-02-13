@@ -32,6 +32,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 // Intake
 public static final class IntakeSubsystemConstants{
     public static final int kIntakeMotorId = 14;
+    public static final int kDeployIntakeMotorId = 21;
     public static final Translation2d hubPose = new Translation2d(16.54, 5.55); // example field coords
     public static final Translation2d homePose = new Translation2d(16.54, 5.55); // example field coords
 
