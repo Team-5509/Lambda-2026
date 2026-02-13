@@ -12,8 +12,7 @@ public class TrackTargetCommand extends Command {
 
     public TrackTargetCommand(
             TurretSubsystem turret,
-            DoubleSupplier targetFieldAngleSupplier
-    ) {
+            DoubleSupplier targetFieldAngleSupplier) {
         this.turret = turret;
         this.targetFieldAngleSupplier = targetFieldAngleSupplier;
         addRequirements(turret);

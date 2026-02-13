@@ -115,8 +115,13 @@ public class Vision extends SubsystemBase {
     public void periodic() {
         Optional<EstimatedRobotPose> visionEst = Optional.empty();
         for (var change : camera.getAllUnreadResults()) {
-            visionEst = photonEstimator.update(change);
+            //visionEst = photonEstimator.update(change);
+            visionEst = photonEstimator.estimateCoprocMultiTagPose(change);
+            if (visionEst.isEmpty()) {
+                visionEst = photonEstimator.estimateLowestAmbiguityPose(change);
+            }
             updateEstimationStdDevs(visionEst, change.getTargets());
+
 
             if (Robot.isSimulation()) {
                 visionEst.ifPresentOrElse(
@@ -133,7 +138,7 @@ public class Vision extends SubsystemBase {
                         // Change our trust in the measurement based on the tags we can see
                         var estStdDevs = getEstimationStdDevs();
 
-                        estConsumer.accept(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+                         estConsumer.accept(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
                     });
         }
     }
