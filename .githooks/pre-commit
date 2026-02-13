@@ -1,12 +1,24 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -e
 
-# Always run from repository root.
-cd "$(git rev-parse --show-toplevel)"
+# Try to find Java for environments like GitHub Desktop that might not have it in PATH
+if ! command -v java >/dev/null 2>&1 && [ -z "$JAVA_HOME" ]; then
+    # Check common WPILib locations
+    if [ -d "C:/Users/Public/wpilib/2026/jdk" ]; then
+        export JAVA_HOME="C:/Users/Public/wpilib/2026/jdk"
+        export PATH="$JAVA_HOME/bin:$PATH"
+    elif [ -d "C:/Users/Public/wpilib/2025/jdk" ]; then
+        export JAVA_HOME="C:/Users/Public/wpilib/2025/jdk"
+        export PATH="$JAVA_HOME/bin:$PATH"
+    elif [ -d "$HOME/.jdk/jdk-17.0.16" ]; then
+        export JAVA_HOME="$HOME/.jdk/jdk-17.0.16"
+        export PATH="$JAVA_HOME/bin:$PATH"
+    fi
+fi
 
-if [[ "${PRE_COMMIT_SKIP_GRADLE_BUILD:-false}" == "true" ]]; then
-    echo "[pre-commit] Skipping Gradle checks because PRE_COMMIT_SKIP_GRADLE_BUILD=true"
+if [ "$PRE_COMMIT_SKIP_GRADLE_BUILD" = "true" ]; then
+    echo "[pre-commit] Skipping Gradle builds"
 else
-    echo "[pre-commit] Running Gradle checks (./gradlew check)..."
+    echo "[pre-commit] Running Gradle check..."
     ./gradlew check
 fi
