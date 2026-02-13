@@ -85,9 +85,8 @@ public class Vision extends SubsystemBase {
 
          camera = new PhotonCamera(kCameraName);
  
-         photonEstimator =
-                 new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, kRobotToCam);
-         photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+         photonEstimator = new PhotonPoseEstimator(kTagLayout, kRobotToCam);
+        //  photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
  
          // ----- Simulation
          if (Robot.isSimulation()) {
@@ -115,11 +114,12 @@ public class Vision extends SubsystemBase {
     public void periodic() {
         Optional<EstimatedRobotPose> visionEst = Optional.empty();
         for (var change : camera.getAllUnreadResults()) {
-            //visionEst = photonEstimator.update(change);
-            visionEst = photonEstimator.estimateCoprocMultiTagPose(change);
-            if (visionEst.isEmpty()) {
+
+            if (change.multitagResult.isPresent()) {
+                visionEst = photonEstimator.estimateCoprocMultiTagPose(change);
+              } else {
                 visionEst = photonEstimator.estimateLowestAmbiguityPose(change);
-            }
+              }
             updateEstimationStdDevs(visionEst, change.getTargets());
 
 
