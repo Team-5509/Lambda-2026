@@ -34,6 +34,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -113,15 +114,29 @@ public class Vision extends SubsystemBase {
      }
 
     public void periodic() {
-        Optional<EstimatedRobotPose> visionEst = Optional.empty();
-        for (var change : camera.getAllUnreadResults()) {
-            //visionEst = photonEstimator.update(change);
-            visionEst = photonEstimator.estimateCoprocMultiTagPose(change);
-            if (visionEst.isEmpty()) {
-                visionEst = photonEstimator.estimateLowestAmbiguityPose(change);
-            }
-            updateEstimationStdDevs(visionEst, change.getTargets());
+        Optional<EstimatedRobotPose> bestEst = Optional.empty();
+        Matrix<N3, N1> bestStdDevs = null;
+        double bestScore = Double.NEGATIVE_INFINITY;
 
+        for (var change : camera.getAllUnreadResults()) {
+            Optional<EstimatedRobotPose> visionEst = photonEstimator.estimateCoprocMultiTagPose(change);
+            if (visionEst.isEmpty())
+                visionEst = photonEstimator.estimateLowestAmbiguityPose(change);
+
+            updateEstimationStdDevs(visionEst, change.getTargets());
+            Matrix<N3, N1> estStdDevs = getEstimationStdDevs();
+
+            // score this frame; in auton we drop weak frames to prevent jumpy fuses
+            double score = scoreMeasurement(change.getTargets());
+            if (DriverStation.isAutonomousEnabled() && score < 0.0) {
+                continue;
+            }
+
+            if (visionEst.isPresent() && score > bestScore) {
+                bestScore = score;
+                bestEst = visionEst;
+                bestStdDevs = estStdDevs;
+            }
 
             if (Robot.isSimulation()) {
                 visionEst.ifPresentOrElse(
@@ -132,15 +147,47 @@ public class Vision extends SubsystemBase {
                             getSimDebugField().getObject("VisionEstimation").setPoses();
                         });
             }
-
-            visionEst.ifPresent(
-                    est -> {
-                        // Change our trust in the measurement based on the tags we can see
-                        var estStdDevs = getEstimationStdDevs();
-
-                         estConsumer.accept(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-                    });
         }
+
+        // Fuse only ONE measurement per camera per loop: the best one.
+        if (bestEst.isPresent() && bestStdDevs != null) {
+            var est = bestEst.get();
+            estConsumer.accept(est.estimatedPose.toPose2d(), est.timestampSeconds, bestStdDevs);
+        }
+    }
+
+    /**
+     * Positive = good, negative = bad.
+     * Prefers multi-tag, low ambiguity, and closer tags.
+     */
+    private double scoreMeasurement(List<PhotonTrackedTarget> targets) {
+        if (targets == null || targets.isEmpty())
+            return -1.0;
+
+        int numTags = 0;
+        double bestAmbiguity = Double.POSITIVE_INFINITY;
+        double avgDist = 0.0;
+
+        for (var tgt : targets) {
+            if (tgt.getFiducialId() <= 0)
+                continue;
+            numTags++;
+            bestAmbiguity = Math.min(bestAmbiguity, tgt.getPoseAmbiguity());
+            avgDist += tgt.getBestCameraToTarget().getTranslation().getNorm();
+        }
+
+        if (numTags == 0)
+            return -1.0;
+        avgDist /= numTags;
+
+        double multiBonus = (numTags >= 2) ? 2.0 : 0.0;
+        double ambiguityPenalty = (Double.isFinite(bestAmbiguity) ? bestAmbiguity : 1.0) * 2.5;
+        double distancePenalty = (avgDist * avgDist) / 9.0; // starts hurting past ~3m
+
+        double score = multiBonus - ambiguityPenalty - distancePenalty;
+        if (numTags == 1 && bestAmbiguity > 0.2)
+            score -= 2.0;
+        return score;
     }
 
     /**
