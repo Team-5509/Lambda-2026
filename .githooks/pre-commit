@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Always run from repository root.
+cd "$(git rev-parse --show-toplevel)"
+
+echo "[pre-commit] Running Gradle build..."
+./gradlew build
