@@ -21,14 +21,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
   private TalonFX intakeMoter = new TalonFX(IntakeSubsystemConstants.kIntakeMotorId);
-  private TalonFX deployIntakeMoter = new TalonFX(IntakeSubsystemConstants.kDeployIntakeMotorId);
+  private TalonFX deployIntakeMoter = new TalonFX(IntakeSubsystemConstants.kIntakeMotorId);
   
 
 
 
   /* ==================== Hardware IDs ==================== */
     private static final int Intake_MOTOR_ID = Constants.IntakeSubsystemConstants.kIntakeMotorId;
-    private static final int Deploy_Intake_MOTOR_ID = Constants.IntakeSubsystemConstants.kDeployIntakeMotorId;
+    private static final int Deploy_Intake_MOTOR_ID = Constants.IntakeSubsystemConstants.kIntakeMotorId;
   
   // Motion Magic
     private static final double MM_CRUISE_VEL = 2.0;   // rot/s
