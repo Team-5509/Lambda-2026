@@ -82,7 +82,7 @@ public class RobotContainer {
             TurretSubsystemConstants.ballSpeed);
 
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
+        autoChooser = AutoBuilder.buildAutoChooser("AutoCloseHang");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
         configureBindings();
