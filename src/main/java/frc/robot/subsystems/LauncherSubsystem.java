@@ -15,11 +15,12 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Constants.LauncherSubsystemConstants;
 
 public class LauncherSubsystem extends SubsystemBase {
 
-    private final TalonFX launcher = new TalonFX(18); // Velocity motor
-    private final TalonFX angle = new TalonFX(19); 
+    private final TalonFX launcher = new TalonFX(LauncherSubsystemConstants.kLauncherMotorId); // Velocity motor
+    private final TalonFX angle = new TalonFX(LauncherSubsystemConstants.kLauncher2MotorId); 
     
 
     public LauncherSubsystem() {
