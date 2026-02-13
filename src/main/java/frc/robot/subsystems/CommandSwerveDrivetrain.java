@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Constants.Constants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import java.util.function.Supplier;
 
@@ -180,6 +181,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     }
     SmartDashboard.putNumber("Rotation, Robot", getState().Pose.getRotation().getDegrees());
+    boolean inBumpZone = isRobotInBumpZone(getState().Pose);
+    SmartDashboard.putBoolean("PoseTrust/InBumpZone", inBumpZone);
+    SmartDashboard.putNumber("PoseTrust/VisionStdDevScale", getVisionStdDevScale(inBumpZone));
   }
 
   private void startSimThread() {
@@ -231,10 +235,40 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
+    Pose2d cur = getState().Pose;
+    boolean inBumpZone = isRobotInBumpZone(cur);
+    visionMeasurementStdDevs = visionMeasurementStdDevs.times(getVisionStdDevScale(inBumpZone));
+
+    boolean auton = DriverStation.isAutonomousEnabled();
+
+    if (auton) {
+      // --- Hard reject obviously wrong measurements (prevents "teleporting") ---
+      double posJump = cur.getTranslation().getDistance(visionRobotPoseMeters.getTranslation());
+      double headingJumpDeg =
+          Math.abs(cur.getRotation().minus(visionRobotPoseMeters.getRotation()).getDegrees());
+
+      if (posJump > kAutonMaxVisionJumpMeters || headingJumpDeg > kAutonMaxVisionHeadingJumpDeg) {
+        return; // reject this update
+      }
+
+      // --- Trust odom more in auton by inflating vision measurement noise ---
+      visionMeasurementStdDevs = visionMeasurementStdDevs.times(kAutonVisionInflation);
+    }
+
     super.addVisionMeasurement(
         visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
         //visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
 
+  }
+
+  private boolean isRobotInBumpZone(Pose2d poseMeters) {
+    return Constants.PoseTrust.isInAnyBump(poseMeters.getTranslation());
+  }
+
+  private double getVisionStdDevScale(boolean inBumpZone) {
+    return inBumpZone
+        ? Constants.PoseTrust.kVisionStdDevScaleInsideBump
+        : Constants.PoseTrust.kVisionStdDevScaleOutsideBump;
   }
 
   public void addFakeVisionReading() {
