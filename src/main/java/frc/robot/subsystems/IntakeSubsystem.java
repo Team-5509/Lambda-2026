@@ -10,7 +10,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.units.Units;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -38,20 +37,24 @@ public class IntakeSubsystem extends SubsystemBase {
   // Intake Speed
   private double speed = 100.0;
   private double speedIncrement = 10.0;
+  // Intake positions (rotations)
+  private double deployPosition = 0.0;
+  private double retractPosition = 0.0;
+  private double deployIncrement = 5;
+
     /* ==================== Hardware ==================== */
   private TalonFX intakeMotor = new TalonFX(IntakeSubsystemConstants.kIntakeMotorId);
   
   private final MotionMagicVelocityVoltage motionMagic = new MotionMagicVelocityVoltage(0);
 
-  // Position control helper: we provide incremental commands to nudge the deploy position.
-  private double deployPositionIncrement = 0.05; // rotations per increment
-
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
-    configureMotor();
+    configureIntakeMotor();
+    configureDeployMotor();
   }
 
-  private void configureMotor() {
+  //configures velocity controlled motor
+  private void configureIntakeMotor() {
     TalonFXConfiguration config = new TalonFXConfiguration();
 
     /* ---- Motion Magic ---- */
@@ -71,10 +74,97 @@ public class IntakeSubsystem extends SubsystemBase {
 
     
     intakeMotor.getConfigurator().apply(config);
-    // Also configure the deploy motor for MotionMagic position control
+  }
+  
+  //configures posistion controlled moter
+private void configureDeployMotor() {
+    TalonFXConfiguration config = new TalonFXConfiguration();
+
+    /* ---- Motion Magic ---- */
+    config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL;
+    config.MotionMagic.MotionMagicAcceleration = MM_ACCEL;
+    config.MotionMagic.MotionMagicJerk = MM_JERK;
+
+        /* ---- PID ---- */
+        config.Slot0.kP = 60.0;
+        config.Slot0.kI = 0.0;
+        config.Slot0.kD = 5.0;
+        config.Slot0.kV = 0.0;
+
+                /* ---- Motor ---- */
+        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+    
     deployIntakeMoter.getConfigurator().apply(config);
   }
   
+  
+/**
+   * Command that stops the kicker motor with magic motion (closed loop control).
+   *
+   * @return a command
+   */
+  public Command StopIntakeMM() {
+    return runOnce(() -> {
+      intakeMotor.setControl(
+          motionMagic.withVelocity(0)
+              .withSlot(0));
+    });
+  }
+
+  /**
+   * Command that runs the kicker motor with magic motion (closed loop control) at
+   * speed from constants.
+   *
+   * @return a command
+   */
+  public Command RunIntakeMM() {
+    return runOnce(() -> {
+      intakeMotor.setControl(
+          motionMagic.withVelocity(speed)
+              .withSlot(0));
+    });
+  }
+
+  /**
+   * Command that runs the kicker motor with magic motion (closed loop control) at
+   * Supplied speed.
+   *
+   * @return a command
+   */
+  public Command RunIntakeMM(DoubleSupplier velocityRPS) {
+    return runOnce(() -> {
+      intakeMotor.setControl(
+          motionMagic.withVelocity(velocityRPS.getAsDouble())
+              .withSlot(0));
+    });
+  }
+
+  public Command DeployIntakeMM() {
+    return runOnce(() -> {
+      MotionMagicVoltage pos = new MotionMagicVoltage(0);
+      pos.withPosition(deployPosition).withSlot(0);
+      deployIntakeMoter.setControl(pos);
+    });
+  }
+
+   public Command RetractIntakeMM() {
+    return runOnce(() -> {
+      MotionMagicVoltage pos = new MotionMagicVoltage(0);
+      pos.withPosition(retractPosition).withSlot(0);
+      deployIntakeMoter.setControl(pos);
+    });
+  }
+
+public Command DeployIntakeMM(DoubleSupplier position) {
+    return runOnce(() -> {
+      MotionMagicVoltage pos = new MotionMagicVoltage(0);
+      pos.withPosition(position.getAsDouble()).withSlot(0);
+      deployIntakeMoter.setControl(pos);
+    });
+  }
+
   /**
    * Command that runs the intake motor at a certain speed.
    *
@@ -150,40 +240,33 @@ public class IntakeSubsystem extends SubsystemBase {
         });
   }
 
-  /**
-   * Set the deploy motor to a target position (in rotations) using MotionMagic position control.
+    /**
+   * Command that increments speed up by certain value.
+   *
+   * @return a command
    */
-  public void setDeployPosition(double targetRotations) {
-    MotionMagicVoltage posRequest = new MotionMagicVoltage(0);
-    posRequest.withPosition(targetRotations);
-    deployIntakeMoter.setControl(posRequest);
+  public Command IncrementDeployPositionUp() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          /* one-time action goes here */
+         deployPosition = deployPosition + deployIncrement;
+        });
   }
-
-  /**
-   * Command that moves the deploy intake to a specified target (single-shot).
+    /**
+   * Command that increments speed up by certain value.
+   *
+   * @return a command
    */
-  public Command MoveDeployToPositionCommand(DoubleSupplier target) {
-    return runOnce(() -> setDeployPosition(target.getAsDouble()));
-  }
-
-  /**
-   * Command that moves the deploy intake up by a small increment (relative to current position).
-   */
-  public Command MoveDeployIncrementUpCommand() {
-    return runOnce(() -> {
-      double current = deployIntakeMoter.getPosition().getValue().in(Units.Rotations);
-      setDeployPosition(current + deployPositionIncrement);
-    });
-  }
-
-  /**
-   * Command that moves the deploy intake down by a small increment (relative to current position).
-   */
-  public Command MoveDeployIncrementDownCommand() {
-    return runOnce(() -> {
-      double current = deployIntakeMoter.getPosition().getValue().in(Units.Rotations);
-      setDeployPosition(current - deployPositionIncrement);
-    });
+  public Command IncrementDeployPositionDown() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          /* one-time action goes here */
+         deployPosition = deployPosition - deployIncrement;
+        });
   }
 
   /**

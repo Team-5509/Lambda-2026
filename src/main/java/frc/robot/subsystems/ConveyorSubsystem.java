@@ -60,6 +60,47 @@ public class ConveyorSubsystem extends SubsystemBase {
     conveyorMotor.getConfigurator().apply(config);
   }
 
+/**
+   * Command that stops the kicker motor with magic motion (closed loop control).
+   *
+   * @return a command
+   */
+  public Command StopConveyorMM() {
+    return runOnce(() -> {
+      conveyorMotor.setControl(
+          motionMagic.withVelocity(0)
+              .withSlot(0));
+    });
+  }
+
+  /**
+   * Command that runs the kicker motor with magic motion (closed loop control) at
+   * speed from constants.
+   *
+   * @return a command
+   */
+  public Command RunConveyorMM() {
+    return runOnce(() -> {
+      conveyorMotor.setControl(
+          motionMagic.withVelocity(speed)
+              .withSlot(0));
+    });
+  }
+
+  /**
+   * Command that runs the kicker motor with magic motion (closed loop control) at
+   * Supplied speed.
+   *
+   * @return a command
+   */
+  public Command RunConveyorMM(DoubleSupplier velocityRPS) {
+    return runOnce(() -> {
+      conveyorMotor.setControl(
+          motionMagic.withVelocity(velocityRPS.getAsDouble())
+              .withSlot(0));
+    });
+  }
+
   /**
    * Command that runs the conveyor motor at a certain speed.
    *

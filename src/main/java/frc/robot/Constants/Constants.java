@@ -14,6 +14,7 @@ public class Constants {
     // Intake
     public static final class IntakeSubsystemConstants {
         public static final int kIntakeMotorId = 14;
+        public static final int kDeployIntakeMotorId = 21;
 
     }
 

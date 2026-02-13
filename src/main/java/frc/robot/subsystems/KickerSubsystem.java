@@ -93,10 +93,10 @@ public class KickerSubsystem extends SubsystemBase {
    *
    * @return a command
    */
-  public Command RunKickerMM(double velocityRPS) {
+  public Command RunKickerMM(DoubleSupplier velocityRPS) {
     return runOnce(() -> {
       kickerMotor.setControl(
-          motionMagic.withVelocity(velocityRPS)
+          motionMagic.withVelocity(velocityRPS.getAsDouble())
               .withSlot(0));
     });
   }

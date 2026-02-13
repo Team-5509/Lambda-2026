@@ -36,7 +36,7 @@ public class RobotContainer {
     private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
     private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
     private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
-    private final LauncherSubsystem m_launcherSubsystem = new LauncherSubsystem();
+    //private final LauncherSubsystem m_launcherSubsystem = new LauncherSubsystem();
  // CCW+, field-relative
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -141,15 +141,28 @@ public class RobotContainer {
                 .whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0).withVelocityY(0.5)));
 
         // Aux driver controls
-        auxXbox.b().onTrue(m_conveyorSubsystem.RunConveyorCommand());
-        auxXbox.x().onTrue(m_conveyorSubsystem.StopConveyorCommand());
-        auxXbox.povRight().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedUp());
-        auxXbox.povLeft().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedDown());
 
-        auxXbox.a().onTrue(m_kickerSubsystem.RunKickerCommand());
-        auxXbox.y().onTrue(m_kickerSubsystem.StopKickerCommand());
-        auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp());
-        auxXbox.povDown().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown());
+        //Conveyor
+        auxXbox.b().onTrue(m_conveyorSubsystem.RunConveyorMM());
+        auxXbox.x().onTrue(m_conveyorSubsystem.StopConveyorMM());
+        auxXbox.povRight().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedUp().andThen(m_conveyorSubsystem.RunConveyorMM()));
+        auxXbox.povLeft().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedDown().andThen(m_conveyorSubsystem.RunConveyorMM()));
+
+        //Kicker
+        auxXbox.a().onTrue(m_kickerSubsystem.RunKickerMM());
+        auxXbox.y().onTrue(m_kickerSubsystem.StopKickerMM());
+        auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp().andThen(m_kickerSubsystem.RunKickerMM()));
+        auxXbox.povDown().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown().andThen(m_kickerSubsystem.RunKickerMM()));
+
+        //Intake
+        auxXbox.rightBumper().onTrue(m_intakeSubsystem.RunIntakeMM());
+        auxXbox.leftBumper().onTrue(m_intakeSubsystem.StopIntakeMM());
+        auxXbox.povUp().onTrue(m_intakeSubsystem.IncrementIntakeSpeedUp().andThen(m_intakeSubsystem.RunIntakeMM()));
+        auxXbox.povDown().onTrue(m_intakeSubsystem.IncrementIntakeSpeedDown().andThen(m_intakeSubsystem.RunIntakeMM()));
+        auxXbox.a().onTrue(m_intakeSubsystem.DeployIntakeMM());
+        auxXbox.y().onTrue(m_intakeSubsystem.RetractIntakeMM());
+        auxXbox.povUp().onTrue(m_intakeSubsystem.IncrementDeployPositionUp().andThen(m_intakeSubsystem.DeployIntakeMM()));
+        auxXbox.povDown().onTrue(m_intakeSubsystem.IncrementDeployPositionDown().andThen(m_intakeSubsystem.DeployIntakeMM()));
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode) is applied to the drive motors while disabled.
