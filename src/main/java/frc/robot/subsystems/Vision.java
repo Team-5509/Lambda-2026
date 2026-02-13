@@ -47,7 +47,6 @@ import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
@@ -86,7 +85,6 @@ public class Vision extends SubsystemBase {
          camera = new PhotonCamera(kCameraName);
  
          photonEstimator = new PhotonPoseEstimator(kTagLayout, kRobotToCam);
-        //  photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
  
          // ----- Simulation
          if (Robot.isSimulation()) {
