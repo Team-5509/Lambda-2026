@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.Algorithms.ShootingArc;
 import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.commands.TrackFieldPoseCommand;
 import frc.robot.generated.TunerConstants;
@@ -145,43 +146,74 @@ public class RobotContainer {
 
         // Aux driver controls
 
-        //Conveyor
-        auxXbox.b().onTrue(m_conveyorSubsystem.RunConveyorMM());
-        auxXbox.x().onTrue(m_conveyorSubsystem.StopConveyorMM());
-        auxXbox.povRight().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedUp().andThen(m_conveyorSubsystem.RunConveyorMM()));
-        auxXbox.povLeft().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedDown().andThen(m_conveyorSubsystem.RunConveyorMM()));
+        // //Conveyor
+        // auxXbox.b().onTrue(m_conveyorSubsystem.RunConveyorMM());
+        // auxXbox.x().onTrue(m_conveyorSubsystem.StopConveyorMM());
+        // auxXbox.povRight().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedUp().andThen(m_conveyorSubsystem.RunConveyorMM()));
+        // auxXbox.povLeft().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedDown().andThen(m_conveyorSubsystem.RunConveyorMM()));
 
-        //Kicker
-        auxXbox.a().onTrue(m_kickerSubsystem.RunKickerMM());
-        auxXbox.y().onTrue(m_kickerSubsystem.StopKickerMM());
-        auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp().andThen(m_kickerSubsystem.RunKickerMM()));
-        auxXbox.povDown().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown().andThen(m_kickerSubsystem.RunKickerMM()));
+        // //Kicker
+        // auxXbox.a().onTrue(m_kickerSubsystem.RunKickerMM());
+        // auxXbox.y().onTrue(m_kickerSubsystem.StopKickerMM());
+        // auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp().andThen(m_kickerSubsystem.RunKickerMM()));
+        // auxXbox.povDown().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown().andThen(m_kickerSubsystem.RunKickerMM()));
 
-        //Intake Speed
-        auxXbox.rightBumper().onTrue(m_intakeSubsystem.RunIntakeMM());
-        auxXbox.leftBumper().onTrue(m_intakeSubsystem.StopIntakeMM());
-        auxXbox.povUp().onTrue(m_intakeSubsystem.IncrementIntakeSpeedUp().andThen(m_intakeSubsystem.RunIntakeMM()));
-        auxXbox.povDown().onTrue(m_intakeSubsystem.IncrementIntakeSpeedDown().andThen(m_intakeSubsystem.RunIntakeMM()));
-        //Intake Deployment
-        auxXbox.a().onTrue(m_intakeSubsystem.DeployIntakeMM(null));
-        auxXbox.y().onTrue(m_intakeSubsystem.RetractIntakeMM(null));
+        // //Intake Speed
+        // auxXbox.rightBumper().onTrue(m_intakeSubsystem.RunIntakeMM());
+        // auxXbox.leftBumper().onTrue(m_intakeSubsystem.StopIntakeMM());
+        // auxXbox.povUp().onTrue(m_intakeSubsystem.IncrementIntakeSpeedUp().andThen(m_intakeSubsystem.RunIntakeMM()));
+        // auxXbox.povDown().onTrue(m_intakeSubsystem.IncrementIntakeSpeedDown().andThen(m_intakeSubsystem.RunIntakeMM()));
+        // //Intake Deployment
+        // auxXbox.a().onTrue(m_intakeSubsystem.DeployIntakeMM(null));
+        // auxXbox.y().onTrue(m_intakeSubsystem.RetractIntakeMM(null));
 
-        //Launcher shooting
-        auxXbox.rightTrigger().onTrue(m_launcherSubsystem.RunLauncherMM());
-        auxXbox.leftTrigger().onTrue(m_launcherSubsystem.StopLauncherMM());
-        auxXbox.povUp().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp().andThen(m_launcherSubsystem.RunLauncherMM()));
-        auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown().andThen(m_launcherSubsystem.RunLauncherMM()));
+        // //Launcher shooting
+        // auxXbox.rightTrigger().onTrue(m_launcherSubsystem.RunLauncherMM());
+        // auxXbox.leftTrigger().onTrue(m_launcherSubsystem.StopLauncherMM());
+        // auxXbox.povUp().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp().andThen(m_launcherSubsystem.RunLauncherMM()));
+        // auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown().andThen(m_launcherSubsystem.RunLauncherMM()));
 
-        //Hood posistion
-        auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
-        auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
-        auxXbox.povUp().onTrue(m_launcherSubsystem.MoveHoodUp().andThen(m_launcherSubsystem.ExtendHoodMM()));
-        auxXbox.povDown().onTrue(m_launcherSubsystem.MoveHoodDown().andThen(m_launcherSubsystem.RetractHoodMM()));
+        // //Hood posistion
+        // auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
+        // auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
+        // auxXbox.povUp().onTrue(m_launcherSubsystem.MoveHoodUp().andThen(m_launcherSubsystem.ExtendHoodMM()));
+        // auxXbox.povDown().onTrue(m_launcherSubsystem.MoveHoodDown().andThen(m_launcherSubsystem.RetractHoodMM()));
 
-        //climber
-        auxXbox.x().onTrue(m_climberSubsystem.ExtendClimberMM(null));
-        auxXbox.a().onTrue(m_climberSubsystem.LowerClimberMM(null));
+        // //climber
+        // auxXbox.x().onTrue(m_climberSubsystem.ExtendClimberMM(null));
+        // auxXbox.a().onTrue(m_climberSubsystem.LowerClimberMM(null));
 
+    //testing alignment with the center of the goal cone
+    auxXbox.rightTrigger().whileTrue(
+        drivetrain.applyRequest(() -> {
+            var robotPose = drivetrain.getState().Pose;
+            // Add 90 degree (pi/2 rad) counterclockwise offset to the target angle
+            var targetAngle = ShootingArc.TestShooting1.getAngle(robotPose) - Math.PI / 2.0;
+            var targetDistance = ShootingArc.TestShooting1.getDistance(robotPose);
+            var currentAngle = robotPose.getRotation().getRadians();
+            var angleError = MathUtil.angleModulus(targetAngle - currentAngle);
+
+            // More aggressive P controller + small feed to overcome stiction for faster convergence
+            double kP = 6.0; // increased proportional gain for faster response
+            double feed = 0.05 * Math.signum(angleError); // small constant feedforward
+            double rotationalSpeed = kP * angleError + feed;
+
+            // Allow a bit more top speed to reach the final position faster
+            double maxRate = MaxAngularRate * 1.5;
+            rotationalSpeed = MathUtil.clamp(rotationalSpeed, -maxRate, maxRate);
+
+            // Tighter angle tolerance: consider aligned when within ~0.57 degrees (0.01 rad)
+            if (Math.abs(angleError) < 0.01) {
+              rotationalSpeed = 0.0;
+            }
+
+            return new SwerveRequest.RobotCentric()
+                .withDriveRequestType(DriveRequestType.Velocity)
+                .withVelocityX(0) // no translation, just rotation
+                .withVelocityY(0)
+                .withRotationalRate(rotationalSpeed);
+        })
+    );
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode) is applied to the drive motors while disabled.
