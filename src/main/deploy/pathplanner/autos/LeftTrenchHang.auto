@@ -7,43 +7,49 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StartToShootMiddle"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.0
+            "pathName": "StartToLeftIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ShootToCloseWall"
+            "pathName": "IntakeMiddleleft"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Intake"
+            "pathName": "IntakeMiddleLeftToShoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CloseWallToDroper"
+            "pathName": "ShootToLeftIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DropperToClimb"
+            "pathName": "IntakeMiddleleft"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "IntakeMiddleLeftToShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ShootToClimb"
           }
         }
       ]
     }
   },
   "resetOdom": false,
-  "folder": "AutoClose",
+  "folder": "New Folder",
   "choreoAuto": false
 }
