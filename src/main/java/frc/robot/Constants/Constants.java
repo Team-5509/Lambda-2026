@@ -15,6 +15,8 @@ public class Constants {
     public static final class IntakeSubsystemConstants {
         public static final int kIntakeMotorId = 14;
         public static final int kDeployIntakeMotorId = 21;
+        // CAN ID for the absolute encoder (CANcoder) used by the deploy intake
+        public static final int kDeployIntakeEncoderId = 22;
 
     }
 
@@ -40,6 +42,7 @@ public class Constants {
     public static final class LauncherSubsystemConstants {
         public static final int kLauncherMotorId = 18;
         public static final int kHoodMotorId = 19;
+        public static final int kHoodEncoderId = 23;
     }
 
     // Climber
