@@ -31,13 +31,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "IntakeMiddleleft"
+            "pathName": "IntakeMiddleLeft2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "IntakeMiddleLeftToShoot"
+            "pathName": "IntakeMiddleLeftToShoot2"
           }
         },
         {
@@ -50,6 +50,6 @@
     }
   },
   "resetOdom": false,
-  "folder": "New Folder",
+  "folder": "LeftTrench",
   "choreoAuto": false
 }
