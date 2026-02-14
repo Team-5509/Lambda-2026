@@ -18,12 +18,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import frc.robot.Constants.CameraManager.CameraProperties;
-import frc.robot.commands.RunKicker;
+import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.RunTurret;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.Constants.CameraManager.CameraProperties;
+import frc.robot.commands.RunKicker;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
@@ -44,6 +46,7 @@ public class RobotContainer {
     private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
     private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
     private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate =
@@ -92,13 +95,15 @@ public class RobotContainer {
         Command runKicker = new RunKicker(m_kickerSubsystem);
         Command conveyorCommand = new ConveyorCommand(m_conveyorSubsystem,0.75);
         Command intakeCommand = new IntakeCommand(m_intakeSubsystem, .75);
+
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
+        // Drivetrain will execute this command periodically
     drivetrain.setDefaultCommand(
         // Drivetrain will execute this command periodically
         drivetrain.applyRequest(
             () ->
-                drive
+                    drive
                     .withVelocityX(
                         -MathUtil.applyDeadband(driverXbox.getLeftY(), 0.05)
                             * MaxSpeed) // Drive forward with negative Y (forward)
@@ -127,16 +132,17 @@ public class RobotContainer {
         );
 
     auxXbox.axisMagnitudeGreaterThan(1, 0.2).whileTrue(runTurret);
+
     auxXbox.a().whileTrue(runKicker );
     auxXbox.b().whileTrue(conveyorCommand);
 
     auxXbox.x().whileTrue(intakeCommand);
+
     // Idle while the robot is disabled. This ensures the configured
     // neutral mode) is applied to the drive motors while disabled.
     final var idle = new SwerveRequest.Idle();
     RobotModeTriggers.disabled()
         .whileTrue(drivetrain.applyRequest(() -> idle).ignoringDisable(true));
-
     drivetrain.registerTelemetry(logger::telemeterize);
   }
 
