@@ -189,7 +189,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public boolean isAtPositiveLimit() {
         return !posLimit.get();
-    }
+    } 
 
     public boolean isHomePressed() {
         return !homeSwitch.get();

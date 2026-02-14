@@ -20,6 +20,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.IntakeSubsystemConstants;
 import frc.robot.Constants.Constants.LauncherSubsystemConstants;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -29,6 +30,9 @@ public class LauncherSubsystem extends SubsystemBase {
    private static final int HOOD_MOTOR_ID = Constants.LauncherSubsystemConstants.kHoodMotorId;
     private static final int HOOD_CANCODER_ID = Constants.LauncherSubsystemConstants.kHoodEncoderId;
 
+    private static final int LIMIT_NEG_ID = 4; // -180 deg
+    private static final int LIMIT_POS_ID = 5; // +180 deg
+    private static final int HOME_SWITCH_ID = 6;
 
   private static final double MM_CRUISE_VEL = 2.0; // rot/s
   private static final double MM_ACCEL = 6.0; // rot/s^2
@@ -53,8 +57,12 @@ public class LauncherSubsystem extends SubsystemBase {
   private TalonFX launcherMotor = new TalonFX(LAUNCHER_MOTOR_ID);
   private TalonFX hoodMotor = new TalonFX(HOOD_MOTOR_ID);
 
-  private final CANcoder hoodEncoder = new CANcoder(LauncherSubsystemConstants.kHoodMotorId);
 
+    private final DigitalInput negLimit = new DigitalInput(LIMIT_NEG_ID);
+    private final DigitalInput posLimit = new DigitalInput(LIMIT_POS_ID);
+    private final DigitalInput homeSwitch = new DigitalInput(HOME_SWITCH_ID);
+
+  private final CANcoder hoodEncoder = new CANcoder(LauncherSubsystemConstants.kHoodEncoderId);
   private final MotionMagicVelocityVoltage motionMagic = new MotionMagicVelocityVoltage(0);
   private final MotionMagicVoltage motionMagicHood = new MotionMagicVoltage(0);
 
@@ -318,6 +326,24 @@ private void configureHoodMotor() {
         });
   }
 
+  public void homeHood() {
+        if (isHomePressed()) {
+            hoodMotor.setPosition(0.0);
+        }
+    }
+
+    public boolean isAtNegativeLimit() {
+        return !negLimit.get();
+    }
+
+    public boolean isAtPositiveLimit() {
+        return !posLimit.get();
+    }
+
+    public boolean isHomePressed() {
+        return !homeSwitch.get();
+    }
+
   /**
    * An example method querying a boolean state of the subsystem (for example, a
    * digital sensor).
@@ -332,6 +358,10 @@ private void configureHoodMotor() {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    // Optional: auto-zero if home switch hit
+        if (isHomePressed()) {
+            hoodMotor.setPosition(0.0);
+        }
   }
 
   @Override

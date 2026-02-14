@@ -34,6 +34,11 @@ public class IntakeSubsystem extends SubsystemBase {
     private static final int Intake_MOTOR_ID = Constants.IntakeSubsystemConstants.kIntakeMotorId;
     private static final int Deploy_Intake_MOTOR_ID = Constants.IntakeSubsystemConstants.kDeployIntakeMotorId;
     private static final int INTAKE_CANCODER_ID = Constants.IntakeSubsystemConstants.kDeployIntakeEncoderId;
+
+    private static final int LIMIT_NEG_ID = 5; // -180 deg
+    private static final int LIMIT_POS_ID = 6; // +180 deg
+    private static final int HOME_SWITCH_ID = 7;
+
   // Motion Magic
     private static final double MM_CRUISE_VEL = 2.0;   // rot/s
     private static final double MM_ACCEL      = 6.0;   // rot/s^2
@@ -49,6 +54,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     /* ==================== Hardware ==================== */
   private TalonFX intakeMotor = new TalonFX(IntakeSubsystemConstants.kIntakeMotorId);
+
+  private final DigitalInput negLimit = new DigitalInput(LIMIT_NEG_ID);
+    private final DigitalInput posLimit = new DigitalInput(LIMIT_POS_ID);
+    private final DigitalInput homeSwitch = new DigitalInput(HOME_SWITCH_ID);
   // Absolute encoder (CANcoder) used for deploy position feedback
   private final CANcoder deployEncoder = new CANcoder(IntakeSubsystemConstants.kDeployIntakeEncoderId);
   
@@ -289,9 +298,31 @@ private void configureDeployMotor() {
     return false;
   }
 
+  public void homeHood() {
+        if (isHomePressed()) {
+            deployIntakeMoter.setPosition(0.0);
+        }
+    }
+
+  public boolean isAtNegativeLimit() {
+        return !negLimit.get();
+    }
+
+    public boolean isAtPositiveLimit() {
+        return !posLimit.get();
+    }
+
+    public boolean isHomePressed() {
+        return !homeSwitch.get();
+    }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+     // Optional: auto-zero if home switch hit
+        if (isHomePressed()) {
+            deployIntakeMoter.setPosition(0.0);
+        }
   }
 
   @Override
