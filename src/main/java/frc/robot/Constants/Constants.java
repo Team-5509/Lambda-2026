@@ -47,7 +47,7 @@ public class Constants {
 
     // Climber
     public static final class ClimberSubsystemConstants {
-        private static final int kClimberMotorId = 20;
+        public static final int kClimberMotorId = 20;
     }
 
 }
