@@ -29,16 +29,16 @@ public class IntakeCommand extends Command {
   public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    m_subsystem.setIntakeMotor(m_speed);
-  }
+  // @Override
+  // public void execute() {
+  //   m_subsystem.setIntakeMotor(m_speed);
+  // }
 
   // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    m_subsystem.setIntakeMotor(0);
-  }
+  // @Override
+  // public void end(boolean interrupted) {
+  //   m_subsystem.setIntakeMotor(0);
+  // }
 
   // Returns true when the command should end.
   @Override
