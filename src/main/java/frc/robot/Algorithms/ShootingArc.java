@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class ShootingArc {
     public class Constants {
         public static final double GoalConeX = 158.32 *0.0254;
-        public static final double GoalConeY = 181.56 * 0.0254;
+        public static final double GoalConeY = 181.56 *0.0254;
         
     
     }
@@ -26,7 +26,7 @@ public class ShootingArc {
             double dx= Constants.GoalConeX-robotPose.getX();
             double dy= Constants.GoalConeY-robotPose.getY();
             double angle = Math.atan2(dy, dx);
-            SmartDashboard.putNumber("ShootingArc", angle);
+            SmartDashboard.putNumber("ShootingArc", Math.toDegrees(angle));
             return angle;
             
         }
