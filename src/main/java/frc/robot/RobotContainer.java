@@ -22,10 +22,12 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.commands.TrackFieldPoseCommand;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.KickerSubsystem;
+import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.Constants.Constants.TurretSubsystemConstants;
@@ -36,7 +38,8 @@ public class RobotContainer {
     private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
     private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
     private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
-    //private final LauncherSubsystem m_launcherSubsystem = new LauncherSubsystem();
+    private final LauncherSubsystem m_launcherSubsystem = new LauncherSubsystem();
+    private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
  // CCW+, field-relative
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -160,10 +163,25 @@ public class RobotContainer {
         auxXbox.povUp().onTrue(m_intakeSubsystem.IncrementIntakeSpeedUp().andThen(m_intakeSubsystem.RunIntakeMM()));
         auxXbox.povDown().onTrue(m_intakeSubsystem.IncrementIntakeSpeedDown().andThen(m_intakeSubsystem.RunIntakeMM()));
         //Intake Deployment
-        auxXbox.a().onTrue(m_intakeSubsystem.DeployIntakeMM());
-        auxXbox.y().onTrue(m_intakeSubsystem.RetractIntakeMM());
-        auxXbox.povUp().onTrue(m_intakeSubsystem.IncrementDeployPositionUp().andThen(m_intakeSubsystem.DeployIntakeMM()));
-        auxXbox.povDown().onTrue(m_intakeSubsystem.IncrementDeployPositionDown().andThen(m_intakeSubsystem.DeployIntakeMM()));
+        auxXbox.a().onTrue(m_intakeSubsystem.DeployIntakeMM(null));
+        auxXbox.y().onTrue(m_intakeSubsystem.RetractIntakeMM(null));
+
+        //Launcher shooting
+        auxXbox.rightTrigger().onTrue(m_launcherSubsystem.RunLauncherMM());
+        auxXbox.leftTrigger().onTrue(m_launcherSubsystem.StopLauncherMM());
+        auxXbox.povUp().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp().andThen(m_launcherSubsystem.RunLauncherMM()));
+        auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown().andThen(m_launcherSubsystem.RunLauncherMM()));
+
+        //Hood posistion
+        auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
+        auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
+        auxXbox.povUp().onTrue(m_launcherSubsystem.MoveHoodUp().andThen(m_launcherSubsystem.ExtendHoodMM()));
+        auxXbox.povDown().onTrue(m_launcherSubsystem.MoveHoodDown().andThen(m_launcherSubsystem.RetractHoodMM()));
+
+        //climber
+        auxXbox.x().onTrue(m_climberSubsystem.ExtendClimberMM(null));
+        auxXbox.a().onTrue(m_climberSubsystem.LowerClimberMM(null));
+
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode) is applied to the drive motors while disabled.

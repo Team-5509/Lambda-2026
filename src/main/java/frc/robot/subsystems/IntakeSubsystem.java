@@ -6,16 +6,21 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.*;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.IntakeSubsystemConstants;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -28,7 +33,9 @@ public class IntakeSubsystem extends SubsystemBase {
   /* ==================== Hardware IDs ==================== */
     private static final int Intake_MOTOR_ID = Constants.IntakeSubsystemConstants.kIntakeMotorId;
     private static final int Deploy_Intake_MOTOR_ID = Constants.IntakeSubsystemConstants.kDeployIntakeMotorId;
-  
+    private static final int INTAKE_CANCODER_ID = Constants.IntakeSubsystemConstants.kDeployIntakeEncoderId;
+
+
   // Motion Magic
     private static final double MM_CRUISE_VEL = 2.0;   // rot/s
     private static final double MM_ACCEL      = 6.0;   // rot/s^2
@@ -37,20 +44,24 @@ public class IntakeSubsystem extends SubsystemBase {
   // Intake Speed
   private double speed = 100.0;
   private double speedIncrement = 10.0;
-  // Intake positions (rotations)
-  private double deployPosition = 0.0;
-  private double retractPosition = 0.0;
-  private double deployIncrement = 5;
+
+  private static final double MIN_INTAKE_ROT = -0.5;
+    private static final double MAX_INTAKE_ROT = 0.5;
+  
 
     /* ==================== Hardware ==================== */
   private TalonFX intakeMotor = new TalonFX(IntakeSubsystemConstants.kIntakeMotorId);
+  // Absolute encoder (CANcoder) used for deploy position feedback
+  private final CANcoder deployEncoder = new CANcoder(IntakeSubsystemConstants.kDeployIntakeEncoderId);
   
   private final MotionMagicVelocityVoltage motionMagic = new MotionMagicVelocityVoltage(0);
+  private final MotionMagicVoltage motionMagicPosistion = new MotionMagicVoltage(0);
 
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
     configureIntakeMotor();
     configureDeployMotor();
+    configureEncoder();
   }
 
   //configures velocity controlled motor
@@ -76,27 +87,51 @@ public class IntakeSubsystem extends SubsystemBase {
     intakeMotor.getConfigurator().apply(config);
   }
   
+  //configures absolute encoder
+ private void configureEncoder() {
+        CANcoderConfiguration config = new CANcoderConfiguration();
+
+        // CANcoder always reports ±0.5 rotations (±180°) in Phoenix 6
+        config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+
+        deployEncoder.getConfigurator().apply(config);
+    }
+
   //configures posistion controlled moter
 private void configureDeployMotor() {
-    TalonFXConfiguration config = new TalonFXConfiguration();
+  // Configure TalonFX to use the CANcoder as its remote feedback device
+  TalonFXConfiguration config = new TalonFXConfiguration();
 
-    /* ---- Motion Magic ---- */
-    config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL;
-    config.MotionMagic.MotionMagicAcceleration = MM_ACCEL;
-    config.MotionMagic.MotionMagicJerk = MM_JERK;
 
-        /* ---- PID ---- */
-        config.Slot0.kP = 60.0;
-        config.Slot0.kI = 0.0;
-        config.Slot0.kD = 5.0;
-        config.Slot0.kV = 0.0;
+  
+  /* ---- Feedback ---- */
+  config.Feedback.FeedbackRemoteSensorID = INTAKE_CANCODER_ID;
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        config.Feedback.SensorToMechanismRatio = 1.0;
 
-                /* ---- Motor ---- */
-        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+  /* ---- Motion Magic ---- */
+  config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL;
+  config.MotionMagic.MotionMagicAcceleration = MM_ACCEL;
+  config.MotionMagic.MotionMagicJerk = MM_JERK;
 
-    
-    deployIntakeMoter.getConfigurator().apply(config);
+  /* ---- PID ---- */
+  config.Slot0.kP = 60.0;
+  config.Slot0.kI = 0.0;
+  config.Slot0.kD = 5.0;
+  config.Slot0.kV = 0.0;
+
+  /* ---- Soft Limits ---- */
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAX_INTAKE_ROT;
+
+        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MIN_INTAKE_ROT;
+
+  /* ---- Motor ---- */
+  config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+  config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+  deployIntakeMoter.getConfigurator().apply(config);
   }
   
   
@@ -141,45 +176,32 @@ private void configureDeployMotor() {
     });
   }
 
+
   /**
-   * Command that sets the deployIntake motor deployed posistion with magic motion 
-   * (closed loop control) using posistion variable.
-   *
-   * @return a command
-   */
-  public Command DeployIntakeMM() {
+     * Command that sets the intake position with magic motion (closed loop
+     * control).
+     *
+     * @return a command
+     */
+  public Command DeployIntakeMM(DoubleSupplier positionSupplier) {
     return runOnce(() -> {
-      MotionMagicVoltage pos = new MotionMagicVoltage(0);
-      pos.withPosition(deployPosition).withSlot(0);
-      deployIntakeMoter.setControl(pos);
+      deployIntakeMoter.setControl(
+          motionMagicPosistion.withPosition(positionSupplier.getAsDouble())
+              .withSlot(0));
     });
   }
 
   /**
-   * Command that sets the deployIntake motor retracted posistion with magic motion 
-   * (closed loop control) using posistion variable.
-   *
-   * @return a command
-   */
-   public Command RetractIntakeMM() {
+     * Command that sets the intake position with magic motion (closed loop
+     * control).
+     *
+     * @return a command
+     */
+  public Command RetractIntakeMM(DoubleSupplier positionSupplier) {
     return runOnce(() -> {
-      MotionMagicVoltage pos = new MotionMagicVoltage(0);
-      pos.withPosition(retractPosition).withSlot(0);
-      deployIntakeMoter.setControl(pos);
-    });
-  }
-
-  /**
-   * Command that runs the deployIntake motor deployed posistion with magic motion 
-   * (closed loop control) to supplied posistion.
-   *
-   * @return a command
-   */
-public Command DeployIntakeMM(DoubleSupplier position) {
-    return runOnce(() -> {
-      MotionMagicVoltage pos = new MotionMagicVoltage(0);
-      pos.withPosition(position.getAsDouble()).withSlot(0);
-      deployIntakeMoter.setControl(pos);
+      deployIntakeMoter.setControl(
+          motionMagicPosistion.withPosition(positionSupplier.getAsDouble())
+              .withSlot(0));
     });
   }
 
@@ -258,34 +280,6 @@ public Command DeployIntakeMM(DoubleSupplier position) {
         });
   }
 
-    /**
-   * Command that increments speed up by certain value.
-   *
-   * @return a command
-   */
-  public Command IncrementDeployPositionUp() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-         deployPosition = deployPosition + deployIncrement;
-        });
-  }
-    /**
-   * Command that increments speed up by certain value.
-   *
-   * @return a command
-   */
-  public Command IncrementDeployPositionDown() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-         deployPosition = deployPosition - deployIncrement;
-        });
-  }
 
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).
@@ -297,9 +291,11 @@ public Command DeployIntakeMM(DoubleSupplier position) {
     return false;
   }
 
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+      
   }
 
   @Override

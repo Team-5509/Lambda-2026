@@ -4,78 +4,368 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import java.util.function.DoubleSupplier;
+
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-//import com.ctre.phoenix6.signals.MotorTypeValue;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Constants;
+import frc.robot.Constants.Constants.IntakeSubsystemConstants;
 import frc.robot.Constants.Constants.LauncherSubsystemConstants;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LauncherSubsystem extends SubsystemBase {
+  /* ==================== Hardware IDs ==================== */
+  private static final int LAUNCHER_MOTOR_ID = Constants.LauncherSubsystemConstants.kLauncherMotorId;
+   private static final int HOOD_MOTOR_ID = Constants.LauncherSubsystemConstants.kHoodMotorId;
+    private static final int HOOD_CANCODER_ID = Constants.LauncherSubsystemConstants.kHoodEncoderId;
 
-    private final TalonFX launcher = new TalonFX(LauncherSubsystemConstants.kLauncherMotorId); // Velocity motor
-    private final TalonFX angle = new TalonFX(LauncherSubsystemConstants.kHoodMotorId); 
-    
+    private static final int LIMIT_NEG_ID = 4; // -180 deg
+    private static final int LIMIT_POS_ID = 5; // +180 deg
+    private static final int HOME_SWITCH_ID = 6;
 
-    public LauncherSubsystem() {
-       TalonFXConfiguration config = new TalonFXConfiguration();
+  private static final double MM_CRUISE_VEL = 2.0; // rot/s
+  private static final double MM_ACCEL = 6.0; // rot/s^2
+  private static final double MM_JERK = 60.0; // rot/s^3
+ 
+  private static final double MM_CRUISE_VEL_HOOD = 2.0; // rot/s
+  private static final double MM_ACCEL_HOOD = 6.0; // rot/s^2
+  private static final double MM_JERK_HOOD = 60.0; // rot/s^3
 
-    /* Feedback */
-    config.Feedback.SensorToMechanismRatio = 1.0;
+  // Launcher Speed
+  private double speed = 100.0;
+  private double speedIncrement = 10.0;
 
-    /* Velocity PID */
-    config.Slot0.kP = 0.3;
+   private static final double MIN_HOOD_ROT = -0.5;
+   private static final double MAX_HOOD_ROT = 0.5;
+
+  private double retractPosistion = 0;
+  private double extendPosistion = 0.5;
+  private double posistionIncrement = .05;
+
+  /* ==================== Hardware ==================== */
+  private TalonFX launcherMotor = new TalonFX(LAUNCHER_MOTOR_ID);
+  private TalonFX hoodMotor = new TalonFX(HOOD_MOTOR_ID);
+
+
+    private final DigitalInput negLimit = new DigitalInput(LIMIT_NEG_ID);
+    private final DigitalInput posLimit = new DigitalInput(LIMIT_POS_ID);
+    private final DigitalInput homeSwitch = new DigitalInput(HOME_SWITCH_ID);
+
+  private final CANcoder hoodEncoder = new CANcoder(LauncherSubsystemConstants.kHoodEncoderId);
+  private final MotionMagicVelocityVoltage motionMagic = new MotionMagicVelocityVoltage(0);
+  private final MotionMagicVoltage motionMagicHood = new MotionMagicVoltage(0);
+
+  /** Creates a new ExampleSubsystem. */
+  public LauncherSubsystem() {
+    configureEncoder();
+    configureHoodMotor();
+    configureMotor();
+  }
+
+  private void configureMotor() {
+    TalonFXConfiguration config = new TalonFXConfiguration();
+
+    /* ---- Motion Magic ---- */
+    config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL;
+    config.MotionMagic.MotionMagicAcceleration = MM_ACCEL;
+    config.MotionMagic.MotionMagicJerk = MM_JERK;
+
+    /* ---- PID ---- */
+    config.Slot0.kP = 60.0;
     config.Slot0.kI = 0.0;
-    config.Slot0.kD = 0.0;
-    config.Slot0.kV = 0.11;
+    config.Slot0.kD = 5.0;
+    config.Slot0.kV = 0.0;
 
-    /* Motion Magic */
-    config.MotionMagic.MotionMagicAcceleration = 60.0;
-    config.MotionMagic.MotionMagicJerk = 300.0;
+    /* ---- Motor ---- */
+    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-    /* Current Limits (safe for Kraken) */
-    CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
-    currentLimits.StatorCurrentLimit = 40;
-    currentLimits.StatorCurrentLimitEnable = true;
-    currentLimits.SupplyCurrentLimit = 20;
-    currentLimits.SupplyCurrentLimitEnable = true;
-    config.CurrentLimits = currentLimits;
+    launcherMotor.getConfigurator().apply(config);
+  }
 
-    launcher.getConfigurator().apply(config);
-    angle.getConfigurator().apply(config);
+ //configures absolute encoder
+ private void configureEncoder() {
+        CANcoderConfiguration config = new CANcoderConfiguration();
+
+        // CANcoder always reports ±0.5 rotations (±180°) in Phoenix 6
+        config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+
+        hoodEncoder.getConfigurator().apply(config);
     }
 
-   
-     public void setLauncherVelocity(double velocityRps) {
-        MotionMagicVelocityVoltage velRequest = new MotionMagicVelocityVoltage(0);
-        velRequest.withVelocity(velocityRps);
-        launcher.setControl(velRequest);
+   //configures posistion controlled moter
+private void configureHoodMotor() {
+  // Configure TalonFX to use the CANcoder as its remote feedback device
+  TalonFXConfiguration config = new TalonFXConfiguration();
+
+
+  
+  /* ---- Feedback ---- */
+  config.Feedback.FeedbackRemoteSensorID = HOOD_CANCODER_ID;
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        config.Feedback.SensorToMechanismRatio = 1.0; //TODO set ratio
+
+  /* ---- Motion Magic ---- */
+  config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL_HOOD;
+  config.MotionMagic.MotionMagicAcceleration = MM_ACCEL_HOOD;
+  config.MotionMagic.MotionMagicJerk = MM_JERK_HOOD;
+
+  /* ---- PID ---- */
+  config.Slot0.kP = 60.0;
+  config.Slot0.kI = 0.0;
+  config.Slot0.kD = 5.0;
+  config.Slot0.kV = 0.0;
+
+  /* ---- Soft Limits ---- */
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAX_HOOD_ROT;
+
+        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MIN_HOOD_ROT;
+
+  /* ---- Motor ---- */
+  config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+  config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+  hoodMotor.getConfigurator().apply(config);
+  }
+
+  /**
+   * Command that stops the launcher motor with magic motion (closed loop control).
+   *
+   * @return a command
+   */
+  public Command StopLauncherMM() {
+    return runOnce(() -> {
+      launcherMotor.setControl(
+          motionMagic.withVelocity(0)
+              .withSlot(0));
+    });
+  }
+
+  /**
+   * Command that runs the launcher motor with magic motion (closed loop control) at
+   * speed from constants.
+   *
+   * @return a command
+   */
+  public Command RunLauncherMM() {
+    return runOnce(() -> {
+      launcherMotor.setControl(
+          motionMagic.withVelocity(speed)
+              .withSlot(0));
+    });
+  }
+
+  /**
+   * Command that runs the launcher motor with magic motion (closed loop control) at
+   * Supplied speed.
+   *
+   * @return a command
+   */
+  public Command RunLauncherMM(DoubleSupplier velocityRPS) {
+    return runOnce(() -> {
+      launcherMotor.setControl(
+          motionMagic.withVelocity(velocityRPS.getAsDouble())
+              .withSlot(0));
+    });
+  }
+
+    /**
+   * Command Retracts the hood with magic motion (closed loop control)
+   *
+   * @return a command
+   */
+  public Command RetractHoodMM() {
+    return runOnce(() -> {
+      hoodMotor.setControl(
+          motionMagicHood.withPosition(retractPosistion)
+              .withSlot(0));
+    });
+  }
+
+   /**
+   * Command Extends the hood with magic motion (closed loop control)
+   *
+   * @return a command
+   */
+  public Command ExtendHoodMM() {
+    return runOnce(() -> {
+      hoodMotor.setControl(
+          motionMagicHood.withPosition(extendPosistion)
+              .withSlot(0));
+    });
+  }
+
+  /**
+   * Command that moves posistion down by certain value.
+   *
+   * @return a command
+   */
+  public Command MoveHoodDown() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          /* one-time action goes here */
+          retractPosistion = retractPosistion - posistionIncrement;
+        });
+  }
+
+  /**
+   * Command that moves posistion down by certain value.
+   *
+   * @return a command
+   */
+  public Command MoveHoodUp() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          /* one-time action goes here */
+          extendPosistion = extendPosistion + posistionIncrement;
+        });
+  }
+
+/**
+   * Command extends the hood with magic motion (closed loop control)
+   *
+   * @return a command
+   */
+  public Command ExtendHoodMM(DoubleSupplier posistionSupplier) {
+    return runOnce(() -> {
+      hoodMotor.setControl(
+          motionMagicHood.withPosition(posistionSupplier.getAsDouble())
+              .withSlot(0));
+    });
+  }
+
+  /**
+   * Command that runs the launcher motor at a certain speed.
+   *
+   * @return a command
+   */
+  public Command RunLauncherCommand() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          /* one-time action goes here */
+          launcherMotor.set(speed);
+        });
+  }
+
+  /**
+   * Command that stops the launcher motor at 0 speed.
+   *
+   * @return a command
+   */
+  public Command StopLauncherCommand() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          /* one-time action goes here */
+          launcherMotor.set(0);
+        });
+  }
+
+  /**
+   * Command that stops the launcher motor at 0 speed.
+   *
+   * @return a command
+   */
+  public Command SetLauncherSpeedCommand(DoubleSupplier setSpeed) {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          /* one-time action goes here */
+          speed = setSpeed.getAsDouble();
+        });
+  }
+
+  /**
+   * Command that increments speed up by certain value.
+   *
+   * @return a command
+   */
+  public Command IncrementLauncherSpeedUp() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          /* one-time action goes here */
+          speed = speed + speedIncrement;
+        });
+  }
+
+  /**
+   * Command that increments speed down by certain value.
+   *
+   * @return a command
+   */
+  public Command IncrementLauncherSpeedDown() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implicitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          /* one-time action goes here */
+          speed = speed - speedIncrement;
+        });
+  }
+
+  public void homeHood() {
+        if (isHomePressed()) {
+            hoodMotor.setPosition(0.0);
+        }
     }
 
-    public void setAnglePosition(double targetRotations) {
-        MotionMagicVoltage posRequest = new MotionMagicVoltage(0);
-        posRequest.withPosition(targetRotations);
-        angle.setControl(posRequest);
+    public boolean isAtNegativeLimit() {
+        return !negLimit.get();
     }
 
-    
-
-    public void stop() {
-        launcher.stopMotor();
-        angle.stopMotor();
+    public boolean isAtPositiveLimit() {
+        return !posLimit.get();
     }
 
-    public double getLauncherVelocity() {
-        return launcher.getVelocity().getValueAsDouble();
+    public boolean isHomePressed() {
+        return !homeSwitch.get();
     }
 
-    public double getAngleVelocity() {
-        return angle.getVelocity().getValueAsDouble();
-    }
+  /**
+   * An example method querying a boolean state of the subsystem (for example, a
+   * digital sensor).
+   *
+   * @return value of some boolean subsystem state, such as a digital sensor.
+   */
+  public boolean LauncherCondition() {
+    // Query some boolean state, such as a digital sensor.
+    return false;
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    // Optional: auto-zero if home switch hit
+        if (isHomePressed()) {
+            hoodMotor.setPosition(0.0);
+        }
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    // This method will be called once per scheduler run during simulation
+  }
 }
