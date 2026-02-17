@@ -187,9 +187,11 @@ public class RobotContainer {
         driverXbox.rightTrigger().whileTrue(
         drivetrain.applyRequest(() -> {
             var robotPose = drivetrain.getState().Pose;
+
+            ShootingArc shootingAlgo = new ShootingArc();
             // Add 90 degree (pi/2 rad) counterclockwise offset to the target angle
-            var targetAngle = ShootingArc.TestShooting1.getAngle(robotPose);
-            var targetDistance = ShootingArc.TestShooting1.getDistance(robotPose);
+            var targetAngle = shootingAlgo.getYawToHub(robotPose);
+            var targetDistance = shootingAlgo.getDistanceToHub(robotPose);
             var currentAngle = robotPose.getRotation().getRadians();
             var angleError = MathUtil.angleModulus(targetAngle - currentAngle);
 
