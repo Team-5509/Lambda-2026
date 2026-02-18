@@ -34,7 +34,7 @@ public class ClimberSubsystem extends SubsystemBase {
   /* ==================== Hardware ==================== */
   private TalonFX climberMotor = new TalonFX(CLIMBER_MOTOR_ID);
 
-  private final MotionMagicVoltage motionMagic = new MotionMagicVoltage(0);
+  private final MotionMagicVoltage motionMagic = new MotionMagicVoltage(0).withEnableFOC(true);
 
   /** Creates a new ExampleSubsystem. */
   public ClimberSubsystem() {
