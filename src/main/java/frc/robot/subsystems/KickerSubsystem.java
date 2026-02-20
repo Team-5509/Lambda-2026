@@ -48,10 +48,11 @@ public class KickerSubsystem extends SubsystemBase {
     config.MotionMagic.MotionMagicJerk = MM_JERK;
 
     /* ---- PID ---- */
-    config.Slot0.kP = 60.0;
+    config.Slot0.kP = 0.36;//60.0;
     config.Slot0.kI = 0.0;
-    config.Slot0.kD = 5.0;
-    config.Slot0.kV = 0.0;
+    config.Slot0.kD = 0.0; //5.0;
+    config.Slot0.kV = 0.145;//0.0;
+    config.Slot0.kA = 0.15;
 
     /* ---- Motor ---- */
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
