@@ -5,45 +5,128 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "TrackHub"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "StartToLeftIntake"
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "IntakeMiddleleft"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "RunIntake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "IntakeMiddleleft"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "sequential",
           "data": {
-            "pathName": "IntakeMiddleLeftToShoot"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "IntakeMiddleLeftToShoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ShootToLeftIntake2"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "ShootToLeftIntake"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "RunIntake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "IntakeMiddleLeft2"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "sequential",
           "data": {
-            "pathName": "IntakeMiddleLeft2"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "IntakeMiddleLeftToShoot2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "sequential",
           "data": {
-            "pathName": "IntakeMiddleLeftToShoot2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ShootToClimb"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ShootToClimb"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ExtendClimber"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 2.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LowerClimber"
+                }
+              }
+            ]
           }
         }
       ]
