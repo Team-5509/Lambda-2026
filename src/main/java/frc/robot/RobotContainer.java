@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.commands.TrackFieldPoseCommand;
+import frc.robot.commands.TrackTargetCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -122,6 +123,9 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         NamedCommands.registerCommand("ExtendHood", m_launcherSubsystem.ExtendHoodMM());
         NamedCommands.registerCommand("RetractHood", m_launcherSubsystem.RetractHoodMM());
         NamedCommands.registerCommand("MoveTurret", m_turretSubsystem.SetTurretPositionMM(null));
+        NamedCommands.registerCommand("Shoot", new Shoot(m_conveyorSubsystem, m_launcherSubsystem, m_kickerSubsystem));
+        NamedCommands.registerCommand("TrackHome", trackBlueHome);
+        NamedCommands.registerCommand("TrackHub", trackBlueHub);
 
         configureBindings();
 
