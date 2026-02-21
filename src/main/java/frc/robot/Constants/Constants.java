@@ -39,7 +39,7 @@ public class Constants {
 
         public static final int kTurretMotorId = 17;
         public static final Double ballSpeed = 22.0;
-    }8
+    }
 
     // Launcher
     public static final class LauncherSubsystemConstants {

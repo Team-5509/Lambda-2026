@@ -102,6 +102,29 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
 
             TurretSubsystemConstants.ballSpeed);
 
+                Command trackRedHub = new TrackFieldPoseCommand(
+            m_turretSubsystem,
+            // Supplier<Pose2d>
+            () -> drivetrain.getState().Pose,
+            // Supplier<Translation2d> (FIELD-RELATIVE)
+            this::getFieldRelativeVelocity,
+
+            TurretSubsystemConstants.redHubPose,
+
+            TurretSubsystemConstants.ballSpeed);
+
+                Command trackRedHome = new TrackFieldPoseCommand(
+            m_turretSubsystem,
+            // Supplier<Pose2d>
+            () -> drivetrain.getState().Pose,
+            // Supplier<Translation2d> (FIELD-RELATIVE)
+            this::getFieldRelativeVelocity,
+
+            TurretSubsystemConstants.redHomePose,
+
+            TurretSubsystemConstants.ballSpeed);
+
+
 
     public RobotContainer() {
         autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
@@ -123,9 +146,11 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         NamedCommands.registerCommand("ExtendHood", m_launcherSubsystem.ExtendHoodMM());
         NamedCommands.registerCommand("RetractHood", m_launcherSubsystem.RetractHoodMM());
         NamedCommands.registerCommand("MoveTurret", m_turretSubsystem.SetTurretPositionMM(null));
-        NamedCommands.registerCommand("Shoot", new Shoot(m_conveyorSubsystem, m_launcherSubsystem, m_kickerSubsystem));
+        NamedCommands.registerCommand("Shoot", shoot);
         NamedCommands.registerCommand("TrackHome", trackBlueHome);
         NamedCommands.registerCommand("TrackHub", trackBlueHub);
+        NamedCommands.registerCommand("TrackRedHome", trackRedHome);
+        NamedCommands.registerCommand("TrackRedHub", trackRedHub);
 
         configureBindings();
 
