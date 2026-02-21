@@ -3,32 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.735791726105562,
-        "y": 4.520199714693296
+        "x": 7.7265763195435095,
+        "y": 4.481383737517832
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.800485021398002,
-        "y": 7.314950071326677
+        "x": 8.25706134094151,
+        "y": 7.923067047075605
       },
       "isLocked": false,
-      "linkedName": "PostIntakeMiddleLeft2"
-    },
-    {
-      "anchor": {
-        "x": 5.41055634807418,
-        "y": 7.392582025677603
-      },
-      "prevControl": {
-        "x": 5.863409415121256,
-        "y": 7.431398002853067
-      },
-      "nextControl": {
-        "x": 4.828156522879309,
-        "y": 7.3426620406609
-      },
-      "isLocked": false,
-      "linkedName": null
+      "linkedName": "PostIntakeMiddleleft"
     },
     {
       "anchor": {
@@ -36,8 +20,8 @@
         "y": 7.392582025677603
       },
       "prevControl": {
-        "x": 4.37546362339515,
-        "y": 7.340827389443652
+        "x": 5.3329243937232516,
+        "y": 7.250256776034237
       },
       "nextControl": null,
       "isLocked": false,
@@ -64,7 +48,7 @@
   "folder": "LeftTrench",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -89.97465448378381
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

@@ -11,9 +11,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "sequential",
           "data": {
-            "pathName": "IntakeMiddleleft"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "IntakeMiddleleft"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": null
+                }
+              }
+            ]
           }
         },
         {
