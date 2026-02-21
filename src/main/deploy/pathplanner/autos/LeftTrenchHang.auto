@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StartToLeftIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "IntakeMiddleleft"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "IntakeMiddleLeftToShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ShootToLeftIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "IntakeMiddleleft"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "IntakeMiddleLeftToShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ShootToClimb"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": "New Folder",
+  "choreoAuto": false
+}
