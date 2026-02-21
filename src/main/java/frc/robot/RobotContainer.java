@@ -6,10 +6,13 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
+
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.commands.TrackFieldPoseCommand;
+import frc.robot.commands.TrackTargetCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -35,12 +39,13 @@ import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 
 public class RobotContainer {
-    private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
+private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
     private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
     private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
     private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
     private final LauncherSubsystem m_launcherSubsystem = new LauncherSubsystem();
     private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
+    
  // CCW+, field-relative
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -101,6 +106,26 @@ public class RobotContainer {
     public RobotContainer() {
         autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
         SmartDashboard.putData("Auto Mode", autoChooser);
+
+                // Register named commands after subsystem fields have been initialized
+        NamedCommands.registerCommand("RunLauncher", m_launcherSubsystem.RunLauncherMM());
+        NamedCommands.registerCommand("StopLauncher", m_launcherSubsystem.StopLauncherMM());
+        NamedCommands.registerCommand("RunIntake", m_intakeSubsystem.RunIntakeMM());
+        NamedCommands.registerCommand("StopIntake", m_intakeSubsystem.StopIntakeMM());
+        NamedCommands.registerCommand("DeployIntake", m_intakeSubsystem.DeployIntakeMM(null));
+        NamedCommands.registerCommand("RetractIntake", m_intakeSubsystem.RetractIntakeMM(null));
+        NamedCommands.registerCommand("RunConveyor", m_conveyorSubsystem.RunConveyorMM());
+        NamedCommands.registerCommand("StopConveyor", m_conveyorSubsystem.StopConveyorMM());
+        NamedCommands.registerCommand("RunKicker", m_kickerSubsystem.RunKickerMM());
+        NamedCommands.registerCommand("StopKicker", m_kickerSubsystem.StopKickerMM());
+        NamedCommands.registerCommand("ExtendClimber", m_climberSubsystem.ExtendClimberMM(null));
+        NamedCommands.registerCommand("LowerClimber", m_climberSubsystem.LowerClimberMM(null));
+        NamedCommands.registerCommand("ExtendHood", m_launcherSubsystem.ExtendHoodMM());
+        NamedCommands.registerCommand("RetractHood", m_launcherSubsystem.RetractHoodMM());
+        NamedCommands.registerCommand("MoveTurret", m_turretSubsystem.SetTurretPositionMM(null));
+        NamedCommands.registerCommand("Shoot", new Shoot(m_conveyorSubsystem, m_launcherSubsystem, m_kickerSubsystem));
+        NamedCommands.registerCommand("TrackHome", trackBlueHome);
+        NamedCommands.registerCommand("TrackHub", trackBlueHub);
 
         configureBindings();
 
