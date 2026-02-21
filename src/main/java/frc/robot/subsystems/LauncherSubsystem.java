@@ -82,10 +82,10 @@ public class LauncherSubsystem extends SubsystemBase {
     config.MotionMagic.MotionMagicJerk = MM_JERK;
 
     /* ---- PID ---- */
-    config.Slot0.kP = 60.0;
+    config.Slot0.kP = 0;//60.0;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 5.0;
-    config.Slot0.kV = 0.0;
+    config.Slot0.kV = 0.125;//0.0;
 
     /* ---- Motor ---- */
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
