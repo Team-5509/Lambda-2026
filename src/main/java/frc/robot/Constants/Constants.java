@@ -34,9 +34,12 @@ public class Constants {
     public static final class TurretSubsystemConstants {
         public static final Translation2d blueHubPose = new Translation2d(4.1275, 4.62); // example field coords
         public static final Translation2d blueHomePose = new Translation2d(2, 3); // example field coords
+        public static final Translation2d redHubPose = new Translation2d(null,null); // example field coords
+        public static final Translation2d redHomePose = new Translation2d(null,null); // example field coords
+
         public static final int kTurretMotorId = 17;
         public static final Double ballSpeed = 22.0;
-    }
+    }8
 
     // Launcher
     public static final class LauncherSubsystemConstants {
