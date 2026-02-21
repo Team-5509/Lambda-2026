@@ -6,10 +6,13 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
+
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.commands.TrackFieldPoseCommand;
+import frc.robot.commands.TrackTargetCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -29,17 +33,19 @@ import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.Shoot;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 
 public class RobotContainer {
-    private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
+private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
     private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
     private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
     private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
     private final LauncherSubsystem m_launcherSubsystem = new LauncherSubsystem();
     private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
+    
  // CCW+, field-relative
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -73,20 +79,78 @@ public class RobotContainer {
 
     // This command will track the robot's pose on the field using vision
     // measurements and drive the turret to point at the hub
-    Command trackHub = new TrackFieldPoseCommand(
+    Command shoot = new Shoot(m_conveyorSubsystem, m_launcherSubsystem, m_kickerSubsystem);
+    Command trackBlueHub = new TrackFieldPoseCommand(
             m_turretSubsystem,
             // Supplier<Pose2d>
             () -> drivetrain.getState().Pose,
             // Supplier<Translation2d> (FIELD-RELATIVE)
             this::getFieldRelativeVelocity,
 
-            TurretSubsystemConstants.hubPose,
+            TurretSubsystemConstants.blueHubPose,
 
             TurretSubsystemConstants.ballSpeed);
+
+                Command trackBlueHome = new TrackFieldPoseCommand(
+            m_turretSubsystem,
+            // Supplier<Pose2d>
+            () -> drivetrain.getState().Pose,
+            // Supplier<Translation2d> (FIELD-RELATIVE)
+            this::getFieldRelativeVelocity,
+
+            TurretSubsystemConstants.blueHomePose,
+
+            TurretSubsystemConstants.ballSpeed);
+
+                Command trackRedHub = new TrackFieldPoseCommand(
+            m_turretSubsystem,
+            // Supplier<Pose2d>
+            () -> drivetrain.getState().Pose,
+            // Supplier<Translation2d> (FIELD-RELATIVE)
+            this::getFieldRelativeVelocity,
+
+            TurretSubsystemConstants.redHubPose,
+
+            TurretSubsystemConstants.ballSpeed);
+
+                Command trackRedHome = new TrackFieldPoseCommand(
+            m_turretSubsystem,
+            // Supplier<Pose2d>
+            () -> drivetrain.getState().Pose,
+            // Supplier<Translation2d> (FIELD-RELATIVE)
+            this::getFieldRelativeVelocity,
+
+            TurretSubsystemConstants.redHomePose,
+
+            TurretSubsystemConstants.ballSpeed);
+
+
 
     public RobotContainer() {
         autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
         SmartDashboard.putData("Auto Mode", autoChooser);
+
+                // Register named commands after subsystem fields have been initialized
+        NamedCommands.registerCommand("RunLauncher", m_launcherSubsystem.RunLauncherMM());
+        NamedCommands.registerCommand("StopLauncher", m_launcherSubsystem.StopLauncherMM());
+        NamedCommands.registerCommand("RunIntake", m_intakeSubsystem.RunIntakeMM());
+        NamedCommands.registerCommand("StopIntake", m_intakeSubsystem.StopIntakeMM());
+        NamedCommands.registerCommand("DeployIntake", m_intakeSubsystem.DeployIntakeMM(null));
+        NamedCommands.registerCommand("RetractIntake", m_intakeSubsystem.RetractIntakeMM(null));
+        NamedCommands.registerCommand("RunConveyor", m_conveyorSubsystem.RunConveyorMM());
+        NamedCommands.registerCommand("StopConveyor", m_conveyorSubsystem.StopConveyorMM());
+        NamedCommands.registerCommand("RunKicker", m_kickerSubsystem.RunKickerMM());
+        NamedCommands.registerCommand("StopKicker", m_kickerSubsystem.StopKickerMM());
+        NamedCommands.registerCommand("ExtendClimber", m_climberSubsystem.ExtendClimberMM(null));
+        NamedCommands.registerCommand("LowerClimber", m_climberSubsystem.LowerClimberMM(null));
+        NamedCommands.registerCommand("ExtendHood", m_launcherSubsystem.ExtendHoodMM());
+        NamedCommands.registerCommand("RetractHood", m_launcherSubsystem.RetractHoodMM());
+        NamedCommands.registerCommand("MoveTurret", m_turretSubsystem.SetTurretPositionMM(null));
+        NamedCommands.registerCommand("Shoot", shoot);
+        NamedCommands.registerCommand("TrackHome", trackBlueHome);
+        NamedCommands.registerCommand("TrackHub", trackBlueHub);
+        NamedCommands.registerCommand("TrackRedHome", trackRedHome);
+        NamedCommands.registerCommand("TrackRedHub", trackRedHub);
 
         configureBindings();
 
@@ -128,7 +192,7 @@ public class RobotContainer {
                                 .withRotationalRate(
                                         -MathUtil.applyDeadband(driverXbox.getRightX(), 0.05)
                                                 * MaxAngularRate) // Drive counterclockwise with negative X (left)
-                ).andThen(trackHub));
+                ).andThen(trackBlueHub));
 
         driverXbox.y().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
         driverXbox.x().whileTrue(drivetrain.applyRequest(() -> brake));
@@ -144,43 +208,18 @@ public class RobotContainer {
                 .whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0).withVelocityY(0.5)));
 
         // Aux driver controls
-
-        //Conveyor
-        auxXbox.b().onTrue(m_conveyorSubsystem.RunConveyorMM());
-        auxXbox.x().onTrue(m_conveyorSubsystem.StopConveyorMM());
-        auxXbox.povRight().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedUp().andThen(m_conveyorSubsystem.RunConveyorMM()));
-        auxXbox.povLeft().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedDown().andThen(m_conveyorSubsystem.RunConveyorMM()));
-
-        //Kicker
-        auxXbox.a().onTrue(m_kickerSubsystem.RunKickerMM());
-        auxXbox.y().onTrue(m_kickerSubsystem.StopKickerMM());
-        auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp().andThen(m_kickerSubsystem.RunKickerMM()));
-        auxXbox.povDown().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown().andThen(m_kickerSubsystem.RunKickerMM()));
-
-        //Intake Speed
-        auxXbox.rightBumper().onTrue(m_intakeSubsystem.RunIntakeMM());
-        auxXbox.leftBumper().onTrue(m_intakeSubsystem.StopIntakeMM());
-        auxXbox.povUp().onTrue(m_intakeSubsystem.IncrementIntakeSpeedUp().andThen(m_intakeSubsystem.RunIntakeMM()));
-        auxXbox.povDown().onTrue(m_intakeSubsystem.IncrementIntakeSpeedDown().andThen(m_intakeSubsystem.RunIntakeMM()));
-        //Intake Deployment
-        auxXbox.a().onTrue(m_intakeSubsystem.DeployIntakeMM(null));
-        auxXbox.y().onTrue(m_intakeSubsystem.RetractIntakeMM(null));
-
-        //Launcher shooting
-        auxXbox.rightTrigger().onTrue(m_launcherSubsystem.RunLauncherMM());
-        auxXbox.leftTrigger().onTrue(m_launcherSubsystem.StopLauncherMM());
-        auxXbox.povUp().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp().andThen(m_launcherSubsystem.RunLauncherMM()));
-        auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown().andThen(m_launcherSubsystem.RunLauncherMM()));
-
-        //Hood posistion
-        auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
-        auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
-        auxXbox.povUp().onTrue(m_launcherSubsystem.MoveHoodUp().andThen(m_launcherSubsystem.ExtendHoodMM()));
-        auxXbox.povDown().onTrue(m_launcherSubsystem.MoveHoodDown().andThen(m_launcherSubsystem.RetractHoodMM()));
-
-        //climber
-        auxXbox.x().onTrue(m_climberSubsystem.ExtendClimberMM(null));
-        auxXbox.a().onTrue(m_climberSubsystem.LowerClimberMM(null));
+        //auxXbox.y().whileTrue(m_conveyorSubsystem.RunConveyorMM());
+        //auxXbox.axisMagnitudeGreaterThan(3 ,.2 ).whileTrue(m_kickerSubsystem.RunKickerMM());
+        auxXbox.rightBumper().whileTrue(m_intakeSubsystem.RunIntakeMM());
+        auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM(null));
+        //auxXbox.rightTrigger().whileTrue(m_launcherSubsystem.RunLauncherMM());
+        //auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
+        //auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
+        auxXbox.a().onTrue(trackBlueHub);
+        auxXbox.b().onTrue(trackBlueHome);
+        auxXbox.axisMagnitudeGreaterThan(4, .2).whileTrue(shoot);
+        auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(null));
+        auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(null));
 
 
         // Idle while the robot is disabled. This ensures the configured
