@@ -184,14 +184,14 @@ public class RobotContainer {
         // auxXbox.a().onTrue(m_climberSubsystem.LowerClimberMM(null));
 
     //testing alignment with the center of the goal cone
-        driverXbox.rightTrigger().whileTrue(
+        driverXbox.x().whileTrue(
         drivetrain.applyRequest(() -> {
             var robotPose = drivetrain.getState().Pose;
 
             ShootingArc shootingAlgo = new ShootingArc();
-            // Add 90 degree (pi/2 rad) counterclockwise offset to the target angle
-            var targetAngle = shootingAlgo.getYawToHub(robotPose);
-            var targetDistance = shootingAlgo.getDistanceToHub(robotPose);
+            var hub = shootingAlgo.getHubTranslation();
+            var robotPos = robotPose.getTranslation();
+            var targetAngle = Math.atan2(hub.getY() - robotPos.getY(), hub.getX() - robotPos.getX());
             var currentAngle = robotPose.getRotation().getRadians();
             var angleError = MathUtil.angleModulus(targetAngle - currentAngle);
 
