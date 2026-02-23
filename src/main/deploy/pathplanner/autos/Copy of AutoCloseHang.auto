@@ -91,25 +91,6 @@
               }
             ]
           }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "ExtendClimber"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "LowerClimber"
-                }
-              }
-            ]
-          }
         }
       ]
     }
