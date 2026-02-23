@@ -1,0 +1,81 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+<<<<<<<< HEAD:src/main/deploy/pathplanner/paths/StartToLeftIntake.path
+        "x": 3.896733238231098,
+        "y": 7.35376604850214
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.10002853067047,
+        "y": 7.41845934379458
+========
+        "x": 2.9392724679029953,
+        "y": 7.392582025677603
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.9392724679029953,
+        "y": 7.392582025677603
+>>>>>>>> origin/Autonomous_Commands:src/main/deploy/pathplanner/paths/ShootToLeftIntake.path
+      },
+      "isLocked": false,
+      "linkedName": "ShootLeft"
+    },
+    {
+      "anchor": {
+<<<<<<<< HEAD:src/main/deploy/pathplanner/paths/StartToLeftIntake.path
+        "x": 7.7265763195435095,
+        "y": 6.7974037089871615
+      },
+      "prevControl": {
+        "x": 7.403109843081312,
+        "y": 7.392582025677603
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "IntakeMiddleLeft"
+========
+        "x": 8.735791726105562,
+        "y": 6.810342368045649
+      },
+      "prevControl": {
+        "x": 8.20530670470756,
+        "y": 7.573723252496434
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "IntakeMiddleLeft2"
+>>>>>>>> origin/Autonomous_Commands:src/main/deploy/pathplanner/paths/ShootToLeftIntake.path
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -88.35539730243757
+  },
+  "reversed": false,
+  "folder": "LeftTrench",
+  "idealStartingState": {
+    "velocity": 0,
+<<<<<<<< HEAD:src/main/deploy/pathplanner/paths/StartToLeftIntake.path
+    "rotation": -1.6846843178961792
+========
+    "rotation": 137.02136494035605
+>>>>>>>> origin/Autonomous_Commands:src/main/deploy/pathplanner/paths/ShootToLeftIntake.path
+  },
+  "useDefaultConstraints": true
+}

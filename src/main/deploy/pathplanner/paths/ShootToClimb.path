@@ -1,0 +1,76 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+<<<<<<<< HEAD:src/main/deploy/pathplanner/paths/ShootToClimb.path
+        "x": 2.9392724679029953,
+        "y": 7.392582025677603
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.525235378031383,
+        "y": 6.745649072753209
+      },
+      "isLocked": false,
+      "linkedName": "ShootLeft"
+    },
+    {
+      "anchor": {
+        "x": 0.7785164051355205,
+        "y": 4.895420827389444
+      },
+      "prevControl": {
+        "x": 1.347817403708987,
+        "y": 5.477660485021398
+========
+        "x": 0.49835463895903087,
+        "y": 0.6547662623497366
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.307392567036465,
+        "y": 1.4468312436747146
+      },
+      "isLocked": false,
+      "linkedName": "Dropper"
+    },
+    {
+      "anchor": {
+        "x": 1.6562899828484468,
+        "y": 3.7055813912004476
+      },
+      "prevControl": {
+        "x": 1.7230385164051354,
+        "y": 3.174579172610556
+>>>>>>>> origin/Autonomous_Commands:src/main/deploy/pathplanner/paths/DropperToClimb.path
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Climb"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 1.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 89.20611007673205
+  },
+  "reversed": false,
+  "folder": "LeftTrench",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 137.02136494035605
+  },
+  "useDefaultConstraints": true
+}

@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.0,
-        "y": 0.0
+        "x": 8.735791726105562,
+        "y": 4.520199714693296
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.0,
-        "y": 0.0
+        "x": 8.800485021398002,
+        "y": 7.314950071326677
+      },
+      "isLocked": false,
+      "linkedName": "PostIntakeMiddleLeft2"
+    },
+    {
+      "anchor": {
+        "x": 5.41055634807418,
+        "y": 7.392582025677603
+      },
+      "prevControl": {
+        "x": 5.863409415121256,
+        "y": 7.431398002853067
+      },
+      "nextControl": {
+        "x": 4.828156522879309,
+        "y": 7.3426620406609
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 6.0
+        "x": 2.9392724679029953,
+        "y": 7.392582025677603
       },
       "prevControl": {
-        "x": 3.0,
-        "y": 6.0
+        "x": 4.37546362339515,
+        "y": 7.340827389443652
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "ShootLeft"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +58,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 137.02136494035605
   },
   "reversed": false,
-  "folder": null,
+  "folder": "LeftTrench",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -89.97465448378381
   },
   "useDefaultConstraints": true
 }

@@ -82,10 +82,10 @@ public class LauncherSubsystem extends SubsystemBase {
     config.MotionMagic.MotionMagicJerk = MM_JERK;
 
     /* ---- PID ---- */
-    config.Slot0.kP = 60.0;
+    config.Slot0.kP = 0;//60.0;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 5.0;
-    config.Slot0.kV = 0.0;
+    config.Slot0.kV = 0.125;//0.0;
 
     /* ---- Motor ---- */
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -113,8 +113,9 @@ private void configureHoodMotor() {
   
   /* ---- Feedback ---- */
   config.Feedback.FeedbackRemoteSensorID = HOOD_CANCODER_ID;
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        config.Feedback.SensorToMechanismRatio = 1.0; //TODO set ratio
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+        config.Feedback.RotorToSensorRatio = 1;
+        config.Feedback.SensorToMechanismRatio = 144;
 
   /* ---- Motion Magic ---- */
   config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL_HOOD;
@@ -122,10 +123,10 @@ private void configureHoodMotor() {
   config.MotionMagic.MotionMagicJerk = MM_JERK_HOOD;
 
   /* ---- PID ---- */
-  config.Slot0.kP = 60.0;
+  config.Slot0.kP = 0;//60.0;
   config.Slot0.kI = 0.0;
-  config.Slot0.kD = 5.0;
-  config.Slot0.kV = 0.0;
+  config.Slot0.kD = 0;//5.0;
+  config.Slot0.kV = 1;//0.0;
 
   /* ---- Soft Limits ---- */
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
