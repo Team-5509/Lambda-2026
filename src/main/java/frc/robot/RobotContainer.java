@@ -85,48 +85,16 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
     // This command will track the robot's pose on the field using vision
     // measurements and drive the turret to point at the hub
     Command shoot = new Shoot(m_conveyorSubsystem, m_launcherSubsystem, m_kickerSubsystem);
-    Command trackBlueHub = new TrackFieldPoseCommand(
+    Command track = new TrackFieldPoseCommand(
             m_turretSubsystem,
             // Supplier<Pose2d>
             () -> drivetrain.getState().Pose,
             // Supplier<Translation2d> (FIELD-RELATIVE)
             this::getFieldRelativeVelocity,
-
-            TurretSubsystemConstants.blueHubPose,
-
-            TurretSubsystemConstants.ballSpeed);
-
-                Command trackBlueHome = new TrackFieldPoseCommand(
-            m_turretSubsystem,
-            // Supplier<Pose2d>
-            () -> drivetrain.getState().Pose,
-            // Supplier<Translation2d> (FIELD-RELATIVE)
-            this::getFieldRelativeVelocity,
-
-            TurretSubsystemConstants.blueHomePose,
-
-            TurretSubsystemConstants.ballSpeed);
-
-                Command trackRedHub = new TrackFieldPoseCommand(
-            m_turretSubsystem,
-            // Supplier<Pose2d>
-            () -> drivetrain.getState().Pose,
-            // Supplier<Translation2d> (FIELD-RELATIVE)
-            this::getFieldRelativeVelocity,
-
-            TurretSubsystemConstants.redHubPose,
-
-            TurretSubsystemConstants.ballSpeed);
-
-                Command trackRedHome = new TrackFieldPoseCommand(
-            m_turretSubsystem,
-            // Supplier<Pose2d>
-            () -> drivetrain.getState().Pose,
-            // Supplier<Translation2d> (FIELD-RELATIVE)
-            this::getFieldRelativeVelocity,
-
-            TurretSubsystemConstants.redHomePose,
-
+        
+            
+            //TurretSubsystemConstants.blueHubPose,
+        
             TurretSubsystemConstants.ballSpeed);
 
 
@@ -152,10 +120,9 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         NamedCommands.registerCommand("RetractHood", m_launcherSubsystem.RetractHoodMM());
         NamedCommands.registerCommand("MoveTurret", m_turretSubsystem.SetTurretPositionMM(null));
         NamedCommands.registerCommand("Shoot", shoot);
-        NamedCommands.registerCommand("TrackHome", trackBlueHome);
-        NamedCommands.registerCommand("TrackHub", trackBlueHub);
-        NamedCommands.registerCommand("TrackRedHome", trackRedHome);
-        NamedCommands.registerCommand("TrackRedHub", trackRedHub);
+        NamedCommands.registerCommand("TrackHome", track);
+
+
 
         configureBindings();
 
@@ -198,7 +165,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
                                 .withRotationalRate(
                                         -MathUtil.applyDeadband(driverXbox.getRightX(), 0.05)
                                                 * MaxAngularRate) // Drive counterclockwise with negative X (left)
-                ).andThen(trackBlueHub));
+                ).andThen(track));
 
         driverXbox.rightBumper().whileTrue(
                         // Drivetrain will execute this command periodically
@@ -213,7 +180,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
                                         .withRotationalRate(
                                                 -MathUtil.applyDeadband(driverXbox.getRightX(), 0.05)
                                                         * MaxAngularRate * FinesseAngularRateMult) // Drive counterclockwise with negative X (left)
-                        ).andThen(trackBlueHub));
+                        ).andThen(track));
        
 
         driverXbox.y().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
@@ -251,8 +218,8 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         //auxXbox.rightTrigger().whileTrue(m_launcherSubsystem.RunLauncherMM());
         //auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
         //auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
-        auxXbox.a().onTrue(trackBlueHub);
-        auxXbox.b().onTrue(trackBlueHome);
+        auxXbox.a().onTrue(track);
+       
         auxXbox.axisMagnitudeGreaterThan(4, .2).whileTrue(shoot);
         auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(null));
         auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(null));

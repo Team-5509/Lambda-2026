@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+import frc.robot.Constants.Constants;
 import edu.wpi.first.wpilibj.Timer;
 
 import java.util.Optional;
@@ -43,33 +43,18 @@ public class ShootingArc {
   }
 
   // Field goal positions (meters). You already had inches->m, keep that idea.
-  public static class Constants {
-    public static final double BlueHubY = 158.32 * 0.0254;
-    public static final double BlueHubX = 181.56 * 0.0254;
-    public static final double RedHubY = 158.32 * 0.0254;
-    public static final double RedHubX = 468.56 * 0.0254;
-
-    public static final double g = 9.80665; // m/s^2
-
-    // Measure these on the robot:
-    public static final double shooterHeightM = 21.5 * 0.0254; // TODO: Measure this 21.5 in -> m
-    public static final double goalHeightM = 72.0 * 0.0254; // 72 in -> m
-    public static final double dz = goalHeightM - shooterHeightM;
-
-    //TODO: Measure this from shooter exit to robot center 
-    public static final Translation2d shooterOffsetRobot = new Translation2d(0.32, 0.18);
-  }
+  
 
   private final double hubX;
   private final double hubY;
 
   public ShootingArc() {
     if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-      hubX = Constants.RedHubX;
-      hubY = Constants.RedHubY;
+      hubX = Constants.TurretSubsystemConstants.redHubPose.getX();
+      hubY = Constants.TurretSubsystemConstants.redHubPose.getY();
     } else {
-      hubX = Constants.BlueHubX;
-      hubY = Constants.BlueHubY;
+      hubX = Constants.TurretSubsystemConstants.blueHubPose.getX();
+      hubY = Constants.TurretSubsystemConstants.blueHubPose.getY();
     }
   }
 
@@ -81,7 +66,7 @@ public class ShootingArc {
   public Pose2d getShooterPosition(Pose2d robotPose) {
     // Get shooter position in field coordinates by applying robot pose + shooter offset
     return robotPose.transformBy(
-        new Transform2d(Constants.shooterOffsetRobot, robotPose.getRotation()));
+        new Transform2d(Constants.TurretSubsystemConstants.shooterOffsetRobot, robotPose.getRotation()));
   }
 
   public Translation2d getHubTranslation() {
@@ -139,7 +124,7 @@ public class ShootingArc {
       yaw = Math.atan2(r.getY(), r.getX());
 
       double R = r.getNorm(); // horizontal distance to cover (we're assuming flat field)
-      var pitchOpt = solvePitchNoDrag(R, Constants.dz, exitSpeedMps, preferHighArc);
+      var pitchOpt = solvePitchNoDrag(R, Constants.TurretSubsystemConstants.dz, exitSpeedMps, preferHighArc);
 
       if (pitchOpt == null) {
         // No real ballistic solution at this speed/distance
@@ -178,7 +163,7 @@ public class ShootingArc {
    * tan(theta) = (v^2 ± sqrt(v^4 - g(gR^2 + 2dz v^2))) / (gR)
    */
   private static Double solvePitchNoDrag(double R, double dz, double v, boolean highArc) {
-    double g = Constants.g;
+    double g = Constants.TurretSubsystemConstants.g;
     double v2 = v * v;
     double v4 = v2 * v2;
 
@@ -212,7 +197,7 @@ public class ShootingArc {
   public Shot solveDragShot(Pose2d robotPose, double exitSpeedMps) {
     Pose2d shooterPose = getShooterPosition(robotPose);
     double distanceM = getDistanceToHub(shooterPose);
-    return solvePitchWithQuadraticDrag(distanceM, Constants.dz, exitSpeedMps, 0.03, true);
+    return solvePitchWithQuadraticDrag(distanceM, Constants.TurretSubsystemConstants.dz, exitSpeedMps, 0.03, true);
   }
 
   /**
@@ -262,7 +247,7 @@ public class ShootingArc {
       double R = r.getNorm();
 
       // Solve drag pitch for this horizontal distance; reuse its sim flight time
-      Shot dragShot = solvePitchWithQuadraticDrag(R, Constants.dz, exitSpeedMps, 0.03, preferHighArc);
+      Shot dragShot = solvePitchWithQuadraticDrag(R, Constants.TurretSubsystemConstants.dz, exitSpeedMps, 0.03, preferHighArc);
 
       if (!dragShot.ok()) {
         SmartDashboard.putBoolean("ShootingArc/HasSolution", false);
