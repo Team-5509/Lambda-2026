@@ -46,6 +46,9 @@ public class Constants {
         public static final int kLauncherMotorId = 18;
         public static final int kHoodMotorId = 19;
         public static final int kHoodEncoderId = 23;
+        public static final double trueZero = -0.186523;
+        public static final double hoodToEncoderRatio = 0.125;
+        
     }
 
     // Climber

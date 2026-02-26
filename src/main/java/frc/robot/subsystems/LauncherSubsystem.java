@@ -13,6 +13,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -46,8 +47,8 @@ public class LauncherSubsystem extends SubsystemBase {
   private double speed = 100.0;
   private double speedIncrement = 10.0;
 
-   private static final double MIN_HOOD_ROT = -0.5;
-   private static final double MAX_HOOD_ROT = 0.5;
+   private static final double MIN_HOOD_ROT = 0.05;
+   private static final double MAX_HOOD_ROT = 1.7;
 
   private double retractPosistion = 0;
   private double extendPosistion = 0.5;
@@ -116,6 +117,7 @@ private void configureHoodMotor() {
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
         config.Feedback.RotorToSensorRatio = 1;
         config.Feedback.SensorToMechanismRatio = 144;
+        config.Feedback.FeedbackRotorOffset = 0.01;
 
   /* ---- Motion Magic ---- */
   config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL_HOOD;
@@ -123,10 +125,12 @@ private void configureHoodMotor() {
   config.MotionMagic.MotionMagicJerk = MM_JERK_HOOD;
 
   /* ---- PID ---- */
-  config.Slot0.kP = 0;//60.0;
+  config.Slot0.kP = 50;//60.0;
   config.Slot0.kI = 0.0;
   config.Slot0.kD = 0;//5.0;
   config.Slot0.kV = 1;//0.0;
+  config.Slot0.kG = -0.04;
+  config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
   /* ---- Soft Limits ---- */
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
@@ -361,7 +365,8 @@ private void configureHoodMotor() {
     // This method will be called once per scheduler run
     // Optional: auto-zero if home switch hit
         if (isHomePressed()) {
-            hoodMotor.setPosition(0.0);
+            hoodMotor.setPosition((hoodEncoder.getAbsolutePosition().getValueAsDouble()
+            -Constants.LauncherSubsystemConstants.trueZero)*1/Constants.LauncherSubsystemConstants.hoodToEncoderRatio);
         }
   }
 
