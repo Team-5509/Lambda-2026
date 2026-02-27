@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.49835463895903087,
-        "y": 7.088495141417877
+        "x": 3.560328102710413,
+        "y": 0.6774179743223976
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.4947571241868469,
-        "y": 5.979761188620239
+        "x": 4.560328102710412,
+        "y": 0.6774179743223976
       },
       "isLocked": false,
-      "linkedName": "ShootWall"
+      "linkedName": "Shooting Right"
     },
     {
       "anchor": {
-        "x": 0.49835463895903087,
-        "y": 4.928701448604934
+        "x": 8.761669044222538,
+        "y": 0.8197432239657632
       },
       "prevControl": {
-        "x": 0.49845624347750445,
-        "y": 6.017225949254433
+        "x": 7.674821683309556,
+        "y": 0.8714978601997152
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "DoneIntakeWalll"
+      "linkedName": "IntakeMiddleRight2"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "reversed": false,
-  "folder": "ClosePaths(Dont Cross Trench Line)",
+  "folder": "RightUnderTrenchPaths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

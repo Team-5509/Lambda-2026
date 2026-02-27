@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StartToLeftIntake"
+            "pathName": null
           }
         },
         {
@@ -105,7 +105,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ShootToClimb"
+                  "pathName": null
                 }
               },
               {
@@ -133,6 +133,6 @@
     }
   },
   "resetOdom": false,
-  "folder": "LeftTrench",
+  "folder": "LeftUnderTrench",
   "choreoAuto": false
 }

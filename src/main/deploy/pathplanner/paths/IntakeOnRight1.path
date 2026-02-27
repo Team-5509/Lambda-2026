@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.49835463895903087,
-        "y": 7.088495141417877
+        "x": 7.791269614835947,
+        "y": 0.832681883024252
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.4947571241868469,
-        "y": 5.979761188620239
+        "x": 7.8255952523739385,
+        "y": 1.6405726804794598
       },
       "isLocked": false,
-      "linkedName": "ShootWall"
+      "linkedName": "Pickup Far Right"
     },
     {
       "anchor": {
-        "x": 0.49835463895903087,
-        "y": 4.928701448604934
+        "x": 7.752453637660485,
+        "y": 3.6015549215406564
       },
       "prevControl": {
-        "x": 0.49845624347750445,
-        "y": 6.017225949254433
+        "x": 7.765392296718973,
+        "y": 2.074793152639088
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "DoneIntakeWalll"
+      "linkedName": "Collecting Right"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 89.72412717786717
   },
   "reversed": false,
-  "folder": "ClosePaths(Dont Cross Trench Line)",
+  "folder": "RightUnderTrenchPaths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

@@ -5,34 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "TrackHub"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "StartToShootMiddle"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Shoot"
-                }
-              }
-            ]
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "ShootToCloseWall"
+            "pathName": "StartToRightIntake"
           }
         },
         {
@@ -42,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Intake"
+                  "pathName": "IntakeOnRight1"
                 }
               },
               {
@@ -55,19 +30,25 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CloseWallToDroper"
+                  "pathName": "CollectToShoot1"
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "Shoot"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ShootToRightIntake2"
                 }
               }
             ]
@@ -80,22 +61,28 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DropperToClimb"
+                  "pathName": "IntakeOnRight2"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot"
+                  "name": "RunIntake"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CollectToShoot2"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
-  "folder": null,
+  "resetOdom": true,
+  "folder": "RightUnderTrench",
   "choreoAuto": false
 }
