@@ -21,7 +21,6 @@ public class TurretSubsystem extends SubsystemBase {
 
     private static final int LIMIT_NEG_ID = 0; // -180 deg
     private static final int LIMIT_POS_ID = 1; // +180 deg
-    private static final int HOME_SWITCH_ID = 2;
 
     /* ==================== Constants ==================== */
     // Turret rotations (1 rotation = 360 degrees)
@@ -41,7 +40,6 @@ public class TurretSubsystem extends SubsystemBase {
 
     private final DigitalInput negLimit = new DigitalInput(LIMIT_NEG_ID);
     private final DigitalInput posLimit = new DigitalInput(LIMIT_POS_ID);
-    private final DigitalInput homeSwitch = new DigitalInput(HOME_SWITCH_ID);
 
     private final MotionMagicVoltage motionMagic = new MotionMagicVoltage(0);
 
@@ -83,7 +81,7 @@ public class TurretSubsystem extends SubsystemBase {
         /* ---- Soft Limits ---- */
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAX_TURRET_ROT;
-
+         
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MIN_TURRET_ROT;
 
@@ -107,6 +105,8 @@ public class TurretSubsystem extends SubsystemBase {
                             .withSlot(0));
         });
     }
+
+
 
     public void aimFieldRelativeWithPrediction(
             Pose2d robotPose,
@@ -143,13 +143,9 @@ public class TurretSubsystem extends SubsystemBase {
         turretMotor.stopMotor();
     }
 
-    /* ==================== Homing ==================== */
-
-    public void homeTurret() {
-        if (isHomePressed()) {
-            turretMotor.setPosition(0.0);
-        }
-    }
+      public void setSpeed(double speed) {
+        turretMotor.set(speed);
+      }
 
     /* ==================== State ==================== */
 
@@ -184,22 +180,27 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public boolean isAtNegativeLimit() {
-        return !negLimit.get();
+        return negLimit.get();
     }
 
     public boolean isAtPositiveLimit() {
-        return !posLimit.get();
+        return posLimit.get();
     } 
 
-    public boolean isHomePressed() {
-        return !homeSwitch.get();
-    }
 
     @Override
     public void periodic() {
         // Optional: auto-zero if home switch hit
-        if (isHomePressed()) {
+        if (isAtNegativeLimit()) {
             turretMotor.setPosition(0.0);
+            if (turretMotor.getVelocity().getValueAsDouble() < 0) {
+                turretMotor.stopMotor();
+            }
+        }
+        else if (isAtPositiveLimit()) {
+            if (turretMotor.getVelocity().getValueAsDouble() > 0) {
+                turretMotor.stopMotor();
+            }
         }
     }
 }
