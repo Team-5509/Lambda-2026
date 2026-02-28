@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants.LauncherSubsystemConstants;
 import frc.robot.Constants.Constants.TurretSubsystemConstants;
@@ -220,5 +221,8 @@ public class LaunchLookup extends Command {
     // input is outside the measured range.
     m_hoodPos = hoodTable.get(effectiveDist);
     m_speed   = speedTable.get(effectiveDist);
+    SmartDashboard.putNumber("LaunchLookup/CalculatedHoodRot", m_hoodPos);
+    SmartDashboard.putNumber("LaunchLookup/CalculatedLauncherRPS", m_speed);
   }
 }
+

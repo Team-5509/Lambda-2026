@@ -10,9 +10,11 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants;
+import frc.robot.generated.TunerConstants;
 
 public class TurretSubsystem extends SubsystemBase {
 
@@ -28,7 +30,7 @@ public class TurretSubsystem extends SubsystemBase {
     private static final double MIN_TURRET_ROT = -0.5;
     private static final double MAX_TURRET_ROT = 0.5;
 
-    private DoubleSupplier robotHeadingDegSupplier = () -> 0.0;
+    // private DoubleSupplier robotHeadingDegSupplier = () -> 0.0;
 
     // Motion Magic
     private static final double MM_CRUISE_VEL = 2.0; // rot/s
@@ -43,6 +45,8 @@ public class TurretSubsystem extends SubsystemBase {
     private final DigitalInput posLimit = new DigitalInput(LIMIT_POS_ID);
 
     private final MotionMagicVoltage motionMagic = new MotionMagicVoltage(0);
+
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public TurretSubsystem() {
         configureEncoder();
@@ -134,8 +138,10 @@ public class TurretSubsystem extends SubsystemBase {
     /* ==================== Control ==================== */
 
     public void setTurretAngleDegrees(double degrees) {
+        SmartDashboard.putNumber("TurretSubsystem/SetpointDegrees", degrees);
         degrees = Math.max(-180.0, Math.min(180.0, degrees));
         double rotations = degrees / 360.0;
+        SmartDashboard.putNumber("TurretSubsystem/SetpointRotations", rotations);
         turretMotor.setControl(
                 motionMagic.withPosition(rotations));
     }
@@ -155,9 +161,9 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     /** Robot heading in field coordinates (CCW+, degrees, 0 = field forward) */
-    public void setRobotHeadingSupplier(DoubleSupplier supplier) {
-        this.robotHeadingDegSupplier = supplier;
-    }
+    // public void setRobotHeadingSupplier(DoubleSupplier supplier) {
+    //     this.robotHeadingDegSupplier = supplier;
+    // }
 
     /* ==================== Field-Oriented Control ==================== */
 
@@ -167,8 +173,10 @@ public class TurretSubsystem extends SubsystemBase {
      * @param fieldAngleDeg CCW+, degrees
      */
     public void aimFieldRelative(double fieldAngleDeg) {
-        double robotHeading = robotHeadingDegSupplier.getAsDouble();
+        double robotHeading = drivetrain.getState().Pose.getRotation().getDegrees();
         double turretAngle = fieldAngleDeg - robotHeading;
+        SmartDashboard.putNumber("TurretSubsystem/FieldAngleDeg", turretAngle);
+        SmartDashboard.putNumber("TurretSubsystem/RobotHeadingDeg", robotHeading);
         setTurretAngleDegrees(wrapDegrees(turretAngle));
     }
 
@@ -192,6 +200,7 @@ public class TurretSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // Optional: auto-zero if home switch hit
+        SmartDashboard.putNumber("TurretSubsystem/TurretPosition", turretMotor.getPosition().getValueAsDouble());
         if (isAtNegativeLimit()) {
             turretMotor.setPosition(0.0);
             if (turretMotor.getVelocity().getValueAsDouble() < 0) {

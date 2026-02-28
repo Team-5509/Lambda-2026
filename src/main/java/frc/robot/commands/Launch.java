@@ -5,10 +5,13 @@ package frc.robot.commands;
 
 import java.util.function.Supplier;
 
+import javax.xml.validation.SchemaFactory;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Constants.LauncherSubsystemConstants;
 import frc.robot.Constants.Constants.TurretSubsystemConstants;
@@ -74,8 +77,8 @@ public class Launch extends Command {
   public void execute() {
     updateShootingParams();
 
-    m_launcherSubsystem.ExtendHoodMM(() -> m_hoodPos);
-    m_launcherSubsystem.RunLauncherMM(() -> m_speed);
+    m_launcherSubsystem.extendHoodMM(m_hoodPos);
+    m_launcherSubsystem.runLauncherMM(m_speed);
 
     if (m_timer.hasElapsed(LauncherSubsystemConstants.kShootSpinUpSeconds)) {
       m_kickerSubsystem.RunKickerMM();
@@ -94,6 +97,14 @@ public class Launch extends Command {
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  public double getHoodRotationsFromHoodAngleDeg(double hoodAngleDeg) {
+    // Linear map  [kHoodMinAngleDeg, kHoodMaxAngleDeg] → [kHoodMinRot, kHoodMaxRot]
+    double fraction = (hoodAngleDeg - LauncherSubsystemConstants.kHoodMinAngleDeg)
+        / (LauncherSubsystemConstants.kHoodMaxAngleDeg - LauncherSubsystemConstants.kHoodMinAngleDeg);
+    return LauncherSubsystemConstants.kHoodMinRot
+        + fraction * (LauncherSubsystemConstants.kHoodMaxRot - LauncherSubsystemConstants.kHoodMinRot);
   }
 
   /**
@@ -182,5 +193,8 @@ public class Launch extends Command {
     // ── Launcher speed ───────────────────────────────────────────────────────
     // RPS = exit_speed / wheel_circumference = v / (π · diameter)
     m_speed = v / (Math.PI * LauncherSubsystemConstants.kLauncherWheelDiameterM);
+    SmartDashboard.putNumber("Launch/CalculatedHoodAngleDeg", launchAngleDeg);
+    SmartDashboard.putNumber("Launch/CalculatedHoodRot", m_hoodPos);
+    SmartDashboard.putNumber("Launch/CalculatedLauncherRPS", m_speed);
   }
 }

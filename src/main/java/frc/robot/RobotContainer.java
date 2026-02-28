@@ -69,7 +69,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
     private final CommandXboxController auxXbox = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
+        
     public final Vision visionFL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_FL);
     public final Vision visionFR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_FR);
     public final Vision visionRL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RL);
@@ -103,15 +103,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
             this::getFieldRelativeVelocity);
     }
 
-    private Command makeTrack() {
-        return new TrackFieldPoseCommand(
-                m_turretSubsystem,
-                // Supplier<Pose2d>
-                () -> drivetrain.getState().Pose,
-                // Supplier<Translation2d> (FIELD-RELATIVE)
-                this::getFieldRelativeVelocity,
-                TurretSubsystemConstants.ballSpeed);
-    }
+
 
 
 
@@ -136,8 +128,14 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         NamedCommands.registerCommand("RetractHood", m_launcherSubsystem.RetractHoodMM());
         NamedCommands.registerCommand("MoveTurret", m_turretSubsystem.SetTurretPositionMM(null));
         NamedCommands.registerCommand("Launch", makeLaunch());
-        NamedCommands.registerCommand("TrackHome", makeTrack());
-
+        NamedCommands.registerCommand("LaunchLookup", makeLaunchLookup());
+        NamedCommands.registerCommand("Track", new TrackFieldPoseCommand(
+                m_turretSubsystem,
+                // Supplier<Pose2d>
+                () -> drivetrain.getState().Pose,
+                // Supplier<Translation2d> (FIELD-RELATIVE)
+                this::getFieldRelativeVelocity,
+                TurretSubsystemConstants.ballSpeed));
 
 
         configureBindings();
@@ -234,9 +232,15 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         //auxXbox.rightTrigger().whileTrue(m_launcherSubsystem.RunLauncherMM());
         //auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
         //auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
-        auxXbox.a().onTrue(makeTrack());
+        auxXbox.a().onTrue(new TrackFieldPoseCommand(
+                m_turretSubsystem,
+                // Supplier<Pose2d>
+                () -> drivetrain.getState().Pose,
+                // Supplier<Translation2d> (FIELD-RELATIVE)
+                this::getFieldRelativeVelocity,
+                TurretSubsystemConstants.ballSpeed));
 
-        auxXbox.axisMagnitudeGreaterThan(4, .2).whileTrue(makeLaunch());
+        auxXbox.x().whileTrue(makeLaunch());
         auxXbox.b().whileTrue(makeLaunchLookup());
         auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(null));
         auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(null));

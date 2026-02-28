@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.998288159771754,
-        "y": 0.3927674750356629
+        "x": 8.062981455064193,
+        "y": 0.4315834522111266
       },
       "isLocked": false,
       "linkedName": "Collecting Right"
@@ -20,15 +20,20 @@
         "y": 0.6774179743223976
       },
       "prevControl": {
-        "x": 7.985349500713266,
-        "y": 0.4315834522111266
+        "x": 7.90771754636234,
+        "y": 0.6127246790299581
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "Shooting Right"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 0.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],

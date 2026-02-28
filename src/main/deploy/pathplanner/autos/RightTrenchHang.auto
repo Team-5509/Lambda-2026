@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Track"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "StartToRightIntake"
@@ -42,13 +48,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot"
+                  "name": "Launch"
                 }
               },
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ShootToRightIntake2"
+                  "pathName": "StartToRightIntake"
                 }
               }
             ]
@@ -61,7 +67,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "IntakeOnRight2"
+                  "pathName": "IntakeOnRight1"
                 }
               },
               {
@@ -80,7 +86,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CollectToShoot2"
+                  "pathName": "CollectToShoot1"
                 }
               },
               {

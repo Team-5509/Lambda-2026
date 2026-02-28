@@ -7,13 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "TrackHub"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": null
+            "name": "Track"
           }
         },
         {

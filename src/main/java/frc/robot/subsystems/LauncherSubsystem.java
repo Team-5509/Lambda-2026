@@ -22,6 +22,7 @@ import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.IntakeSubsystemConstants;
 import frc.robot.Constants.Constants.LauncherSubsystemConstants;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -164,6 +165,7 @@ private void configureHoodMotor() {
    */
   public Command RunLauncherMM() {
     return runOnce(() -> {
+      // SmartDashboard.putNumber("LauncherSubsystem/LauncherMMSetpointRPS", speed);
       launcherMotor.setControl(
           motionMagic.withVelocity(speed)
               .withSlot(0));
@@ -178,10 +180,24 @@ private void configureHoodMotor() {
    */
   public Command RunLauncherMM(DoubleSupplier velocityRPS) {
     return runOnce(() -> {
+      SmartDashboard.putNumber("LauncherSubsystem/LauncherMMSetpointRPS", velocityRPS.getAsDouble());
       launcherMotor.setControl(
           motionMagic.withVelocity(velocityRPS.getAsDouble())
               .withSlot(0));
     });
+  }
+
+    /**
+   * Method that runs the launcher motor with magic motion (closed loop control) at
+   * Supplied speed.
+   *
+   * @return a void
+   */
+  public void runLauncherMM(double velocityRPS) {
+      SmartDashboard.putNumber("LauncherSubsystem/LauncherMMSetpointRPS", velocityRPS);
+      launcherMotor.setControl(
+          motionMagic.withVelocity(velocityRPS)
+              .withSlot(0));
   }
 
     /**
@@ -191,6 +207,7 @@ private void configureHoodMotor() {
    */
   public Command RetractHoodMM() {
     return runOnce(() -> {
+
       hoodMotor.setControl(
           motionMagicHood.withPosition(retractPosistion)
               .withSlot(0));
@@ -204,6 +221,7 @@ private void configureHoodMotor() {
    */
   public Command ExtendHoodMM() {
     return runOnce(() -> {
+
       hoodMotor.setControl(
           motionMagicHood.withPosition(extendPosistion)
               .withSlot(0));
@@ -241,12 +259,25 @@ private void configureHoodMotor() {
   }
 
 /**
+   * Method to run extends the hood with magic motion (closed loop control)
+   *
+   * @return a void
+   */
+  public void extendHoodMM(double posistion) {
+      SmartDashboard.putNumber("LauncherSubsystem/HoodPosition", posistion);
+      hoodMotor.setControl(
+          motionMagicHood.withPosition(posistion)
+              .withSlot(0));
+  }
+
+/**
    * Command extends the hood with magic motion (closed loop control)
    *
    * @return a command
    */
   public Command ExtendHoodMM(DoubleSupplier posistionSupplier) {
     return runOnce(() -> {
+      SmartDashboard.putNumber("LauncherSubsystem/HoodPositionSupplier", posistionSupplier.getAsDouble());
       hoodMotor.setControl(
           motionMagicHood.withPosition(posistionSupplier.getAsDouble())
               .withSlot(0));
@@ -353,6 +384,8 @@ private void configureHoodMotor() {
   public void periodic() {
     // This method will be called once per scheduler run
     // Optional: auto-zero if home switch hit
+      SmartDashboard.putNumber("LauncherSubsystem/LauncherRPS", launcherMotor.getVelocity().getValueAsDouble());
+      SmartDashboard.putNumber("LauncherSubsystem/HoodPosition", hoodMotor.getPosition().getValueAsDouble());
         if (isHomePressed()) {
             hoodMotor.setPosition(0.0);
             // hoodMotor.setPosition((hoodEncoder.getAbsolutePosition().getValueAsDouble()
