@@ -41,9 +41,17 @@ public class CameraManager {
         public final Matrix<N3, N1> singleTagStdDevs;
         public final Matrix<N3, N1> multiTagStdDevs;
 
-        private CameraProperties(String name, 
-                Transform3d transform, 
-                Matrix<N3, N1> singleTagStdDevs, 
+        /**
+         * Constructs a CameraProperties enum constant with camera configuration data.
+         *
+         * @param name            The PhotonVision camera name used to identify the camera
+         * @param transform       The 3D transform from robot center to camera position/orientation
+         * @param singleTagStdDevs Standard deviations [x, y, theta] when only one AprilTag is visible
+         * @param multiTagStdDevs  Standard deviations [x, y, theta] when multiple AprilTags are visible
+         */
+        private CameraProperties(String name,
+                Transform3d transform,
+                Matrix<N3, N1> singleTagStdDevs,
                 Matrix<N3, N1> multiTagStdDevs) {
             this.name = name;
             this.transform = transform;
@@ -51,19 +59,38 @@ public class CameraManager {
             this.multiTagStdDevs = multiTagStdDevs;
         }
 
-        // Getters
+        /**
+         * Returns the PhotonVision camera name for this camera.
+         *
+         * @return Camera name string
+         */
         public String getName() {
             return name;
         }
 
+        /**
+         * Returns the 3D transform from the robot center to this camera.
+         *
+         * @return Robot-to-camera Transform3d
+         */
         public Transform3d getTransform() {
             return transform;
         }
 
+        /**
+         * Returns the measurement standard deviations used when a single AprilTag is detected.
+         *
+         * @return Standard deviation matrix [x, y, theta] for single-tag estimation
+         */
         public Matrix<N3, N1> getSingleTagStdDevs() {
             return singleTagStdDevs;
         }
 
+        /**
+         * Returns the measurement standard deviations used when multiple AprilTags are detected.
+         *
+         * @return Standard deviation matrix [x, y, theta] for multi-tag estimation
+         */
         public Matrix<N3, N1> getMultiTagStdDevs() {
             return multiTagStdDevs;
         }

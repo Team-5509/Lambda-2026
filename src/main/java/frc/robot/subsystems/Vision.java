@@ -71,9 +71,15 @@ public class Vision extends SubsystemBase {
     AprilTagFieldLayout kTagLayout = Constants.Vision.kTagLayout;
 
     /**
-      * @param estConsumer Lamba that will accept a pose estimate and pass it to your desired {@link
-      *     edu.wpi.first.math.estimator.SwerveDrivePoseEstimator}
-      */
+     * Constructs a Vision subsystem for the specified camera.
+     * Initializes the PhotonCamera, pose estimator, and (in simulation) a full
+     * VisionSystemSim with simulated camera properties.
+     *
+     * @param estConsumer Lambda that accepts a pose estimate and passes it to the
+     *                    {@link edu.wpi.first.math.estimator.SwerveDrivePoseEstimator}
+     * @param cameraName  The CameraProperties enum entry defining this camera's name,
+     *                    transform, and standard deviations
+     */
      public Vision(EstimateConsumer estConsumer, CameraProperties cameraName) {
         this.estConsumer = estConsumer;
 
@@ -112,6 +118,11 @@ public class Vision extends SubsystemBase {
          }
      }
 
+    /**
+     * Called every scheduler cycle. Processes all unread camera results, estimates the robot pose
+     * from detected AprilTags, updates the dynamic standard deviations, and passes valid estimates
+     * to the pose estimator consumer. In simulation, also updates the debug field visualization.
+     */
     public void periodic() {
         Optional<EstimatedRobotPose> visionEst = Optional.empty();
         for (var change : camera.getAllUnreadResults()) {
@@ -211,6 +222,12 @@ public class Vision extends SubsystemBase {
 
     // ----- Simulation
 
+    /**
+     * Updates the vision simulation with the robot's current simulated pose.
+     * Should be called from {@link frc.robot.Robot#simulationPeriodic()}.
+     *
+     * @param robotSimPose The current simulated robot pose on the field
+     */
     public void simulationPeriodic(Pose2d robotSimPose) {
         visionSim.update(robotSimPose);
     }

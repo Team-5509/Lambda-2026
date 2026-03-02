@@ -9,6 +9,12 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Main {
   private Main() {}
 
+  /**
+   * Main entry point for the robot program.
+   * Starts the WPILib robot framework using the Robot class as the implementation.
+   *
+   * @param args Command-line arguments (not used)
+   */
   public static void main(String... args) {
     RobotBase.startRobot(Robot::new);
   }

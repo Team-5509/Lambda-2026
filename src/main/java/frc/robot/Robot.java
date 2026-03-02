@@ -24,6 +24,11 @@ public class Robot extends LoggedRobot {
 
   private final RobotContainer m_robotContainer;
 
+  /**
+   * Robot constructor. Initializes the RobotContainer and configures AdvantageKit logging.
+   * On a real robot, writes logs to USB and publishes live to AdvantageScope via NT4.
+   * In simulation, supports optional log replay or live simulation with local log output.
+   */
   public Robot() {
     m_robotContainer = new RobotContainer();
     Logger.recordMetadata("ProjectName", "Lambda-2026");
@@ -57,6 +62,10 @@ public class Robot extends LoggedRobot {
     Logger.start(); // Start logging after receivers are added
   }
 
+  /**
+   * Runs every scheduler cycle (~20ms) regardless of robot mode.
+   * Runs the WPILib CommandScheduler to execute active commands and poll triggers.
+   */
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
@@ -67,15 +76,22 @@ public class Robot extends LoggedRobot {
     // m_robotContainer.visionRR.periodic();
   }
 
+  /** Called once when the robot enters the disabled state. */
   @Override
   public void disabledInit() {}
 
+  /** Called periodically while the robot is disabled. */
   @Override
   public void disabledPeriodic() {}
 
+  /** Called once when the robot exits the disabled state. */
   @Override
   public void disabledExit() {}
 
+  /**
+   * Called once when autonomous mode begins.
+   * Retrieves and schedules the autonomous command selected on the SmartDashboard.
+   */
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -85,12 +101,18 @@ public class Robot extends LoggedRobot {
     }
   }
 
+  /** Called periodically during autonomous mode. */
   @Override
   public void autonomousPeriodic() {}
 
+  /** Called once when autonomous mode ends. */
   @Override
   public void autonomousExit() {}
 
+  /**
+   * Called once when teleoperated mode begins.
+   * Cancels any autonomous command that may still be running.
+   */
   @Override
   public void teleopInit() {
     if (m_autonomousCommand != null) {
@@ -98,23 +120,36 @@ public class Robot extends LoggedRobot {
     }
   }
 
+  /** Called periodically during teleoperated mode. */
   @Override
   public void teleopPeriodic() {}
 
+  /** Called once when teleoperated mode ends. */
   @Override
   public void teleopExit() {}
 
+  /**
+   * Called once when test mode begins.
+   * Cancels all currently scheduled commands to start with a clean state.
+   */
   @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
   }
 
+  /** Called periodically during test mode. */
   @Override
   public void testPeriodic() {}
 
+  /** Called once when test mode ends. */
   @Override
   public void testExit() {}
 
+  /**
+   * Called periodically during simulation.
+   * Updates all four vision camera simulations with the current robot pose
+   * and sets the estimated robot pose on each debug field visualization.
+   */
   @Override
   public void simulationPeriodic() {
     m_robotContainer.visionFL.simulationPeriodic(m_robotContainer.drivetrain.getState().Pose);
