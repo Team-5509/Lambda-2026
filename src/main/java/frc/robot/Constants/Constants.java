@@ -86,6 +86,10 @@ public class Constants {
         public static final double kHoodMinAngleDeg = 20.0;
         public static final double kHoodMaxAngleDeg = 70.0;
 
+        // Maximum ball exit speed the launcher can achieve (m/s).
+        // TODO: Measure actual max exit speed on the robot.
+        public static final double kMaxExitSpeedMps = 25.0;
+
         // Flywheel diameter used to convert ball exit speed (m/s) → launcher RPS.
         // TODO: Measure actual flywheel diameter.
         public static final double kLauncherWheelDiameterM = 0.1016; // 4 in default

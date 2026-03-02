@@ -1,4 +1,9 @@
 {
+  "Keyboard 0 Settings": {
+    "window": {
+      "visible": true
+    }
+  },
   "System Joysticks": {
     "window": {
       "enabled": false
@@ -12,8 +17,7 @@
           "incKey": 87
         },
         {
-          "decKey": 65,
-          "incKey": 68
+          "decKey": 68
         },
         {
           "decayRate": 0.0,
