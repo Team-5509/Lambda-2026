@@ -20,15 +20,14 @@ public class TurretSubsystem extends SubsystemBase {
 
     /* ==================== Hardware IDs ==================== */
     private static final int TURRET_MOTOR_ID = Constants.TurretSubsystemConstants.kTurretMotorId;
-    private static final int TURRET_CANCODER_ID = Constants.TurretSubsystemConstants.kTurretEncoderId;
 
     private static final int LIMIT_NEG_ID = 0; // -180 deg
     private static final int LIMIT_POS_ID = 1; // +180 deg
 
     /* ==================== Constants ==================== */
     // Turret rotations (1 rotation = 360 degrees)
-    private static final double MIN_TURRET_ROT = -0.5;
-    private static final double MAX_TURRET_ROT = 0.5;
+    private static final double MIN_TURRET_ROT = -0.75;
+    private static final double MAX_TURRET_ROT = 0.25;
 
     // private DoubleSupplier robotHeadingDegSupplier = () -> 0.0;
 
@@ -39,7 +38,6 @@ public class TurretSubsystem extends SubsystemBase {
 
     /* ==================== Hardware ==================== */
     private final TalonFX turretMotor = new TalonFX(TURRET_MOTOR_ID);
-    private final CANcoder turretEncoder = new CANcoder(TURRET_CANCODER_ID);
 
     private final DigitalInput negLimit = new DigitalInput(LIMIT_NEG_ID);
     private final DigitalInput posLimit = new DigitalInput(LIMIT_POS_ID);
@@ -61,17 +59,13 @@ public class TurretSubsystem extends SubsystemBase {
         // CANcoder always reports ±0.5 rotations (±180°) in Phoenix 6
         config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
 
-        turretEncoder.getConfigurator().apply(config);
     }
 
     private void configureMotor() {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
         /* ---- Feedback ---- */
-        config.Feedback.FeedbackRemoteSensorID = TURRET_CANCODER_ID;
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        config.Feedback.SensorToMechanismRatio = 10.0 / 100.0; // encoder → turret
-
+       
         /* ---- Motion Magic ---- */
         config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL;
         config.MotionMagic.MotionMagicAcceleration = MM_ACCEL;
@@ -139,8 +133,13 @@ public class TurretSubsystem extends SubsystemBase {
 
     public void setTurretAngleDegrees(double degrees) {
         SmartDashboard.putNumber("TurretSubsystem/SetpointDegrees", degrees);
-        degrees = Math.max(-180.0, Math.min(180.0, degrees));
+        degrees = Math.max(Constants.TurretSubsystemConstants.minTurretRotation, Math.min(Constants.TurretSubsystemConstants.maxTurretRotation, degrees));
+        //TODO FIND THE ACTUAL MIN TURRET ROTATION
+        if(degrees < (-90) ) {
+            degrees = (Constants.TurretSubsystemConstants.maxTurretRotation + (Constants.TurretSubsystemConstants.maxTurretRotation - Math.abs(degrees)));
+        }
         double rotations = degrees / 360.0;
+        rotations = (rotations * Constants.TurretSubsystemConstants.gearRatio);
         SmartDashboard.putNumber("TurretSubsystem/SetpointRotations", rotations);
         turretMotor.setControl(
                 motionMagic.withPosition(rotations));
@@ -202,12 +201,13 @@ public class TurretSubsystem extends SubsystemBase {
         // Optional: auto-zero if home switch hit
         SmartDashboard.putNumber("TurretSubsystem/TurretPosition", turretMotor.getPosition().getValueAsDouble());
         if (isAtNegativeLimit()) {
-            turretMotor.setPosition(0.0);
+            turretMotor.setPosition(Constants.TurretSubsystemConstants.minNegTurretMotorRot);
             if (turretMotor.getVelocity().getValueAsDouble() < 0) {
                 turretMotor.stopMotor();
             }
         }
         else if (isAtPositiveLimit()) {
+            turretMotor.setPosition(Constants.TurretSubsystemConstants.maxPosTurretMotorRot);
             if (turretMotor.getVelocity().getValueAsDouble() > 0) {
                 turretMotor.stopMotor();
             }
