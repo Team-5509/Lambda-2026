@@ -92,8 +92,8 @@ public class Constants {
 
         // Physical angle corresponding to the min/max hood rotation positions.
         // TODO: Measure both values on the actual robot.
-        public static final double kHoodMinAngleDeg = 20.0;
-        public static final double kHoodMaxAngleDeg = 70.0;
+        public static final double kHoodMinAngleDeg = 22.0;
+        public static final double kHoodMaxAngleDeg = 65.0;
 
         // Flywheel diameter used to convert ball exit speed (m/s) → launcher RPS.
         // TODO: Measure actual flywheel diameter.
