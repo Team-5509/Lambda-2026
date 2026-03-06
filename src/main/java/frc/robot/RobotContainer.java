@@ -35,9 +35,11 @@ import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
+import frc.robot.commands.FireCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.Launch;
 import frc.robot.commands.LaunchLookup;
+import frc.robot.commands.ShootingArcCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
@@ -85,6 +87,12 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
 
     // This command will track the robot's pose on the field using vision
     // measurements and drive the turret to point at the hub
+    // Background command: always computes shooting arc and keeps launcher ready
+    private final ShootingArcCommand m_shootingArcCommand = new ShootingArcCommand(
+        m_launcherSubsystem,
+        () -> drivetrain.getState().Pose,
+        this::getFieldRelativeVelocity);
+
     private Command makeLaunch() {
         return new Launch(
             m_conveyorSubsystem,
@@ -137,6 +145,10 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
                 this::getFieldRelativeVelocity,
                 TurretSubsystemConstants.ballSpeed));
 
+
+        // Keep the launcher spinning and hood pre-positioned at all times.
+        // FireCommand (kicker + conveyor only) fires without interrupting this.
+        m_launcherSubsystem.setDefaultCommand(m_shootingArcCommand);
 
         configureBindings();
 
@@ -240,7 +252,8 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
                 this::getFieldRelativeVelocity,
                 TurretSubsystemConstants.ballSpeed));
 
-        auxXbox.x().whileTrue(makeLaunch());
+        // Launcher is already spun up by ShootingArcCommand — just fire kicker + conveyor.
+        auxXbox.x().whileTrue(new FireCommand(m_kickerSubsystem, m_conveyorSubsystem));
         auxXbox.b().whileTrue(makeLaunchLookup());
         auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(null));
         auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(null));

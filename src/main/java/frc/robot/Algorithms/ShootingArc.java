@@ -49,17 +49,22 @@ public class ShootingArc {
     }
   }
 
-  private final double hubX;
-  private final double hubY;
+  private Translation2d m_hubPose;
 
   public ShootingArc() {
     if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-      hubX = Constants.TurretSubsystemConstants.redHubPose.getX();
-      hubY = Constants.TurretSubsystemConstants.redHubPose.getY();
+      m_hubPose = Constants.TurretSubsystemConstants.redHubPose.getTranslation();
     } else {
-      hubX = Constants.TurretSubsystemConstants.blueHubPose.getX();
-      hubY = Constants.TurretSubsystemConstants.blueHubPose.getY();
+      m_hubPose = Constants.TurretSubsystemConstants.blueHubPose.getTranslation();
     }
+  }
+
+  public Translation2d getHubPose() {
+    return m_hubPose;
+  }
+
+  public void setHubPose(Translation2d hubPose) {
+    m_hubPose = hubPose;
   }
 
   public Pose2d getShooterPosition(Pose2d robotPose) {
@@ -68,20 +73,20 @@ public class ShootingArc {
   }
 
   public Translation2d getHubTranslation() {
-    return new Translation2d(hubX, hubY);
+    return m_hubPose;
   }
 
   public double getDistanceToHub(Pose2d robotPose) {
-    double dx = hubX - robotPose.getX();
-    double dy = hubY - robotPose.getY();
+    double dx = m_hubPose.getX() - robotPose.getX();
+    double dy = m_hubPose.getY() - robotPose.getY();
     double distance = Math.sqrt(dx * dx + dy * dy);
     SmartDashboard.putNumber("ShootingArc/DistanceToGoal", distance);
     return distance;
   }
 
   public double getYawToHub(Pose2d robotPose) {
-    double dx = hubX - robotPose.getX();
-    double dy = hubY - robotPose.getY();
+    double dx = m_hubPose.getX() - robotPose.getX();
+    double dy = m_hubPose.getY() - robotPose.getY();
     double angle = Math.atan2(dy, dx);
     SmartDashboard.putNumber("ShootingArc/YawToGoalDeg", Math.toDegrees(angle));
     return angle;
