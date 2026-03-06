@@ -110,9 +110,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
 
 
     public RobotContainer() {
-        // ShootingTurnDetector needs the drivetrain pose, so it is initialized
-        // after the drivetrain field is assigned above.
-        m_shootingTurnDetector = new ShootingTurnDetector(() -> drivetrain.getState().Pose);
+        m_shootingTurnDetector = new ShootingTurnDetector();
 
         autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
         SmartDashboard.putData("Auto Mode", autoChooser);
