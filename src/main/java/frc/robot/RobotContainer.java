@@ -43,6 +43,8 @@ import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 
 public class RobotContainer {
+    public final ShootingTurnDetector m_shootingTurnDetector;
+
 private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
     private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
     private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
@@ -108,6 +110,10 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
 
 
     public RobotContainer() {
+        // ShootingTurnDetector needs the drivetrain pose, so it is initialized
+        // after the drivetrain field is assigned above.
+        m_shootingTurnDetector = new ShootingTurnDetector(() -> drivetrain.getState().Pose);
+
         autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -242,6 +248,11 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
 
         auxXbox.x().whileTrue(makeLaunch());
         auxXbox.b().whileTrue(makeLaunchLookup());
+
+        // Automatically enable lookup-based launching whenever it is our shooting turn
+        // (robot enabled + on our hub-shooting side of the field).
+        // The auxXbox.x() / auxXbox.b() manual overrides above still work independently.
+        m_shootingTurnDetector.shootingTurn().whileTrue(makeLaunchLookup());
         auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(null));
         auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(null));
 

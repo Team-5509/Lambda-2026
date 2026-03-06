@@ -61,6 +61,9 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
 
+    // Keep ShootingTurnDetector state current and publish to SmartDashboard.
+    m_robotContainer.m_shootingTurnDetector.update();
+
     // m_robotContainer.visionFL.periodic();
     // m_robotContainer.visionFR.periodic();
     // m_robotContainer.visionRL.periodic();
