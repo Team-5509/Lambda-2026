@@ -36,47 +36,9 @@
           }
         },
         {
-          "type": "sequential",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CollectToShoot1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Launch"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "StartToRightIntake"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "IntakeOnRight1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "RunIntake"
-                }
-              }
-            ]
+            "pathName": "SpinRight"
           }
         },
         {
@@ -86,7 +48,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CollectToShoot1"
+                  "pathName": "SpinRightToShoot"
                 }
               },
               {
@@ -102,6 +64,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "RightUnderTrench",
+  "folder": "RightMessUpBalls",
   "choreoAuto": false
 }

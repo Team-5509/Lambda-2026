@@ -5,15 +5,47 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "Track"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "RunIntake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "IntakeMiddleleft"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "IntakeMiddleLeftToShoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Launch"
+                }
+              }
+            ]
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "StartToRightIntake"
+            "pathName": "ShootToDepot"
           }
         },
         {
@@ -23,7 +55,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "IntakeOnRight1"
+                  "pathName": "Intake"
                 }
               },
               {
@@ -36,72 +68,15 @@
           }
         },
         {
-          "type": "sequential",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CollectToShoot1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Launch"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "StartToRightIntake"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "IntakeOnRight1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "RunIntake"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CollectToShoot1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Launch"
-                }
-              }
-            ]
+            "name": "Launch"
           }
         }
       ]
     }
   },
-  "resetOdom": true,
-  "folder": "RightUnderTrench",
+  "resetOdom": false,
+  "folder": "LeftDepot",
   "choreoAuto": false
 }
