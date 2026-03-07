@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -116,14 +117,14 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         NamedCommands.registerCommand("StopLauncher", m_launcherSubsystem.StopLauncherMM());
         NamedCommands.registerCommand("RunIntake", m_intakeSubsystem.RunIntakeMM());
         NamedCommands.registerCommand("StopIntake", m_intakeSubsystem.StopIntakeMM());
-        NamedCommands.registerCommand("DeployIntake", m_intakeSubsystem.DeployIntakeMM(null));
-        NamedCommands.registerCommand("RetractIntake", m_intakeSubsystem.RetractIntakeMM(null));
+        NamedCommands.registerCommand("DeployIntake", m_intakeSubsystem.DeployIntakeMM());
+        NamedCommands.registerCommand("RetractIntake", m_intakeSubsystem.RetractIntakeMM());
         NamedCommands.registerCommand("RunConveyor", m_conveyorSubsystem.RunConveyorMM());
         NamedCommands.registerCommand("StopConveyor", m_conveyorSubsystem.StopConveyorMM());
         NamedCommands.registerCommand("RunKicker", m_kickerSubsystem.RunKickerMM());
         NamedCommands.registerCommand("StopKicker", m_kickerSubsystem.StopKickerMM());
-        NamedCommands.registerCommand("ExtendClimber", m_climberSubsystem.ExtendClimberMM(null));
-        NamedCommands.registerCommand("LowerClimber", m_climberSubsystem.LowerClimberMM(null));
+        NamedCommands.registerCommand("ExtendClimber", m_climberSubsystem.ExtendClimberMM(2.3));
+        NamedCommands.registerCommand("LowerClimber", m_climberSubsystem.LowerClimberMM(0.3));
         NamedCommands.registerCommand("ExtendHood", m_launcherSubsystem.ExtendHoodMM());
         NamedCommands.registerCommand("RetractHood", m_launcherSubsystem.RetractHoodMM());
         NamedCommands.registerCommand("MoveTurret", m_turretSubsystem.SetTurretPositionMM(null));
@@ -227,6 +228,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         // Aux driver controls
         //auxXbox.y().whileTrue(m_conveyorSubsystem.RunConveyorMM());
         //auxXbox.axisMagnitudeGreaterThan(3 ,.2 ).whileTrue(m_kickerSubsystem.RunKickerMM());
+        
         auxXbox.rightBumper().whileTrue(m_intakeSubsystem.RunIntakeMM());
         auxXbox.y().whileTrue(m_conveyorSubsystem.RunConveyorMM());
         auxXbox.b().whileTrue(m_kickerSubsystem.RunKickerMM());
