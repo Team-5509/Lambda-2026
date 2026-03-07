@@ -20,7 +20,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     /* ==================== Hardware IDs ==================== */
     private static final int TURRET_MOTOR_ID = Constants.TurretSubsystemConstants.kTurretMotorId;
-    private static final int TURRET_CANCODER_ID = Constants.TurretSubsystemConstants.kTurretEncoderId;
+    //private static final int TURRET_CANCODER_ID = Constants.TurretSubsystemConstants.kTurretEncoderId;
 
     private static final int LIMIT_NEG_ID = 0; // -180 deg
     private static final int LIMIT_POS_ID = 1; // +180 deg
@@ -39,7 +39,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     /* ==================== Hardware ==================== */
     private final TalonFX turretMotor = new TalonFX(TURRET_MOTOR_ID);
-    private final CANcoder turretEncoder = new CANcoder(TURRET_CANCODER_ID);
+    //private final CANcoder turretEncoder = new CANcoder(TURRET_CANCODER_ID);
 
     private final DigitalInput negLimit = new DigitalInput(LIMIT_NEG_ID);
     private final DigitalInput posLimit = new DigitalInput(LIMIT_POS_ID);
@@ -49,28 +49,28 @@ public class TurretSubsystem extends SubsystemBase {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public TurretSubsystem() {
-        configureEncoder();
+        //configureEncoder();
         configureMotor();
     }
 
     /* ==================== Configuration ==================== */
 
-    private void configureEncoder() {
-        CANcoderConfiguration config = new CANcoderConfiguration();
+    // private void configureEncoder() {
+    //     CANcoderConfiguration config = new CANcoderConfiguration();
 
-        // CANcoder always reports ±0.5 rotations (±180°) in Phoenix 6
-        config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+    //     // CANcoder always reports ±0.5 rotations (±180°) in Phoenix 6
+    //     config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
 
-        turretEncoder.getConfigurator().apply(config);
-    }
+    //     turretEncoder.getConfigurator().apply(config);
+    // }
 
     private void configureMotor() {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
         /* ---- Feedback ---- */
-        config.Feedback.FeedbackRemoteSensorID = TURRET_CANCODER_ID;
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        config.Feedback.SensorToMechanismRatio = 10.0 / 100.0; // encoder → turret
+        //config.Feedback.FeedbackRemoteSensorID = TURRET_CANCODER_ID;
+        // config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        // config.Feedback.SensorToMechanismRatio = 10.0 / 100.0; // encoder → turret
 
         /* ---- Motion Magic ---- */
         config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL;
