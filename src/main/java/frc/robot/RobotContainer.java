@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -116,14 +117,14 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         NamedCommands.registerCommand("StopLauncher", m_launcherSubsystem.StopLauncherMM());
         NamedCommands.registerCommand("RunIntake", m_intakeSubsystem.RunIntakeMM());
         NamedCommands.registerCommand("StopIntake", m_intakeSubsystem.StopIntakeMM());
-        NamedCommands.registerCommand("DeployIntake", m_intakeSubsystem.DeployIntakeMM(null));
-        NamedCommands.registerCommand("RetractIntake", m_intakeSubsystem.RetractIntakeMM(null));
+        NamedCommands.registerCommand("DeployIntake", m_intakeSubsystem.DeployIntakeMM(2.3));
+        NamedCommands.registerCommand("RetractIntake", m_intakeSubsystem.RetractIntakeMM(0.3));
         NamedCommands.registerCommand("RunConveyor", m_conveyorSubsystem.RunConveyorMM());
         NamedCommands.registerCommand("StopConveyor", m_conveyorSubsystem.StopConveyorMM());
         NamedCommands.registerCommand("RunKicker", m_kickerSubsystem.RunKickerMM());
         NamedCommands.registerCommand("StopKicker", m_kickerSubsystem.StopKickerMM());
-        NamedCommands.registerCommand("ExtendClimber", m_climberSubsystem.ExtendClimberMM(null));
-        NamedCommands.registerCommand("LowerClimber", m_climberSubsystem.LowerClimberMM(null));
+        NamedCommands.registerCommand("ExtendClimber", m_climberSubsystem.ExtendClimberMM(2.3));
+        NamedCommands.registerCommand("LowerClimber", m_climberSubsystem.LowerClimberMM(0.3));
         NamedCommands.registerCommand("ExtendHood", m_launcherSubsystem.ExtendHoodMM());
         NamedCommands.registerCommand("RetractHood", m_launcherSubsystem.RetractHoodMM());
         NamedCommands.registerCommand("MoveTurret", m_turretSubsystem.SetTurretPositionMM(null));
@@ -227,8 +228,10 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         // Aux driver controls
         //auxXbox.y().whileTrue(m_conveyorSubsystem.RunConveyorMM());
         //auxXbox.axisMagnitudeGreaterThan(3 ,.2 ).whileTrue(m_kickerSubsystem.RunKickerMM());
+        
         auxXbox.rightBumper().whileTrue(m_intakeSubsystem.RunIntakeMM());
-        auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM(null));
+        auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM(2.3));
+        auxXbox.povRight().onTrue(m_intakeSubsystem.RetractIntakeMM(0.3));
         //auxXbox.rightTrigger().whileTrue(m_launcherSubsystem.RunLauncherMM());
         //auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
         //auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
@@ -242,8 +245,8 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
 
         auxXbox.x().whileTrue(makeLaunch());
         auxXbox.b().whileTrue(makeLaunchLookup());
-        auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(null));
-        auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(null));
+        auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(2.3));
+        auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(0.3));
 
 
         // Idle while the robot is disabled. This ensures the configured

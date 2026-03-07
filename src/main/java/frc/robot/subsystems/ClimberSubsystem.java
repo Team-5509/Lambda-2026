@@ -68,10 +68,10 @@ public class ClimberSubsystem extends SubsystemBase {
    *
    * @return a command
    */
-  public Command ExtendClimberMM(DoubleSupplier positionSupplier) {
+  public Command ExtendClimberMM(double positionSupplier) {
     return runOnce(() -> {
       climberMotor.setControl(
-          motionMagic.withPosition(positionSupplier.getAsDouble())
+          motionMagic.withPosition(positionSupplier)
               .withSlot(0));
     });
   }
@@ -81,10 +81,10 @@ public class ClimberSubsystem extends SubsystemBase {
    *
    * @return a command
    */
-  public Command LowerClimberMM(DoubleSupplier positionSupplier) {
+  public Command LowerClimberMM(double positionSupplier) {
     return runOnce(() -> {
       climberMotor.setControl(
-          motionMagic.withPosition(positionSupplier.getAsDouble())
+          motionMagic.withPosition(positionSupplier)
               .withSlot(0));
     });
   }

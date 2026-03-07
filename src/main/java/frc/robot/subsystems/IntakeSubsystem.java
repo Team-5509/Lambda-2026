@@ -183,10 +183,10 @@ private void configureDeployMotor() {
      *
      * @return a command
      */
-  public Command DeployIntakeMM(DoubleSupplier positionSupplier) {
+  public Command DeployIntakeMM(double positionSupplier) {
     return runOnce(() -> {
       deployIntakeMoter.setControl(
-          motionMagicPosistion.withPosition(positionSupplier.getAsDouble())
+          motionMagicPosistion.withPosition(positionSupplier)
               .withSlot(0));
     });
   }
@@ -197,10 +197,10 @@ private void configureDeployMotor() {
      *
      * @return a command
      */
-  public Command RetractIntakeMM(DoubleSupplier positionSupplier) {
+  public Command RetractIntakeMM(double positionSupplier) {
     return runOnce(() -> {
       deployIntakeMoter.setControl(
-          motionMagicPosistion.withPosition(positionSupplier.getAsDouble())
+          motionMagicPosistion.withPosition(positionSupplier)
               .withSlot(0));
     });
   }
