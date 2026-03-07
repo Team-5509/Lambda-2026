@@ -230,14 +230,18 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         //auxXbox.axisMagnitudeGreaterThan(3 ,.2 ).whileTrue(m_kickerSubsystem.RunKickerMM());
         
         auxXbox.rightBumper().whileTrue(m_intakeSubsystem.RunIntakeMM());
+        auxXbox.leftBumper().whileTrue(m_intakeSubsystem.StopIntakeMM());
         auxXbox.y().whileTrue(m_conveyorSubsystem.RunConveyorMM());
+        auxXbox.x().whileTrue(m_conveyorSubsystem.StopConveyorMM());
         auxXbox.b().whileTrue(m_kickerSubsystem.RunKickerMM());
+        auxXbox.a().whileTrue(m_kickerSubsystem.StopKickerMM());
         auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp());
         auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp());
 
         // auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM());
         // auxXbox.povRight().onTrue(m_intakeSubsystem.RetractIntakeMM());
-        auxXbox.rightTrigger().whileTrue(m_launcherSubsystem.RunLauncherMM());
+        auxXbox.povLeft().whileTrue(m_launcherSubsystem.RunLauncherMM());
+        auxXbox.povRight().whileTrue(m_launcherSubsystem.StopLauncherMM());
         //auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
         //auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
         // auxXbox.a().onTrue(new TrackFieldPoseCommand(
