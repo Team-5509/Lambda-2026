@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "DeployIntake"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -42,7 +48,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot"
+                  "name": "Launch"
                 }
               },
               {
@@ -86,7 +92,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot"
+                  "name": "Launch"
                 }
               }
             ]

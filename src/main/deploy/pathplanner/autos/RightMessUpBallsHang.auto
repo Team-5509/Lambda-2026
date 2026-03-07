@@ -5,34 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "sequential",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "TrackHub"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "StartToShootMiddle"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Launch"
-                }
-              }
-            ]
+            "name": "Track"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ShootToCloseWall"
+            "pathName": "StartToRightIntake"
           }
         },
         {
@@ -42,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Intake"
+                  "pathName": "IntakeOnRight1"
                 }
               },
               {
@@ -55,32 +36,19 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CloseWallToDroper"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Launch"
-                }
-              }
-            ]
+            "pathName": "SpinRight"
           }
         },
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DropperToClimb"
+                  "pathName": "SpinRightToShoot"
                 }
               },
               {
@@ -96,6 +64,12 @@
           "type": "sequential",
           "data": {
             "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ShootToRightHang"
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -114,7 +88,7 @@
       ]
     }
   },
-  "resetOdom": false,
-  "folder": "CloseAutons(Dont Cross Trench Line)",
+  "resetOdom": true,
+  "folder": "RightMessUpBalls",
   "choreoAuto": false
 }

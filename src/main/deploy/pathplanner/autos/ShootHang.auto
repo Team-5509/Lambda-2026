@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "TrackHub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DeployIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BackUp"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Launch"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ExtendClimber"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BackUpToHang"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LowerClimber"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "SimpleShoot",
+  "choreoAuto": false
+}

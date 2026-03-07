@@ -33,8 +33,7 @@ public class LauncherSubsystem extends SubsystemBase {
     private static final int HOOD_CANCODER_ID = Constants.LauncherSubsystemConstants.kHoodEncoderId;
 
     private static final int LIMIT_NEG_ID = 4; // -180 deg
-    private static final int LIMIT_POS_ID = 5; // +180 deg
-    private static final int HOME_SWITCH_ID = 6;
+
 
   private static final double MM_CRUISE_VEL = 2.0; // rot/s
   private static final double MM_ACCEL = 6.0; // rot/s^2
@@ -48,8 +47,8 @@ public class LauncherSubsystem extends SubsystemBase {
   private double speed = 100.0;
   private double speedIncrement = 10.0;
 
-   private static final double MIN_HOOD_ROT = 0.05;
-   private static final double MAX_HOOD_ROT = 1.7;
+   private static final double MIN_HOOD_ROT = Constants.LauncherSubsystemConstants.kHoodMinRot;
+   private static final double MAX_HOOD_ROT = Constants.LauncherSubsystemConstants.kHoodMaxRot;
 
   private double retractPosistion = 0;
   private double extendPosistion = 0.5;
@@ -59,7 +58,7 @@ public class LauncherSubsystem extends SubsystemBase {
   private TalonFX launcherMotor = new TalonFX(LAUNCHER_MOTOR_ID);
   private TalonFX hoodMotor = new TalonFX(HOOD_MOTOR_ID);
 
-  private final DigitalInput homeSwitch = new DigitalInput(HOME_SWITCH_ID);
+  private final DigitalInput lowLimitSwitch = new DigitalInput(LIMIT_NEG_ID);
 
   private final CANcoder hoodEncoder = new CANcoder(LauncherSubsystemConstants.kHoodEncoderId);
   private final MotionMagicVelocityVoltage motionMagic = new MotionMagicVelocityVoltage(0);
@@ -359,14 +358,8 @@ private void configureHoodMotor() {
         });
   }
 
-  public void homeHood() {
-        if (isHomePressed()) {
-            hoodMotor.setPosition(0.0);
-        }
-    }
-
     public boolean isHomePressed() {
-        return !homeSwitch.get();
+        return !lowLimitSwitch.get();
     }
 
   /**
@@ -387,7 +380,10 @@ private void configureHoodMotor() {
       SmartDashboard.putNumber("LauncherSubsystem/LauncherRPS", launcherMotor.getVelocity().getValueAsDouble());
       SmartDashboard.putNumber("LauncherSubsystem/HoodPosition", hoodMotor.getPosition().getValueAsDouble());
         if (isHomePressed()) {
-            hoodMotor.setPosition(0.0);
+          hoodMotor.setPosition(0.05);
+          if (hoodMotor.getVelocity().getValueAsDouble() < 0) {
+                hoodMotor.stopMotor();
+            }
             // hoodMotor.setPosition((hoodEncoder.getAbsolutePosition().getValueAsDouble()
             // -Constants.LauncherSubsystemConstants.trueZero)*1/Constants.LauncherSubsystemConstants.hoodToEncoderRatio);
         }
