@@ -26,8 +26,8 @@ public class KickerSubsystem extends SubsystemBase {
   private static final double MM_JERK = 60.0; // rot/s^3
 
   // Kicker Speed
-  private double speed = 100.0;
-  private double speedIncrement = 10.0;
+  private double speed = 30;
+  private double speedIncrement = 5;
 
   /* ==================== Hardware ==================== */
   private TalonFX kickerMotor = new TalonFX(KICKER_MOTOR_ID);

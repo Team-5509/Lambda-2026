@@ -45,8 +45,8 @@ public class IntakeSubsystem extends SubsystemBase {
   private double speed = 100.0;
   private double speedIncrement = 10.0;
 
-  private static final double MIN_INTAKE_ROT = -0.5;
-    private static final double MAX_INTAKE_ROT = 0.5;
+  private static final double MIN_INTAKE_ROT = -0.3;
+    private static final double MAX_INTAKE_ROT = 0.3;
   
 
     /* ==================== Hardware ==================== */
@@ -183,10 +183,10 @@ private void configureDeployMotor() {
      *
      * @return a command
      */
-  public Command DeployIntakeMM(DoubleSupplier positionSupplier) {
+  public Command DeployIntakeMM() {
     return runOnce(() -> {
       deployIntakeMoter.setControl(
-          motionMagicPosistion.withPosition(positionSupplier.getAsDouble())
+          motionMagicPosistion.withPosition(MAX_INTAKE_ROT)
               .withSlot(0));
     });
   }
@@ -197,10 +197,10 @@ private void configureDeployMotor() {
      *
      * @return a command
      */
-  public Command RetractIntakeMM(DoubleSupplier positionSupplier) {
+  public Command RetractIntakeMM() {
     return runOnce(() -> {
       deployIntakeMoter.setControl(
-          motionMagicPosistion.withPosition(positionSupplier.getAsDouble())
+          motionMagicPosistion.withPosition(MIN_INTAKE_ROT)
               .withSlot(0));
     });
   }

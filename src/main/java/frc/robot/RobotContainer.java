@@ -228,22 +228,28 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         //auxXbox.y().whileTrue(m_conveyorSubsystem.RunConveyorMM());
         //auxXbox.axisMagnitudeGreaterThan(3 ,.2 ).whileTrue(m_kickerSubsystem.RunKickerMM());
         auxXbox.rightBumper().whileTrue(m_intakeSubsystem.RunIntakeMM());
-        auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM(null));
-        //auxXbox.rightTrigger().whileTrue(m_launcherSubsystem.RunLauncherMM());
+        auxXbox.y().whileTrue(m_conveyorSubsystem.RunConveyorMM());
+        auxXbox.b().whileTrue(m_kickerSubsystem.RunKickerMM());
+        auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp());
+        auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp());
+
+        auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM());
+        auxXbox.povRight().onTrue(m_intakeSubsystem.RetractIntakeMM());
+        auxXbox.rightTrigger().whileTrue(m_launcherSubsystem.RunLauncherMM());
         //auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
         //auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
-        auxXbox.a().onTrue(new TrackFieldPoseCommand(
-                m_turretSubsystem,
-                // Supplier<Pose2d>
-                () -> drivetrain.getState().Pose,
-                // Supplier<Translation2d> (FIELD-RELATIVE)
-                this::getFieldRelativeVelocity,
-                TurretSubsystemConstants.ballSpeed));
+        // auxXbox.a().onTrue(new TrackFieldPoseCommand(
+        //         m_turretSubsystem,
+        //         // Supplier<Pose2d>
+        //         () -> drivetrain.getState().Pose,
+        //         // Supplier<Translation2d> (FIELD-RELATIVE)
+        //         this::getFieldRelativeVelocity,
+        //         TurretSubsystemConstants.ballSpeed));
 
         //auxXbox.x().whileTrue(makeLaunch());
         //auxXbox.b().whileTrue(makeLaunchLookup());
-        auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(null));
-        auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(null));
+        //auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(null));
+        //auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(null));
 
 
         // Idle while the robot is disabled. This ensures the configured
