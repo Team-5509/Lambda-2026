@@ -20,6 +20,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     /* ==================== Hardware IDs ==================== */
     private static final int TURRET_MOTOR_ID = Constants.TurretSubsystemConstants.kTurretMotorId;
+    //private static final int TURRET_CANCODER_ID = Constants.TurretSubsystemConstants.kTurretEncoderId;
 
     private static final int LIMIT_NEG_ID = 0; // -180 deg
     private static final int LIMIT_POS_ID = 1; // +180 deg
@@ -32,12 +33,17 @@ public class TurretSubsystem extends SubsystemBase {
     // private DoubleSupplier robotHeadingDegSupplier = () -> 0.0;
 
     // Motion Magic
-    private static final double MM_CRUISE_VEL = 2.0; // rot/s
-    private static final double MM_ACCEL = 6.0; // rot/s^2
-    private static final double MM_JERK = 60.0; // rot/s^3
+    // Make Motion Magic very slow on purpose
+    private static final double MM_CRUISE_VEL = 0.25; // rot/s (was 2.0)
+    private static final double MM_ACCEL = 0.5; // rot/s^2 (was 6.0)
+    private static final double MM_JERK = 5.0; // rot/s^3 (was 60.0)
+
+    // Cap open-loop speed to a small value to keep turret motion very slow
+    private static final double MAX_OPEN_LOOP_SPEED = 0.15;
 
     /* ==================== Hardware ==================== */
     private final TalonFX turretMotor = new TalonFX(TURRET_MOTOR_ID);
+    //private final CANcoder turretEncoder = new CANcoder(TURRET_CANCODER_ID);
 
     private final DigitalInput negLimit = new DigitalInput(LIMIT_NEG_ID);
     private final DigitalInput posLimit = new DigitalInput(LIMIT_POS_ID);
@@ -47,24 +53,30 @@ public class TurretSubsystem extends SubsystemBase {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public TurretSubsystem() {
-        configureEncoder();
+        //configureEncoder();
         configureMotor();
     }
 
     /* ==================== Configuration ==================== */
 
-    private void configureEncoder() {
-        CANcoderConfiguration config = new CANcoderConfiguration();
+    // private void configureEncoder() {
+    //     CANcoderConfiguration config = new CANcoderConfiguration();
 
-        // CANcoder always reports ±0.5 rotations (±180°) in Phoenix 6
-        config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+    //     // CANcoder always reports ±0.5 rotations (±180°) in Phoenix 6
+    //     config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
 
-    }
+    //     turretEncoder.getConfigurator().apply(config);
+    // }
+    //}
 
     private void configureMotor() {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
         /* ---- Feedback ---- */
+        //config.Feedback.FeedbackRemoteSensorID = TURRET_CANCODER_ID;
+        // config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        // config.Feedback.SensorToMechanismRatio = 10.0 / 100.0; // encoder → turret
+
        
         /* ---- Motion Magic ---- */
         config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL;
@@ -99,9 +111,10 @@ public class TurretSubsystem extends SubsystemBase {
      */
     public Command SetTurretPositionMM(DoubleSupplier positionSupplier) {
         return runOnce(() -> {
-            turretMotor.setControl(
-                    motionMagic.withPosition(positionSupplier.getAsDouble())
-                            .withSlot(0));
+            // Commented out to prevent turret movement during testing/analysis
+            // turretMotor.setControl(
+            //         motionMagic.withPosition(positionSupplier.getAsDouble())
+            //                 .withSlot(0));
         });
     }
 
@@ -141,16 +154,17 @@ public class TurretSubsystem extends SubsystemBase {
         double rotations = degrees / 360.0;
         rotations = (rotations * Constants.TurretSubsystemConstants.gearRatio);
         SmartDashboard.putNumber("TurretSubsystem/SetpointRotations", rotations);
-        turretMotor.setControl(
-                motionMagic.withPosition(rotations));
+    // Commented out to prevent turret movement during testing/analysis
+    // turretMotor.setControl(
+    //         motionMagic.withPosition(rotations));
     }
 
     public void stop() {
-        turretMotor.stopMotor();
+                // turretMotor.stopMotor();
     }
 
       public void setSpeed(double speed) {
-        turretMotor.set(speed);
+                // turretMotor.set(speed);
       }
 
     /* ==================== State ==================== */
@@ -201,15 +215,17 @@ public class TurretSubsystem extends SubsystemBase {
         // Optional: auto-zero if home switch hit
         SmartDashboard.putNumber("TurretSubsystem/TurretPosition", turretMotor.getPosition().getValueAsDouble());
         if (isAtNegativeLimit()) {
-            turretMotor.setPosition(Constants.TurretSubsystemConstants.minNegTurretMotorRot);
+            // Commented out to prevent forcing turret position when limit switches hit
+            // turretMotor.setPosition(Constants.TurretSubsystemConstants.minNegTurretMotorRot);
             if (turretMotor.getVelocity().getValueAsDouble() < 0) {
-                turretMotor.stopMotor();
+                // turretMotor.stopMotor();
             }
         }
         else if (isAtPositiveLimit()) {
-            turretMotor.setPosition(Constants.TurretSubsystemConstants.maxPosTurretMotorRot);
+            // Commented out to prevent forcing turret position when limit switches hit
+            // turretMotor.setPosition(Constants.TurretSubsystemConstants.maxPosTurretMotorRot);
             if (turretMotor.getVelocity().getValueAsDouble() > 0) {
-                turretMotor.stopMotor();
+                // turretMotor.stopMotor();
             }
         }
     }
