@@ -33,9 +33,13 @@ public class TurretSubsystem extends SubsystemBase {
     // private DoubleSupplier robotHeadingDegSupplier = () -> 0.0;
 
     // Motion Magic
-    private static final double MM_CRUISE_VEL = 2.0; // rot/s
-    private static final double MM_ACCEL = 6.0; // rot/s^2
-    private static final double MM_JERK = 60.0; // rot/s^3
+    // Make Motion Magic very slow on purpose
+    private static final double MM_CRUISE_VEL = 0.25; // rot/s (was 2.0)
+    private static final double MM_ACCEL = 0.5; // rot/s^2 (was 6.0)
+    private static final double MM_JERK = 5.0; // rot/s^3 (was 60.0)
+
+    // Cap open-loop speed to a small value to keep turret motion very slow
+    private static final double MAX_OPEN_LOOP_SPEED = 0.15;
 
     /* ==================== Hardware ==================== */
     private final TalonFX turretMotor = new TalonFX(TURRET_MOTOR_ID);

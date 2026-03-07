@@ -240,8 +240,8 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
                 this::getFieldRelativeVelocity,
                 TurretSubsystemConstants.ballSpeed));
 
-        auxXbox.x().whileTrue(makeLaunch());
-        auxXbox.b().whileTrue(makeLaunchLookup());
+        //auxXbox.x().whileTrue(makeLaunch());
+        //auxXbox.b().whileTrue(makeLaunchLookup());
         auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(null));
         auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(null));
 
