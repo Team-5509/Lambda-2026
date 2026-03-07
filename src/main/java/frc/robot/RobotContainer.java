@@ -17,11 +17,13 @@ import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.commands.TrackFieldPoseCommand;
 import frc.robot.commands.TrackTargetCommand;
@@ -38,6 +40,7 @@ import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.Launch;
 import frc.robot.commands.LaunchLookup;
+import frc.robot.commands.LockTurretCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
@@ -110,6 +113,10 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
     public RobotContainer() {
         autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
         SmartDashboard.putData("Auto Mode", autoChooser);
+
+        // Turret lock dashboard controls
+        SmartDashboard.putBoolean("TurretLock/Enabled", false);
+        SmartDashboard.putNumber("TurretLock/AngleDegrees", 0.0);
 
                 // Register named commands after subsystem fields have been initialized
         NamedCommands.registerCommand("RunLauncher", m_launcherSubsystem.RunLauncherMM());
@@ -245,6 +252,15 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(null));
         auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(null));
 
+
+        // Turret lock: when "TurretLock/Enabled" is true on SmartDashboard,
+        // hold the turret at the angle specified by "TurretLock/AngleDegrees".
+        // The motor stays in Brake mode, so it resists being pushed off position.
+        new Trigger(() -> NetworkTableInstance.getDefault()
+                .getTable("SmartDashboard")
+                .getEntry("TurretLock/Enabled")
+                .getBoolean(false))
+            .whileTrue(new LockTurretCommand(m_turretSubsystem));
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode) is applied to the drive motors while disabled.
