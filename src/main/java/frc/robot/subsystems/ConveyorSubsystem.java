@@ -27,7 +27,7 @@ public class ConveyorSubsystem extends SubsystemBase {
   private static final double MM_JERK = 60.0; // rot/s^3
 
   // Conveyor Speed
-  private double speed = 100.0;
+  private double speed = -40;
   private double speedIncrement = 10.0;
   /* ==================== Hardware ==================== */
   private TalonFX conveyorMotor = new TalonFX(CONVEYOR_MOTOR_ID);
@@ -48,9 +48,9 @@ public class ConveyorSubsystem extends SubsystemBase {
     config.MotionMagic.MotionMagicJerk = MM_JERK;
 
     /* ---- PID ---- */
-    config.Slot0.kP = 60.0;
+    config.Slot0.kP = 0.1;
     config.Slot0.kI = 0.0;
-    config.Slot0.kD = 5.0;
+    config.Slot0.kD = 0.0;
     config.Slot0.kV = 0.0;
 
     /* ---- Motor ---- */
