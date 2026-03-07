@@ -51,9 +51,9 @@ public class ClimberSubsystem extends SubsystemBase {
   config.MotionMagic.MotionMagicJerk = MM_JERK;
 
   /* ---- PID ---- */
-  config.Slot0.kP = 60.0;
+  config.Slot0.kP = 0.1;
   config.Slot0.kI = 0.0;
-  config.Slot0.kD = 5.0;
+  config.Slot0.kD = 0;
   config.Slot0.kV = 0.0;
 
   /* ---- Motor ---- */

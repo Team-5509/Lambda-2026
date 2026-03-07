@@ -45,8 +45,8 @@ public class IntakeSubsystem extends SubsystemBase {
   private double speed = 100.0;
   private double speedIncrement = 10.0;
 
-  private static final double MIN_INTAKE_ROT = -0.3;
-    private static final double MAX_INTAKE_ROT = 0.3;
+  private static final double MIN_INTAKE_ROT = 0.0;
+    private static final double MAX_INTAKE_ROT = -0.3;
   
 
     /* ==================== Hardware ==================== */
@@ -115,10 +115,12 @@ private void configureDeployMotor() {
   config.MotionMagic.MotionMagicJerk = MM_JERK;
 
   /* ---- PID ---- */
-  config.Slot0.kP = 0.1;
+  config.Slot0.kP = 1.0;
   config.Slot0.kI = 0.0;
   config.Slot0.kD = 0.0;
   config.Slot0.kV = 0.0;
+  config.Slot0.kG = 1.0;
+  config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
   /* ---- Soft Limits ---- */
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;

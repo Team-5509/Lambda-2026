@@ -235,8 +235,8 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp());
         auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp());
 
-        auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM());
-        auxXbox.povRight().onTrue(m_intakeSubsystem.RetractIntakeMM());
+        // auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM());
+        // auxXbox.povRight().onTrue(m_intakeSubsystem.RetractIntakeMM());
         auxXbox.rightTrigger().whileTrue(m_launcherSubsystem.RunLauncherMM());
         //auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
         //auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
