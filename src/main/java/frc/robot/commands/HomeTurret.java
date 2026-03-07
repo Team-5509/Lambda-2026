@@ -23,23 +23,35 @@ public class HomeTurret extends Command {
     addRequirements(subsystem);
   }
 
-  // Called when the command is initially scheduled.
+  /** Called when the command is initially scheduled. */
   @Override
   public void initialize() {}
 
-  // Called every time the scheduler runs while the command is scheduled.
+  /**
+   * Called every scheduler cycle while the command is active.
+   * Slowly drives the turret toward the negative limit switch at low speed.
+   */
   @Override
   public void execute() {
     m_subsystem.setSpeed(-0.1);
   }
 
-  // Called once the command ends or is interrupted.
+  /**
+   * Called once when the command ends or is interrupted.
+   * Stops the turret motor.
+   *
+   * @param interrupted Whether the command was interrupted
+   */
   @Override
   public void end(boolean interrupted) {
     m_subsystem.stop();
   }
 
-  // Returns true when the command should end.
+  /**
+   * Returns true when the turret has reached the negative (home) limit switch.
+   *
+   * @return true if the negative limit switch is triggered
+   */
   @Override
   public boolean isFinished() {
     return m_subsystem.isAtNegativeLimit();

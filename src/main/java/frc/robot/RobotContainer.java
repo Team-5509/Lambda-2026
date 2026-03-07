@@ -83,8 +83,12 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
-    // This command will track the robot's pose on the field using vision
-    // measurements and drive the turret to point at the hub
+    /**
+     * Creates a Launch command that runs the conveyor, launcher, and kicker
+     * using the robot's current pose and field-relative velocity for shot compensation.
+     *
+     * @return A new Launch command instance
+     */
     private Command makeLaunch() {
         return new Launch(
             m_conveyorSubsystem,
@@ -94,6 +98,12 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
             this::getFieldRelativeVelocity);
     }
 
+    /**
+     * Creates a LaunchLookup command that runs the conveyor, launcher, and kicker
+     * using a lookup table to determine hood angle and flywheel speed from the current pose.
+     *
+     * @return A new LaunchLookup command instance
+     */
     private Command makeLaunchLookup() {
         return new LaunchLookup(
             m_conveyorSubsystem,
@@ -107,6 +117,11 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
 
 
 
+    /**
+     * Constructs the RobotContainer. Builds the autonomous chooser, registers all
+     * PathPlanner named commands, configures controller bindings, and pre-warms
+     * PathPlanner to prevent JVM pauses during matches.
+     */
     public RobotContainer() {
         autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
         SmartDashboard.putData("Auto Mode", autoChooser);
@@ -144,6 +159,14 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         FollowPathCommand.warmupCommand().schedule();
     }
 
+    /**
+     * Configures all controller button bindings and default commands.
+     * Driver Xbox (port 0): left stick = field-centric translation, right stick X = rotation,
+     * right bumper = finesse (reduced speed) mode, Y = reset heading, X = brake,
+     * B = fake vision reading, POV = robot-centric nudge.
+     * Aux Xbox (port 1): right bumper = intake, POV left = deploy intake, A = track hub,
+     * X = launch, B = launch lookup, POV up/down = climber extend/lower.
+     */
     private void configureBindings() {
 
         // Driver controls
@@ -255,11 +278,22 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
+    /**
+     * Returns the autonomous command selected via the SmartDashboard chooser.
+     *
+     * @return The autonomous Command to run, or null if none is selected
+     */
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
         return autoChooser.getSelected();
     }
 
+    /**
+     * Returns the robot's current velocity in field-relative coordinates.
+     * Converts robot-relative chassis speeds to field-relative using the current robot heading.
+     *
+     * @return Field-relative velocity as a Translation2d (x = forward, y = left, in m/s)
+     */
     private Translation2d getFieldRelativeVelocity() {
         ChassisSpeeds robotRelative = drivetrain.getState().Speeds;
 

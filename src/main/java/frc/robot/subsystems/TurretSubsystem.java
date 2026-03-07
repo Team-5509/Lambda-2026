@@ -48,6 +48,10 @@ public class TurretSubsystem extends SubsystemBase {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+    /**
+     * Constructs the TurretSubsystem. Configures the encoder and applies
+     * Motion Magic PID, soft limits, and neutral mode to the turret motor.
+     */
     public TurretSubsystem() {
         //configureEncoder();
         configureMotor();
@@ -115,6 +119,16 @@ public class TurretSubsystem extends SubsystemBase {
 
 
 
+    /**
+     * Aims the turret at a target while compensating for robot and projectile travel time.
+     * Predicts the robot's future position based on current velocity and flight time,
+     * then aims at the field-relative angle to the predicted intercept point.
+     *
+     * @param robotPose       Current robot pose on the field
+     * @param robotVelocity   Current field-relative robot velocity (m/s)
+     * @param targetPosition  Field-relative target position (e.g., hub center)
+     * @param projectileSpeed Projectile exit speed in m/s used to estimate flight time
+     */
     public void aimFieldRelativeWithPrediction(
             Pose2d robotPose,
             Translation2d robotVelocity,
@@ -139,6 +153,12 @@ public class TurretSubsystem extends SubsystemBase {
 
     /* ==================== Control ==================== */
 
+    /**
+     * Commands the turret to the specified angle (degrees), clamped to the allowed rotation range.
+     * Converts degrees to motor rotations using the gear ratio and issues a Motion Magic position command.
+     *
+     * @param degrees Target turret angle in degrees (field-relative)
+     */
     public void setTurretAngleDegrees(double degrees) {
         SmartDashboard.putNumber("TurretSubsystem/SetpointDegrees", degrees);
         degrees = Math.max(Constants.TurretSubsystemConstants.minTurretRotation, Math.min(Constants.TurretSubsystemConstants.maxTurretRotation, degrees));
@@ -153,16 +173,27 @@ public class TurretSubsystem extends SubsystemBase {
                 motionMagic.withPosition(rotations));
     }
 
+    /** Stops the turret motor immediately. */
     public void stop() {
         turretMotor.stopMotor();
     }
 
+    /**
+     * Sets the turret motor to the specified duty-cycle speed.
+     *
+     * @param speed Motor output speed (-1.0 to 1.0)
+     */
       public void setSpeed(double speed) {
         turretMotor.set(speed);
       }
 
     /* ==================== State ==================== */
 
+    /**
+     * Returns the current turret position in degrees.
+     *
+     * @return Turret position in degrees (CCW+)
+     */
     public double getTurretDegrees() {
         return turretMotor.getPosition().getValue().in(Units.Degrees);
     }
@@ -195,15 +226,30 @@ public class TurretSubsystem extends SubsystemBase {
         return degrees;
     }
 
+    /**
+     * Returns whether the turret has reached the negative (minimum angle) limit switch.
+     *
+     * @return true if the negative limit switch is triggered
+     */
     public boolean isAtNegativeLimit() {
         return negLimit.get();
     }
 
+    /**
+     * Returns whether the turret has reached the positive (maximum angle) limit switch.
+     *
+     * @return true if the positive limit switch is triggered
+     */
     public boolean isAtPositiveLimit() {
         return posLimit.get();
     } 
 
 
+    /**
+     * Called every scheduler cycle. Publishes turret position to SmartDashboard and
+     * auto-zeros the motor encoder when a limit switch is triggered, stopping the motor
+     * if it is moving in the direction of the triggered limit.
+     */
     @Override
     public void periodic() {
         // Optional: auto-zero if home switch hit

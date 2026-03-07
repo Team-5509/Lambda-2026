@@ -118,6 +118,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     configureAutoBuilder();
   }
 
+  /**
+   * Configures PathPlanner's AutoBuilder with the drivetrain's pose, speed, and chassis
+   * control callbacks. Automatically flips paths for the Red alliance. Errors are reported
+   * to the DriverStation but do not crash the robot.
+   */
   private void configureAutoBuilder() {
     try {
       var config = RobotConfig.fromGUISettings();
@@ -158,6 +163,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     return run(() -> this.setControl(requestSupplier.get()));
   }
 
+  /**
+   * Called every scheduler cycle. Applies the correct operator perspective (field-forward direction)
+   * based on the current alliance color, and publishes the robot's rotation to SmartDashboard.
+   */
   @Override
   public void periodic() {
     /*
@@ -182,6 +191,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     SmartDashboard.putNumber("Rotation, Robot", getState().Pose.getRotation().getDegrees());
   }
 
+  /**
+   * Starts a high-frequency simulation notifier thread (200 Hz) that updates the
+   * swerve drivetrain simulation state using elapsed time and simulated battery voltage.
+   */
   private void startSimThread() {
     m_lastSimTime = Utils.getCurrentTimeSeconds();
 
@@ -239,6 +252,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   }
 
+  /**
+   * Injects a hardcoded fake vision measurement at (3, 3) meters with a 65-degree heading
+   * for testing the pose estimator without a real camera.
+   */
   public void addFakeVisionReading() {
     addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
   }
