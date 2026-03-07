@@ -107,9 +107,10 @@ public class TurretSubsystem extends SubsystemBase {
      */
     public Command SetTurretPositionMM(DoubleSupplier positionSupplier) {
         return runOnce(() -> {
-            turretMotor.setControl(
-                    motionMagic.withPosition(positionSupplier.getAsDouble())
-                            .withSlot(0));
+            // Commented out to prevent turret movement during testing/analysis
+            // turretMotor.setControl(
+            //         motionMagic.withPosition(positionSupplier.getAsDouble())
+            //                 .withSlot(0));
         });
     }
 
@@ -149,16 +150,17 @@ public class TurretSubsystem extends SubsystemBase {
         double rotations = degrees / 360.0;
         rotations = (rotations * Constants.TurretSubsystemConstants.gearRatio);
         SmartDashboard.putNumber("TurretSubsystem/SetpointRotations", rotations);
-        turretMotor.setControl(
-                motionMagic.withPosition(rotations));
+    // Commented out to prevent turret movement during testing/analysis
+    // turretMotor.setControl(
+    //         motionMagic.withPosition(rotations));
     }
 
     public void stop() {
-        turretMotor.stopMotor();
+                // turretMotor.stopMotor();
     }
 
       public void setSpeed(double speed) {
-        turretMotor.set(speed);
+                // turretMotor.set(speed);
       }
 
     /* ==================== State ==================== */
@@ -209,15 +211,17 @@ public class TurretSubsystem extends SubsystemBase {
         // Optional: auto-zero if home switch hit
         SmartDashboard.putNumber("TurretSubsystem/TurretPosition", turretMotor.getPosition().getValueAsDouble());
         if (isAtNegativeLimit()) {
-            turretMotor.setPosition(Constants.TurretSubsystemConstants.minNegTurretMotorRot);
+            // Commented out to prevent forcing turret position when limit switches hit
+            // turretMotor.setPosition(Constants.TurretSubsystemConstants.minNegTurretMotorRot);
             if (turretMotor.getVelocity().getValueAsDouble() < 0) {
-                turretMotor.stopMotor();
+                // turretMotor.stopMotor();
             }
         }
         else if (isAtPositiveLimit()) {
-            turretMotor.setPosition(Constants.TurretSubsystemConstants.maxPosTurretMotorRot);
+            // Commented out to prevent forcing turret position when limit switches hit
+            // turretMotor.setPosition(Constants.TurretSubsystemConstants.maxPosTurretMotorRot);
             if (turretMotor.getVelocity().getValueAsDouble() > 0) {
-                turretMotor.stopMotor();
+                // turretMotor.stopMotor();
             }
         }
     }
