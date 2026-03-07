@@ -44,7 +44,7 @@ public class LauncherSubsystem extends SubsystemBase {
   private static final double MM_JERK_HOOD = 60.0; // rot/s^3
 
   // Launcher Speed
-  private double speed = -20.0;
+  private double speed = -10.0;
   private double speedIncrement = -5.0;
 
    private static final double MIN_HOOD_ROT = Constants.LauncherSubsystemConstants.kHoodMinRot;
