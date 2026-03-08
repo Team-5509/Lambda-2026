@@ -28,7 +28,7 @@ public class ConveyorSubsystem extends SubsystemBase {
   private static final double MM_JERK = 2000.0; // rot/s^3
 
   // Conveyor Speed
-  private double speed = -40;
+  private double speed = -60;
   private double speedIncrement = -10.0;
 
   // Stall detection

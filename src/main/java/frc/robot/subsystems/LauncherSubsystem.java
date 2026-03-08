@@ -32,7 +32,7 @@ public class LauncherSubsystem extends SubsystemBase {
    private static final int HOOD_MOTOR_ID = Constants.LauncherSubsystemConstants.kHoodMotorId;
     private static final int HOOD_CANCODER_ID = Constants.LauncherSubsystemConstants.kHoodEncoderId;
 
-    private static final int LIMIT_NEG_ID = 4; // -180 deg
+    private static final int LIMIT_NEG_ID = 0; // -180 deg
 
 
   private static final double MM_CRUISE_VEL = 2.0; // rot/s
@@ -113,7 +113,7 @@ private void configureHoodMotor() {
   config.Feedback.FeedbackRemoteSensorID = HOOD_CANCODER_ID;
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
         config.Feedback.RotorToSensorRatio = 1;
-        config.Feedback.SensorToMechanismRatio = 144;
+        config.Feedback.SensorToMechanismRatio = 8;
         //config.Feedback.FeedbackRotorOffset = 0.01;
 
   /* ---- Motion Magic ---- */
@@ -379,6 +379,7 @@ private void configureHoodMotor() {
     // Optional: auto-zero if home switch hit
       SmartDashboard.putNumber("LauncherSubsystem/LauncherRPS", launcherMotor.getVelocity().getValueAsDouble());
       SmartDashboard.putNumber("LauncherSubsystem/HoodPosition", hoodMotor.getPosition().getValueAsDouble());
+      SmartDashboard.putBoolean("LauncherSubsystem/PosReached", isHomePressed());
         if (isHomePressed()) {
           hoodMotor.setPosition(0.05);
           if (hoodMotor.getVelocity().getValueAsDouble() < 0) {
