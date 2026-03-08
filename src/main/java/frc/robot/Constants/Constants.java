@@ -63,8 +63,8 @@ public class Constants {
     //TODO: Measure this from shooter exit to robot center 
     public static final Translation2d shooterOffsetRobot = new Translation2d(0.32, 0.18);
 
-        public static final double maxPosTurretMotorRot = 20.83; // rot, example value
-        public static final double minNegTurretMotorRot = -20.83; // rot, example value
+        public static final double maxPosTurretMotorRot = 20.3; // rot, example value
+        public static final double minNegTurretMotorRot = -20.3; // rot, example value
 
         public static final double motorReturnOffset = 10.415; // rot, example value to convert from motor rotations to actual turret rotations
 
