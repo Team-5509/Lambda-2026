@@ -112,6 +112,10 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
+        // Speed sliders for kicker and launcher (adjustable in SmartDashboard/Shuffleboard)
+        SmartDashboard.putNumber("KickerSubsystem/SpeedRPS", -30.0);
+        SmartDashboard.putNumber("LauncherSubsystem/SpeedRPS", -45.0);
+
                 // Register named commands after subsystem fields have been initialized
         NamedCommands.registerCommand("RunLauncher", m_launcherSubsystem.RunLauncherMM());
         NamedCommands.registerCommand("StopLauncher", m_launcherSubsystem.StopLauncherMM());
@@ -233,16 +237,25 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         auxXbox.leftBumper().whileTrue(m_intakeSubsystem.StopIntakeMM());
         auxXbox.y().whileTrue(m_conveyorSubsystem.RunConveyorMM());
         auxXbox.x().whileTrue(m_conveyorSubsystem.StopConveyorMM());
+        
         auxXbox.b().whileTrue(m_kickerSubsystem.RunKickerMM());
+        // auxXbox.b().whileTrue(m_kickerSubsystem.RunKickerMM(
+        //         () -> SmartDashboard.getNumber("KickerSubsystem/SpeedRPS", -30.0)));
         auxXbox.a().whileTrue(m_kickerSubsystem.StopKickerMM());
-        auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp().andThen(m_kickerSubsystem.RunKickerMM()));
+        auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp().andThen
+        (m_kickerSubsystem.RunKickerMM()));
         auxXbox.start().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown().andThen(m_kickerSubsystem.RunKickerMM()));
         auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp().andThen(m_launcherSubsystem.RunLauncherMM()));
         auxXbox.back().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown().andThen(m_launcherSubsystem.RunLauncherMM()));
 
+        
+
+
         // auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM());
         // auxXbox.povRight().onTrue(m_intakeSubsystem.RetractIntakeMM());
         auxXbox.povLeft().whileTrue(m_launcherSubsystem.RunLauncherMM());
+        // auxXbox.povLeft().whileTrue(m_launcherSubsystem.RunLauncherMM(
+        //         () -> SmartDashboard.getNumber("LauncherSubsystem/SpeedRPS", -45.0)));
         auxXbox.povRight().whileTrue(m_launcherSubsystem.StopLauncherMM());
         //auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
         //auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
@@ -256,8 +269,9 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
 
         //auxXbox.x().whileTrue(makeLaunch());
         //auxXbox.b().whileTrue(makeLaunchLookup());
-        //auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(null));
-        //auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(null));
+        auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(2));
+        auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(0
+        ));
 
 
         // Idle while the robot is disabled. This ensures the configured

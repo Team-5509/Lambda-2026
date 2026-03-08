@@ -27,8 +27,8 @@ public class ConveyorSubsystem extends SubsystemBase {
   private static final double MM_JERK = 60.0; // rot/s^3
 
   // Conveyor Speed
-  private double speed = -40;
-  private double speedIncrement = 10.0;
+  private double speed = -10;
+  private double speedIncrement = -10.0;
   /* ==================== Hardware ==================== */
   private TalonFX conveyorMotor = new TalonFX(CONVEYOR_MOTOR_ID);
 
@@ -51,7 +51,8 @@ public class ConveyorSubsystem extends SubsystemBase {
     config.Slot0.kP = 0.1;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
-    config.Slot0.kV = 0.0;
+    config.Slot0.kV = 0.5;
+    config.Slot0.kA = 1;
 
     /* ---- Motor ---- */
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
