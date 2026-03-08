@@ -23,12 +23,12 @@ public class ConveyorSubsystem extends SubsystemBase {
   private static final int CONVEYOR_MOTOR_ID = Constants.ConveyorSubsystemConstants.kConveyorMotorId;
 
   // Motion Magic
-  private static final double MM_CRUISE_VEL = 2.0; // rot/s
-  private static final double MM_ACCEL = 6.0; // rot/s^2
-  private static final double MM_JERK = 60.0; // rot/s^3
+  private static final double MM_CRUISE_VEL = 40.0; // rot/s
+  private static final double MM_ACCEL = 200.0; // rot/s^2
+  private static final double MM_JERK = 2000.0; // rot/s^3
 
   // Conveyor Speed
-  private double speed = -10;
+  private double speed = -40;
   private double speedIncrement = -10.0;
 
   // Stall detection
@@ -57,7 +57,7 @@ public class ConveyorSubsystem extends SubsystemBase {
     config.Slot0.kP = 0.1;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
-    config.Slot0.kV = 0.5;
+    config.Slot0.kV = 2.0;
     config.Slot0.kA = 1;
 
     /* ---- Motor ---- */
