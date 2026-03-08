@@ -243,6 +243,10 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         // then resume normal intake spin. Fires once per stall event (rising edge).
         new Trigger(m_conveyorSubsystem::isStalling)
                 .onTrue(m_conveyorSubsystem.AgitateConveyorCommand());
+
+        // Auto-agitate intake: same pattern for the intake motor.
+        new Trigger(m_intakeSubsystem::isStalling)
+                .onTrue(m_intakeSubsystem.AgitateIntakeCommand());
         auxXbox.b().whileTrue(m_kickerSubsystem.RunKickerMM());
         // auxXbox.b().whileTrue(m_kickerSubsystem.RunKickerMM(
         //         () -> SmartDashboard.getNumber("KickerSubsystem/SpeedRPS", -30.0)));
