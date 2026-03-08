@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.IntakeSubsystemConstants;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -44,6 +45,12 @@ public class IntakeSubsystem extends SubsystemBase {
   // Intake Speed
   private double speed = 100.0;
   private double speedIncrement = 10.0;
+
+  // Stall detection
+  private static final double STALL_CURRENT_THRESHOLD_A = 40.0;
+  private static final double STALL_VELOCITY_THRESHOLD_RPS = 0.5;
+  private static final double AGITATE_REVERSE_DURATION_S = 0.3;
+  private boolean isRunning = false;
 
   private static final double MIN_INTAKE_ROT = 0.0;
     private static final double MAX_INTAKE_ROT = -0.3;
@@ -77,7 +84,7 @@ public class IntakeSubsystem extends SubsystemBase {
         config.Slot0.kP = 0.1;
         config.Slot0.kI = 0.0;
         config.Slot0.kD = 0;//5.0;
-        config.Slot0.kV = 0;
+        config.Slot0.kV = 0.5;
         config.Slot0.kA = 0;
 
                 /* ---- Motor ---- */
@@ -145,6 +152,7 @@ private void configureDeployMotor() {
    */
   public Command StopIntakeMM() {
     return runOnce(() -> {
+      isRunning = false;
       intakeMotor.setControl(
           motionMagic.withVelocity(0)
               .withSlot(0));
@@ -159,6 +167,7 @@ private void configureDeployMotor() {
    */
   public Command RunIntakeMM() {
     return runOnce(() -> {
+      isRunning = true;
       intakeMotor.setControl(
           motionMagic.withVelocity(speed)
               .withSlot(0));
@@ -283,6 +292,26 @@ private void configureDeployMotor() {
         });
   }
 
+
+  public boolean isStalling() {
+    if (!isRunning) return false;
+    double current = intakeMotor.getStatorCurrent().getValueAsDouble();
+    double velocity = Math.abs(intakeMotor.getVelocity().getValueAsDouble());
+    return current > STALL_CURRENT_THRESHOLD_A && velocity < STALL_VELOCITY_THRESHOLD_RPS;
+  }
+
+  public Command AgitateIntakeCommand() {
+    return Commands.sequence(
+        runOnce(() -> {
+          isRunning = false;
+          intakeMotor.setControl(motionMagic.withVelocity(-speed).withSlot(0));
+        }),
+        Commands.waitSeconds(AGITATE_REVERSE_DURATION_S),
+        runOnce(() -> {
+          isRunning = true;
+          intakeMotor.setControl(motionMagic.withVelocity(speed).withSlot(0));
+        }));
+  }
 
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).
