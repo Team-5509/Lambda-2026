@@ -205,14 +205,18 @@ public class ConveyorSubsystem extends SubsystemBase {
    */
   public Command AgitateConveyorCommand() {
     return Commands.sequence(
-        // Step 1: reverse the motor (negate speed flips direction)
-        runOnce(() -> conveyorMotor.setControl(
-            motionMagic.withVelocity(-speed).withSlot(0))),
+        // Step 1: clear isRunning so isStalling() goes false (allows trigger to re-fire if still jammed)
+        runOnce(() -> {
+          isRunning = false;
+          conveyorMotor.setControl(motionMagic.withVelocity(-speed).withSlot(0));
+        }),
         // Step 2: hold reverse briefly
         Commands.waitSeconds(AGITATE_REVERSE_DURATION_S),
-        // Step 3: resume normal intake spin to pull points in
-        runOnce(() -> conveyorMotor.setControl(
-            motionMagic.withVelocity(speed).withSlot(0))));
+        // Step 3: resume normal intake spin; restore isRunning so stall detection is active again
+        runOnce(() -> {
+          isRunning = true;
+          conveyorMotor.setControl(motionMagic.withVelocity(speed).withSlot(0));
+        }));
   }
 
   /**
