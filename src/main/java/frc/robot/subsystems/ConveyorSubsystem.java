@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants.Constants;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ConveyorSubsystem extends SubsystemBase {
@@ -174,6 +175,33 @@ public class ConveyorSubsystem extends SubsystemBase {
           /* one-time action goes here */
           speed = speed - speedIncrement;
         });
+  }
+
+  // Agitation reverse speed (RPS) — flips sign of normal speed to run backward
+  private static final double AGITATE_REVERSE_DURATION_S = 0.3;
+
+  /**
+   * Agitation command: briefly reverses the conveyor motor to undo itself (clear
+   * any jam or reset), then resumes normal intake spin to pull game pieces in.
+   *
+   * <p>Sequence:
+   * <ol>
+   *   <li>Run motor in reverse at {@code -speed} RPS for {@value #AGITATE_REVERSE_DURATION_S} s
+   *   <li>Return to normal intake speed ({@code speed} RPS)
+   * </ol>
+   *
+   * @return a command
+   */
+  public Command AgitateConveyorCommand() {
+    return Commands.sequence(
+        // Step 1: reverse the motor (negate speed flips direction)
+        runOnce(() -> conveyorMotor.setControl(
+            motionMagic.withVelocity(-speed).withSlot(0))),
+        // Step 2: hold reverse briefly
+        Commands.waitSeconds(AGITATE_REVERSE_DURATION_S),
+        // Step 3: resume normal intake spin to pull points in
+        runOnce(() -> conveyorMotor.setControl(
+            motionMagic.withVelocity(speed).withSlot(0))));
   }
 
   /**
