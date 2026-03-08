@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.commands.TrackFieldPoseCommand;
 import frc.robot.commands.TrackTargetCommand;
@@ -237,7 +238,11 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         auxXbox.leftBumper().whileTrue(m_intakeSubsystem.StopIntakeMM());
         auxXbox.y().whileTrue(m_conveyorSubsystem.RunConveyorMM());
         auxXbox.x().whileTrue(m_conveyorSubsystem.StopConveyorMM());
-        
+
+        // Auto-agitate: when conveyor is running and the motor stalls, reverse briefly
+        // then resume normal intake spin. Fires once per stall event (rising edge).
+        new Trigger(m_conveyorSubsystem::isStalling)
+                .onTrue(m_conveyorSubsystem.AgitateConveyorCommand());
         auxXbox.b().whileTrue(m_kickerSubsystem.RunKickerMM());
         // auxXbox.b().whileTrue(m_kickerSubsystem.RunKickerMM(
         //         () -> SmartDashboard.getNumber("KickerSubsystem/SpeedRPS", -30.0)));
