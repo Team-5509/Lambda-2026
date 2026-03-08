@@ -132,7 +132,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         NamedCommands.registerCommand("LowerClimber", m_climberSubsystem.LowerClimberMM(0.3));
         NamedCommands.registerCommand("ExtendHood", m_launcherSubsystem.ExtendHoodMM());
         NamedCommands.registerCommand("RetractHood", m_launcherSubsystem.RetractHoodMM());
-        NamedCommands.registerCommand("MoveTurret", m_turretSubsystem.SetTurretPositionMM(null));
+        // NamedCommands.registerCommand("MoveTurret", m_turretSubsystem.SetTurretPositionMM(null));
         NamedCommands.registerCommand("Launch", makeLaunch());
         NamedCommands.registerCommand("LaunchLookup", makeLaunchLookup());
         NamedCommands.registerCommand("Track", new TrackFieldPoseCommand(

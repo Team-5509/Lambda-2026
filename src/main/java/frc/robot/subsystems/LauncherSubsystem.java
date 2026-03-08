@@ -39,8 +39,8 @@ public class LauncherSubsystem extends SubsystemBase {
   private static final double MM_ACCEL = 6.0; // rot/s^2
   private static final double MM_JERK = 60.0; // rot/s^3
  
-  private static final double MM_CRUISE_VEL_HOOD = 2.0; // rot/s
-  private static final double MM_ACCEL_HOOD = 6.0; // rot/s^2
+  private static final double MM_CRUISE_VEL_HOOD = 40; // rot/s
+  private static final double MM_ACCEL_HOOD = 20; // rot/s^2
   private static final double MM_JERK_HOOD = 60.0; // rot/s^3
 
   // Launcher Speed
@@ -122,7 +122,7 @@ private void configureHoodMotor() {
   config.MotionMagic.MotionMagicJerk = MM_JERK_HOOD;
 
   /* ---- PID ---- */
-  config.Slot0.kP = 50;//60.0;
+  config.Slot0.kP = 100;//60.0;
   config.Slot0.kI = 0.0;
   config.Slot0.kD = 0;//5.0;
   config.Slot0.kV = 1;//0.0;

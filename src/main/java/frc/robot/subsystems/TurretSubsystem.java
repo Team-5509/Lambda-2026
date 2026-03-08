@@ -27,8 +27,8 @@ public class TurretSubsystem extends SubsystemBase {
 
     /* ==================== Constants ==================== */
     // Turret rotations (1 rotation = 360 degrees)
-    private static final double MIN_TURRET_ROT = 15;
-    private static final double MAX_TURRET_ROT = -15;
+    private static final double MIN_TURRET_ROT = -20;
+    private static final double MAX_TURRET_ROT = 20;
     double maxPosistion = 15;
     double minPosistion = -15;
 
@@ -36,7 +36,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // Motion Magic
     // Make Motion Magic very slow on purpose
-    private static final double MM_CRUISE_VEL = 65.0; // rot/s (was 2.0)
+    private static final double MM_CRUISE_VEL = 250.0; // rot/s (was 2.0)
     private static final double MM_ACCEL = 80.0; // rot/s^2 (was 6.0)
     private static final double MM_JERK = 10.0; // rot/s^3 (was 60.0)
 
