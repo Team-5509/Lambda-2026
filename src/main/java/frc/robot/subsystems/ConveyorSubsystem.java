@@ -27,7 +27,7 @@ public class ConveyorSubsystem extends SubsystemBase {
   private static final double MM_JERK = 60.0; // rot/s^3
 
   // Conveyor Speed
-  private double speed = -10;
+  private double speed = -60;
   private double speedIncrement = -10.0;
   /* ==================== Hardware ==================== */
   private TalonFX conveyorMotor = new TalonFX(CONVEYOR_MOTOR_ID);

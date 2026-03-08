@@ -97,8 +97,11 @@ public class TurretSubsystem extends SubsystemBase {
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MIN_TURRET_ROT;
 
         /* ---- Motor ---- */
-        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.MotorOutput.NeutralMode = NeutralModeValue.Coast; //TODO set back to brake
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        config.CurrentLimits.SupplyCurrentLimit = 10;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+
 
         turretMotor.getConfigurator().apply(config);
     }
