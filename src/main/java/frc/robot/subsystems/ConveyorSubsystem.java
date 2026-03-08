@@ -30,6 +30,11 @@ public class ConveyorSubsystem extends SubsystemBase {
   // Conveyor Speed
   private double speed = -40;
   private double speedIncrement = 10.0;
+
+  // Stall detection
+  private static final double STALL_CURRENT_THRESHOLD_A = 40.0; // stator amps above this = stalling
+  private static final double STALL_VELOCITY_THRESHOLD_RPS = 0.5; // |velocity| below this = near-stopped
+  private boolean isRunning = false;
   /* ==================== Hardware ==================== */
   private TalonFX conveyorMotor = new TalonFX(CONVEYOR_MOTOR_ID);
 
@@ -68,6 +73,7 @@ public class ConveyorSubsystem extends SubsystemBase {
    */
   public Command StopConveyorMM() {
     return runOnce(() -> {
+      isRunning = false;
       conveyorMotor.setControl(
           motionMagic.withVelocity(0)
               .withSlot(0));
@@ -82,6 +88,7 @@ public class ConveyorSubsystem extends SubsystemBase {
    */
   public Command RunConveyorMM() {
     return runOnce(() -> {
+      isRunning = true;
       conveyorMotor.setControl(
           motionMagic.withVelocity(speed)
               .withSlot(0));
@@ -96,6 +103,7 @@ public class ConveyorSubsystem extends SubsystemBase {
    */
   public Command RunConveyorMM(DoubleSupplier velocityRPS) {
     return runOnce(() -> {
+      isRunning = true;
       conveyorMotor.setControl(
           motionMagic.withVelocity(velocityRPS.getAsDouble())
               .withSlot(0));
@@ -113,6 +121,7 @@ public class ConveyorSubsystem extends SubsystemBase {
     return runOnce(
         () -> {
           /* one-time action goes here */
+          isRunning = true;
           conveyorMotor.set(speed);
         });
   }
@@ -128,6 +137,7 @@ public class ConveyorSubsystem extends SubsystemBase {
     return runOnce(
         () -> {
           /* one-time action goes here */
+          isRunning = false;
           conveyorMotor.set(0);
         });
   }
@@ -202,6 +212,20 @@ public class ConveyorSubsystem extends SubsystemBase {
         // Step 3: resume normal intake spin to pull points in
         runOnce(() -> conveyorMotor.setControl(
             motionMagic.withVelocity(speed).withSlot(0))));
+  }
+
+  /**
+   * Returns true when the conveyor motor is commanded to run but is stalling —
+   * i.e. stator current is above {@value #STALL_CURRENT_THRESHOLD_A} A and
+   * velocity is below {@value #STALL_VELOCITY_THRESHOLD_RPS} RPS.
+   *
+   * @return true if stalling while running
+   */
+  public boolean isStalling() {
+    if (!isRunning) return false;
+    double current = conveyorMotor.getStatorCurrent().getValueAsDouble();
+    double velocity = Math.abs(conveyorMotor.getVelocity().getValueAsDouble());
+    return current > STALL_CURRENT_THRESHOLD_A && velocity < STALL_VELOCITY_THRESHOLD_RPS;
   }
 
   /**
