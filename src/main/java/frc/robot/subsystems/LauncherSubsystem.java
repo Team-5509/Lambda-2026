@@ -44,7 +44,7 @@ public class LauncherSubsystem extends SubsystemBase {
   private static final double MM_JERK_HOOD = 60.0; // rot/s^3
 
   // Launcher Speed
-  private double speed = -45.0;
+  private double speed = -60.0;
   private double speedIncrement = -5.0;
 
    private static final double MIN_HOOD_ROT = Constants.LauncherSubsystemConstants.kHoodMinRot;
@@ -83,7 +83,7 @@ public class LauncherSubsystem extends SubsystemBase {
     config.Slot0.kP = 0;//60.0;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
-    config.Slot0.kV = 0.125;//0.0;
+    config.Slot0.kV = 0.375;//0.0;
 
     /* ---- Motor ---- */
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;

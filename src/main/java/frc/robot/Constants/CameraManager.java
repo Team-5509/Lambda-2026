@@ -14,7 +14,7 @@ public class CameraManager {
         // Back Center Camera
         CAM_FL("Apple",
             // Cam mounted facing forward, half a meter forward of center, half a meter up from center. 
-            new Transform3d(new Translation3d(0, -11.691, 10.607), new Rotation3d(0, Math.toRadians(10), Math.toRadians(-180))), 
+            new Transform3d(new Translation3d(0, -11.691, 10.607), new Rotation3d(0, Math.toRadians(10), Math.toRadians(180))), 
             VecBuilder.fill(4, 4, 8), 
             VecBuilder.fill(0.5, 0.5, 1)),
         
