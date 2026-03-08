@@ -229,21 +229,17 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         
 
         
-
-        // Aux driver controls
+// Aux driver controls Aux driver controls Aux driver controls Aux driver controls Aux driver controls Aux driver controls Aux driver controls Aux driver controls
         //auxXbox.y().whileTrue(m_conveyorSubsystem.RunConveyorMM());
         //auxXbox.axisMagnitudeGreaterThan(3 ,.2 ).whileTrue(m_kickerSubsystem.RunKickerMM());
-        
-        auxXbox.rightBumper().whileTrue(m_intakeSubsystem.RunIntakeMM());
-        auxXbox.leftBumper().whileTrue(m_intakeSubsystem.StopIntakeMM());
+        // auxXbox.rightBumper().whileTrue(m_intakeSubsystem.RunIntakeMM());
+        // auxXbox.leftBumper().whileTrue(m_intakeSubsystem.StopIntakeMM());
         auxXbox.y().whileTrue(m_conveyorSubsystem.RunConveyorMM());
         auxXbox.x().whileTrue(m_conveyorSubsystem.StopConveyorMM());
-
         // Auto-agitate: when conveyor is running and the motor stalls, reverse briefly
         // then resume normal intake spin. Fires once per stall event (rising edge).
         new Trigger(m_conveyorSubsystem::isStalling)
                 .onTrue(m_conveyorSubsystem.AgitateConveyorCommand());
-
         // Auto-agitate intake: same pattern for the intake motor.
         new Trigger(m_intakeSubsystem::isStalling)
                 .onTrue(m_intakeSubsystem.AgitateIntakeCommand());
@@ -256,18 +252,12 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         auxXbox.start().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown().andThen(m_kickerSubsystem.RunKickerMM()));
         auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp().andThen(m_launcherSubsystem.RunLauncherMM()));
         auxXbox.back().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown().andThen(m_launcherSubsystem.RunLauncherMM()));
-
-        
-
-
-        // auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM());
-        // auxXbox.povRight().onTrue(m_intakeSubsystem.RetractIntakeMM());
-        auxXbox.povLeft().whileTrue(m_launcherSubsystem.RunLauncherMM());
-        // auxXbox.povLeft().whileTrue(m_launcherSubsystem.RunLauncherMM(
-        //         () -> SmartDashboard.getNumber("LauncherSubsystem/SpeedRPS", -45.0)));
-        auxXbox.povRight().whileTrue(m_launcherSubsystem.StopLauncherMM());
-        //auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
-        //auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
+        auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM());
+        auxXbox.povRight().onTrue(m_intakeSubsystem.RetractIntakeMM());
+        // auxXbox.povLeft().whileTrue(m_launcherSubsystem.RunLauncherMM());
+        // auxXbox.povRight().whileTrue(m_launcherSubsystem.StopLauncherMM());
+        auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
+        auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
         // auxXbox.a().onTrue(new TrackFieldPoseCommand(
         //         m_turretSubsystem,
         //         // Supplier<Pose2d>
@@ -275,7 +265,6 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         //         // Supplier<Translation2d> (FIELD-RELATIVE)
         //         this::getFieldRelativeVelocity,
         //         TurretSubsystemConstants.ballSpeed));
-
         //auxXbox.x().whileTrue(makeLaunch());
         //auxXbox.b().whileTrue(makeLaunchLookup());
         auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(2));
