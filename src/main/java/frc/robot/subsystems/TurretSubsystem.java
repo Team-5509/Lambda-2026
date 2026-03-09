@@ -35,10 +35,9 @@ public class TurretSubsystem extends SubsystemBase {
      private DoubleSupplier robotHeadingDegSupplier = () -> 0.0;
 
     // Motion Magic
-    // Make Motion Magic very slow on purpose
-    private static final double MM_CRUISE_VEL = 250.0; // rot/s (was 2.0)
-    private static final double MM_ACCEL = 80.0; // rot/s^2 (was 6.0)
-    private static final double MM_JERK = 10.0; // rot/s^3 (was 60.0)
+    private static final double MM_CRUISE_VEL = 250.0; // rot/s
+    private static final double MM_ACCEL = 200.0; // rot/s^2 (was 80.0)
+    private static final double MM_JERK = 1600.0; // rot/s^3 (was 10.0)
 
     /* ==================== Hardware ==================== */
     private final TalonFX turretMotor = new TalonFX(TURRET_MOTOR_ID);
@@ -84,10 +83,11 @@ public class TurretSubsystem extends SubsystemBase {
         config.MotionMagic.MotionMagicJerk = MM_JERK;
 
         /* ---- PID ---- */
-        config.Slot0.kP = 10.0;
+        config.Slot0.kP = 15.0;
         config.Slot0.kI = 0.0;
-        config.Slot0.kD = 0.0;
+        config.Slot0.kD = 0.2;
         config.Slot0.kV = 0.05;
+        config.Slot0.kS = 0.15;
         
 
         /* ---- Soft Limits ---- */
