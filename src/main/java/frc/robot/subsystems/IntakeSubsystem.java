@@ -43,7 +43,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private static final double MM_JERK       = 60.0;  // rot/s^3
 
   // Intake Speed
-  private double speed = 100.0;
+  private double speed = 10.0;
   private double speedIncrement = 10.0;
 
   // Stall detection
