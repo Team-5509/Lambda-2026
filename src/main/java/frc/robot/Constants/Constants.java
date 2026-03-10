@@ -66,7 +66,7 @@ public class Constants {
         public static final double maxPosTurretMotorRot = 20.3; // rot, example value
         public static final double minNegTurretMotorRot = -20.3; // rot, example value
 
-        public static final double motorReturnOffset = 10.415; // rot, example value to convert from motor rotations to actual turret rotations
+        public static final double motorReturnOffsetDegrees = 90; // rot, example value to convert from motor rotations to actual turret rotations
 
         //TODO : Measure these angles on the actual robot and convert to motor rotations using the gear ratio
         public static final double maxTurretRotation = 180; // degrees, example value

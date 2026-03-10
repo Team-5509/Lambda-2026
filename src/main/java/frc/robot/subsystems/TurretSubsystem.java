@@ -22,13 +22,13 @@ public class TurretSubsystem extends SubsystemBase {
     private static final int TURRET_MOTOR_ID = Constants.TurretSubsystemConstants.kTurretMotorId;
     //private static final int TURRET_CANCODER_ID = Constants.TurretSubsystemConstants.kTurretEncoderId;
 
-    private static final int LIMIT_NEG_ID = 1; // -180 deg
-    private static final int LIMIT_POS_ID = 2; // +180 deg
+    private static final int LIMIT_NEG_ID = 2; // -180 deg
+    private static final int LIMIT_POS_ID = 1; // +180 deg
 
     /* ==================== Constants ==================== */
     // Turret rotations (1 rotation = 360 degrees)
-    private static final double MIN_TURRET_ROT = -20;
-    private static final double MAX_TURRET_ROT = 20;
+    private static final double MIN_TURRET_ROT = -10;
+    private static final double MAX_TURRET_ROT = 30;
     double maxPosistion = 15;
     double minPosistion = -15;
 
@@ -99,7 +99,7 @@ public class TurretSubsystem extends SubsystemBase {
 
         /* ---- Motor ---- */
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         
 
 
@@ -153,18 +153,25 @@ public Command SetTurretPositionMinMM() {
     /* ==================== Control ==================== */
 
     public void setTurretAngleDegrees(double degrees) {
+        //Offset to get proper rotations
+        degrees += Constants.TurretSubsystemConstants.motorReturnOffsetDegrees;
         SmartDashboard.putNumber("TurretSubsystem/SetpointDegrees", degrees);
-        degrees = Math.max(Constants.TurretSubsystemConstants.minTurretRotation, Math.min(Constants.TurretSubsystemConstants.maxTurretRotation, degrees));
-        //TODO FIND THE ACTUAL MIN TURRET ROTATION
+
+        double maxDegrees = Constants.TurretSubsystemConstants.maxTurretRotation;
+        double minDegrees = Constants.TurretSubsystemConstants.minTurretRotation;
+        degrees = Math.max(-90, Math.min(270, degrees));
+        
         if(degrees < (-90) ) {
-            degrees = (Constants.TurretSubsystemConstants.maxTurretRotation + (Constants.TurretSubsystemConstants.maxTurretRotation - Math.abs(degrees)));
+            degrees = maxDegrees + (maxDegrees - Math.abs(degrees));
         }
+        
+        degrees += 90;
+        SmartDashboard.putNumber("TurretSubsystem/AfterCalculationSetpointDegrees", degrees);
         double rotations = degrees / 360.0;
         rotations = (rotations * Constants.TurretSubsystemConstants.gearRatio);
         SmartDashboard.putNumber("TurretSubsystem/SetpointRotations", rotations);
     
-     turretMotor.setControl(
-             motionMagic.withPosition(rotations));
+        turretMotor.setControl(motionMagic.withPosition(rotations));
     }
 
     public void stop() {
