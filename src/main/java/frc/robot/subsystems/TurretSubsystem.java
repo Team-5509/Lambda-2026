@@ -26,12 +26,14 @@ public class TurretSubsystem extends SubsystemBase {
     private static final int LIMIT_POS_ID = 1; // +180 deg
 
     /* ==================== Constants ==================== */
-    // Limit switches at 90° from robot front → full 360° range: -270° to +90°
     private static final double GEAR_RATIO    = 5000.0 / 120.0;             // ~41.667
     private static final double MIN_TURRET_ROT = (-270.0 / 360.0) * GEAR_RATIO; // ~-31.25 motor rot
     private static final double MAX_TURRET_ROT = (90.0  / 360.0) * GEAR_RATIO;  // ~+10.42 motor rot
     double maxPosistion = MAX_TURRET_ROT;
     double minPosistion = MIN_TURRET_ROT;
+
+    /* ==================== Calibration ==================== */
+    private final TurretCalibration calibration = new TurretCalibration();
 
      private DoubleSupplier robotHeadingDegSupplier = () -> 0.0;
 
@@ -174,6 +176,33 @@ public Command SetTurretPositionMinMM() {
                  turretMotor.set(speed);
       }
 
+    /** Raw motor rotations from the TalonFX rotor sensor (boot-relative). */
+    public double getRawMotorRotations() {
+        return turretMotor.getPosition().getValueAsDouble();
+    }
+
+    /** Get the calibration data object. */
+    public TurretCalibration getCalibration() {
+        return calibration;
+    }
+
+    /**
+     * Apply saved calibration after a homing event or after the calibration
+     * command completes.  Re-zeros the encoder so that 0 motor-rot = true zero.
+     *
+     * Call this after homing to either limit switch so that all subsequent
+     * angle commands are robot-relative.
+     */
+    public void applyCalibration() {
+        if (!calibration.isCalibrated()) return;
+
+        if (isAtNegativeLimit()) {
+            turretMotor.setPosition(calibration.getNegSwitchMotorRot());
+        } else if (isAtPositiveLimit()) {
+            turretMotor.setPosition(calibration.getPosSwitchMotorRot());
+        }
+    }
+
     /* ==================== State ==================== */
 
     public double getTurretDegrees() {
@@ -219,20 +248,28 @@ public Command SetTurretPositionMinMM() {
 
     @Override
     public void periodic() {
-        // Optional: auto-zero if home switch hit
         SmartDashboard.putNumber("TurrentSubsystem/TurretPositionInDegrees", turretMotor.getPosition().getValue().in(Units.Degrees));
         SmartDashboard.putNumber("TurretSubsystem/TurretPosition", turretMotor.getPosition().getValueAsDouble());
         SmartDashboard.putBoolean("TurretSubsystem.PosReached", isAtPositiveLimit());
         SmartDashboard.putBoolean("TurretSubsystem/NegReached", isAtNegativeLimit());
-        if (!isAtNegativeLimit()) {
-            // Re-zero encoder at the known -270° position
-            turretMotor.setPosition(Constants.TurretSubsystemConstants.minNegTurretMotorRot);
+        SmartDashboard.putBoolean("TurretSubsystem/Calibrated", calibration.isCalibrated());
+
+        // Auto re-zero when a limit switch is hit.
+        // If calibrated, use the saved switch positions (robot-relative).
+        // Otherwise fall back to the hard-coded assumptions.
+        if (isAtNegativeLimit()) {
+            double negRot = calibration.isCalibrated()
+                    ? calibration.getNegSwitchMotorRot()
+                    : Constants.TurretSubsystemConstants.minNegTurretMotorRot;
+            turretMotor.setPosition(negRot);
             if (turretMotor.getVelocity().getValueAsDouble() < 0) {
                 turretMotor.stopMotor();
             }
-        } else if (!isAtPositiveLimit()) {
-            // Re-zero encoder at the known +90° position
-            turretMotor.setPosition(Constants.TurretSubsystemConstants.maxPosTurretMotorRot);
+        } else if (isAtPositiveLimit()) {
+            double posRot = calibration.isCalibrated()
+                    ? calibration.getPosSwitchMotorRot()
+                    : Constants.TurretSubsystemConstants.maxPosTurretMotorRot;
+            turretMotor.setPosition(posRot);
             if (turretMotor.getVelocity().getValueAsDouble() > 0) {
                 turretMotor.stopMotor();
             }

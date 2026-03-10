@@ -37,6 +37,11 @@ public class HomeTurret extends Command {
   @Override
   public void end(boolean interrupted) {
     m_subsystem.stop();
+    if (!interrupted) {
+      // We're sitting on the neg limit switch – apply calibration so the
+      // encoder knows the true robot-relative angle of this switch.
+      m_subsystem.applyCalibration();
+    }
   }
 
   // Returns true when the command should end.

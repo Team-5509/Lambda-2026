@@ -37,6 +37,8 @@ import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
+import frc.robot.commands.CalibrateTurret;
+import frc.robot.commands.HomeTurret;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.Launch;
 import frc.robot.commands.LaunchLookup;
@@ -144,6 +146,12 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
                 this::getFieldRelativeVelocity,
                 TurretSubsystemConstants.ballSpeed));
 
+
+        // Put calibrate and home commands on SmartDashboard for easy access
+        SmartDashboard.putData("Calibrate Turret",
+                new CalibrateTurret(m_turretSubsystem, m_turretSubsystem.getCalibration()));
+        SmartDashboard.putData("Home Turret",
+                new HomeTurret(m_turretSubsystem));
 
         configureBindings();
 
