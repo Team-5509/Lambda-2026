@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants.Constants;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class KickerSubsystem extends SubsystemBase {
@@ -24,6 +25,8 @@ public class KickerSubsystem extends SubsystemBase {
   private static final double MM_CRUISE_VEL = 2.0; // rot/s
   private static final double MM_ACCEL = 6.0; // rot/s^2
   private static final double MM_JERK = 60.0; // rot/s^3
+
+  private static final double AGITATE_REVERSE_DURATION_S = 0.3; // seconds to run kicker in reverse for agitation
 
   // Kicker Speed
   private double speed = -30;
@@ -177,6 +180,25 @@ public class KickerSubsystem extends SubsystemBase {
         });
   }
 
+     /**
+     * Command that reverses the kicker motor.
+     *
+     * @return a command
+     */
+    public Command reverseKickerCommand() {
+      return runOnce(() -> {
+        kickerMotor.setControl(
+            motionMagic.withVelocity(-speed)
+                .withSlot(0));
+      });
+    }
+  
+    public Command AgitateKickerCommand() {
+      return Commands.sequence(
+          reverseKickerCommand(),
+          Commands.waitSeconds(AGITATE_REVERSE_DURATION_S),
+        RunKickerCommand());
+  }
   /**
    * An example method querying a boolean state of the subsystem (for example, a
    * digital sensor).

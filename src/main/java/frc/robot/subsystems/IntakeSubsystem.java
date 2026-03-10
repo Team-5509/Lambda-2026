@@ -302,17 +302,21 @@ private void configureDeployMotor() {
 
   public Command AgitateIntakeCommand() {
     return Commands.sequence(
-        runOnce(() -> {
-          isRunning = false;
-          intakeMotor.setControl(motionMagic.withVelocity(-speed).withSlot(0));
-        }),
+        reverseIntakeCommand(),
         Commands.waitSeconds(AGITATE_REVERSE_DURATION_S),
         runOnce(() -> {
           isRunning = true;
           intakeMotor.setControl(motionMagic.withVelocity(speed).withSlot(0));
         }));
   }
-
+ public Command reverseIntakeCommand() {
+    return runOnce(() -> {
+      isRunning = false;
+      intakeMotor.setControl(
+          motionMagic.withVelocity(-speed)
+              .withSlot(0));
+    });
+  }
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).
    *
