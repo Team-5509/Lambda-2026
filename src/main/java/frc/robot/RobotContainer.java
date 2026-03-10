@@ -301,6 +301,9 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
 
         auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
 
+        auxXbox.rightBumper().onTrue(m_intakeSubsystem.RunIntakeMM());
+        auxXbox.leftBumper().onTrue(m_intakeSubsystem.StopIntakeMM());
+
         auxXbox.leftTrigger().whileTrue(m_intakeSubsystem.AgitateIntakeCommand()
         .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
         .alongWith(m_kickerSubsystem.AgitateKickerCommand())
