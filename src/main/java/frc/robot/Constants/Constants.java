@@ -63,16 +63,16 @@ public class Constants {
     //TODO: Measure this from shooter exit to robot center 
     public static final Translation2d shooterOffsetRobot = new Translation2d(0.32, 0.18);
 
-        public static final double maxPosTurretMotorRot = 20.3; // rot, example value
-        public static final double minNegTurretMotorRot = -20.3; // rot, example value
+        // Limit switches are physically at 90° from robot front.
+        // Full 360° range: -270° (neg limit) to +90° (pos limit).
+        public static final double gearRatio = 5000.0 / 120.0; // ~41.667 — must be double, not int
 
-        public static final double motorReturnOffsetDegrees = 90; // rot, example value to convert from motor rotations to actual turret rotations
+        public static final double maxTurretRotation = 90.0;   // degrees, positive limit switch
+        public static final double minTurretRotation = -270.0; // degrees, negative limit switch
 
-        //TODO : Measure these angles on the actual robot and convert to motor rotations using the gear ratio
-        public static final double maxTurretRotation = 180; // degrees, example value
-        public static final double minTurretRotation = -180; // degrees, example value
-
-        public static final int gearRatio = 5000/120;
+        // Motor rotations at each physical limit (used for encoder re-zeroing)
+        public static final double maxPosTurretMotorRot = (90.0 / 360.0) * (5000.0 / 120.0);   // ~10.417 rot
+        public static final double minNegTurretMotorRot = (-270.0 / 360.0) * (5000.0 / 120.0); // ~-31.25 rot
         public static final int kTurretMotorId = 17;
         public static final Double ballSpeed = 22.0;
     }
