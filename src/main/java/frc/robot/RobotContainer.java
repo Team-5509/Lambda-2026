@@ -47,6 +47,10 @@ import frc.robot.subsystems.ConveyorSubsystem;
 
 public class RobotContainer {
 private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
+
+    public TurretSubsystem getTurretSubsystem() {
+        return m_turretSubsystem;
+    }
     private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
     private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
     private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
