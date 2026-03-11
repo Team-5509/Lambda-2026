@@ -317,7 +317,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
 
 
         // Slow clockwise turret rotation until a limit switch is hit
-        auxXbox.b().onTrue(new SlowClockwiseToSwitch(m_turretSubsystem));
+        auxXbox.b().whileTrue(new SlowClockwiseToSwitch(m_turretSubsystem));
 
 //         auxXbox.leftTrigger().whileTrue(m_intakeSubsystem.AgitateIntakeCommand()
 //         .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
