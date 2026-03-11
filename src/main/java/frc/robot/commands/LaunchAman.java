@@ -37,7 +37,8 @@ public class LaunchAman extends Command {
   private final LauncherSubsystem m_launcherSubsystem;
   private final KickerSubsystem   m_kickerSubsystem;
   private final Supplier<Pose2d>        m_poseSupplier;
-  private final Supplier<Translation2d> m_velocitySupplier; // field-relative, m/s
+  private final Supplier<Translation2d> m_velocitySupplier;     // field-relative, m/s
+  private final Supplier<Translation2d> m_accelerationSupplier; // field-relative, m/s²
 
   private final Timer m_timer = new Timer();
   private final ShootingArc m_shootingArc = new ShootingArc();
@@ -50,20 +51,23 @@ public class LaunchAman extends Command {
    * @param conveyorSubsystem  Conveyor subsystem
    * @param launcherSubsystem  Launcher subsystem
    * @param kickerSubsystem    Kicker subsystem
-   * @param poseSupplier       Field-relative robot pose (e.g. drivetrain::getState().Pose)
-   * @param velocitySupplier   Field-relative robot velocity in m/s (e.g. getFieldRelativeVelocity)
+   * @param poseSupplier         Field-relative robot pose (e.g. drivetrain::getState().Pose)
+   * @param velocitySupplier     Field-relative robot velocity in m/s (e.g. getFieldRelativeVelocity)
+   * @param accelerationSupplier Field-relative robot acceleration in m/s²
    */
   public LaunchAman(
       ConveyorSubsystem conveyorSubsystem,
       LauncherSubsystem launcherSubsystem,
       KickerSubsystem kickerSubsystem,
       Supplier<Pose2d> poseSupplier,
-      Supplier<Translation2d> velocitySupplier) {
-    m_conveyorSubsystem = conveyorSubsystem;
-    m_launcherSubsystem = launcherSubsystem;
-    m_kickerSubsystem   = kickerSubsystem;
-    m_poseSupplier      = poseSupplier;
-    m_velocitySupplier  = velocitySupplier;
+      Supplier<Translation2d> velocitySupplier,
+      Supplier<Translation2d> accelerationSupplier) {
+    m_conveyorSubsystem  = conveyorSubsystem;
+    m_launcherSubsystem  = launcherSubsystem;
+    m_kickerSubsystem    = kickerSubsystem;
+    m_poseSupplier       = poseSupplier;
+    m_velocitySupplier   = velocitySupplier;
+    m_accelerationSupplier = accelerationSupplier;
 
     addRequirements(conveyorSubsystem, launcherSubsystem, kickerSubsystem);
   }
@@ -117,8 +121,9 @@ public class LaunchAman extends Command {
     double exitSpeed = TurretSubsystemConstants.ballSpeed;
 
     // ── Drag-compensated solver (ACTIVE) ─────────────────────────────────────
+    Translation2d robotAccel = m_accelerationSupplier.get();
     ShootingArc.Shot dragShot = m_shootingArc.solveDragShotWithLead(
-        robotPose, robotVelocity, null, Optional.of(exitSpeed), false);
+        robotPose, robotVelocity, robotAccel, Optional.of(exitSpeed), true);
 
     SmartDashboard.putNumber("Launch/Drag/PitchDeg",    Math.toDegrees(dragShot.pitchRad()));
     SmartDashboard.putNumber("Launch/Drag/YawDeg",      Math.toDegrees(dragShot.yawFieldRad()));
