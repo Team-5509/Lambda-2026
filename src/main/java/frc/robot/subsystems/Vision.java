@@ -43,6 +43,7 @@ import frc.robot.Constants.CameraManager;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -54,10 +55,14 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
+    private static final double kMaxAmbiguity = 0.2; // Reject single-tag estimates above this ambiguity
+    private static final double kMaxRotationErrorDeg = 50; // Reject vision if rotation differs from gyro by more than this
+
     private final PhotonCamera camera;
     private final PhotonPoseEstimator photonEstimator;
     private Matrix<N3, N1> curStdDevs;
     private final EstimateConsumer estConsumer;
+    private final Supplier<Rotation2d> gyroRotationSupplier;
 
     // Simulation
     private PhotonCameraSim cameraSim;
@@ -74,8 +79,9 @@ public class Vision extends SubsystemBase {
       * @param estConsumer Lamba that will accept a pose estimate and pass it to your desired {@link
       *     edu.wpi.first.math.estimator.SwerveDrivePoseEstimator}
       */
-     public Vision(EstimateConsumer estConsumer, CameraProperties cameraName) {
+     public Vision(EstimateConsumer estConsumer, CameraProperties cameraName, Supplier<Rotation2d> gyroRotationSupplier) {
         this.estConsumer = estConsumer;
+        this.gyroRotationSupplier = gyroRotationSupplier;
 
         // Update camera properties within Vision class
         kCameraName = cameraName.getName();
@@ -115,13 +121,29 @@ public class Vision extends SubsystemBase {
     public void periodic() {
         Optional<EstimatedRobotPose> visionEst = Optional.empty();
         for (var change : camera.getAllUnreadResults()) {
-            //visionEst = photonEstimator.update(change);f
+            // Try multi-tag first (reliable rotation), then fall back to single-tag
             visionEst = photonEstimator.estimateCoprocMultiTagPose(change);
             if (visionEst.isEmpty()) {
+                // Single-tag fallback: reject if ambiguity is too high
+                if (change.hasTargets() && change.getBestTarget().getPoseAmbiguity() > kMaxAmbiguity) {
+                    continue; // Skip this frame entirely — ambiguous single-tag
+                }
                 visionEst = photonEstimator.estimateLowestAmbiguityPose(change);
             }
-            updateEstimationStdDevs(visionEst, change.getTargets());
 
+            // Reject vision estimates whose rotation is too far from the gyro
+            if (visionEst.isPresent()) {
+                double visionDeg = visionEst.get().estimatedPose.toPose2d().getRotation().getDegrees();
+                double gyroDeg = gyroRotationSupplier.get().getDegrees();
+                double rotationError = Math.abs(visionDeg - gyroDeg);
+                // Normalize to [0, 180]
+                if (rotationError > 180) rotationError = 360 - rotationError;
+                if (rotationError > kMaxRotationErrorDeg) {
+                    continue; // Vision rotation is too far off — likely a bad estimate
+                }
+            }
+
+            updateEstimationStdDevs(visionEst, change.getTargets());
 
             if (Robot.isSimulation()) {
                 visionEst.ifPresentOrElse(
@@ -136,9 +158,7 @@ public class Vision extends SubsystemBase {
             visionEst.ifPresent(
                     est -> {
                         // Change our trust in the measurement based on the tags we can see
-                            
                         var estStdDevs = getEstimationStdDevs();
-
                          estConsumer.accept(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
                     });
         }
