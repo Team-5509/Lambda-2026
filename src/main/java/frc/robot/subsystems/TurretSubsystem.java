@@ -102,7 +102,7 @@ public class TurretSubsystem extends SubsystemBase {
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MIN_TURRET_ROT;
 
         /* ---- Motor ---- */
-        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         
 
@@ -167,6 +167,10 @@ public Command SetTurretPositionMinMM() {
         SmartDashboard.putNumber("TurretSubsystem/SetpointRotations", rotations);
 
         turretMotor.setControl(motionMagic.withPosition(rotations));
+    }
+
+    public void setNeutralBrake() {
+        turretMotor.setNeutralMode(NeutralModeValue.Brake);
     }
 
     public void stop() {
