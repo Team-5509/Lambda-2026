@@ -215,6 +215,7 @@ public class LaunchLookup extends Command {
 
     Translation2d predictedShooterPos = shooterPos.plus(robotVelocity.times(flightTime));
     double effectiveDist = predictedShooterPos.getDistance(hub);
+    SmartDashboard.putNumber("LaunchLookup/DistanceToHubP2", effectiveDist);
 
     // ── Table lookup ─────────────────────────────────────────────────────────
     // InterpolatingDoubleTreeMap clamps to the min/max table entry when the
