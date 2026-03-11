@@ -209,7 +209,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
 
         driverXbox.start().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
         driverXbox.rightTrigger().whileTrue(drivetrain.applyRequest(() -> brake)); 
-        driverXbox.leftTrigger().whileTrue(m_intakeSubsystem.RunIntakeMM().andThen(m_intakeSubsystem.StopIntakeMM()));
+        driverXbox.leftTrigger().onTrue(m_intakeSubsystem.RunIntakeMM()).onFalse(m_intakeSubsystem.StopIntakeMM());
         //driverXbox.b().onTrue(drivetrain.runOnce(() -> drivetrain.addFakeVisionReading()));
 
         
@@ -218,13 +218,13 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
                                 () -> forwardStraight
                                         .withVelocityX(
                                                 -MathUtil.applyDeadband(driverXbox.getLeftY(), 0.05)
-                                                        * MaxSpeed) // Drive forward with negative Y (forward)
+                                                        * -MaxSpeed) // Drive forward with negative Y (forward)
                                         .withVelocityY(
                                                 -MathUtil.applyDeadband(driverXbox.getLeftX(), 0.05)
-                                                        * MaxSpeed) // Drive left with negative X (left)
+                                                        * -MaxSpeed) // Drive left with negative X (left)
                                         .withRotationalRate(
                                                 -MathUtil.applyDeadband(driverXbox.getRightX(), 0.05)
-                                                        * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                                                        * -MaxAngularRate) // Drive counterclockwise with negative X (left)
                         ));
 
                 
