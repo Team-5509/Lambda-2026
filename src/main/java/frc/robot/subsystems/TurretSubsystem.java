@@ -37,7 +37,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // Motion Magic
     // Make Motion Magic very slow on purpose
-    private static final double MM_CRUISE_VEL = 6 * GEAR_RATIO; // rot/s (was 2.0)
+    private static final double MM_CRUISE_VEL = 3 * GEAR_RATIO; // rot/s (was 2.0)
     private static final double MM_ACCEL = 300.0; // rot/s^2 (was 6.0)
     private static final double MM_JERK = 1600.0; // rot/s^3 (was 60.0)
 
@@ -93,6 +93,8 @@ public class TurretSubsystem extends SubsystemBase {
         config.Slot0.kV = 0.05;
         config.Slot0.kS = 0.15;
         
+        config.CurrentLimits.SupplyCurrentLimit = 20;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         /* ---- Soft Limits ---- */
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;

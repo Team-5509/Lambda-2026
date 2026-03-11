@@ -75,7 +75,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         
     //public final Vision visionFL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_FL);
     //public final Vision visionFR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_FR);
-    public final Vision visionRL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RL);
+//     public final Vision visionRL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RL);
     public final Vision visionR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_R);
     public final Vision visionRR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RR);
 
@@ -136,7 +136,13 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         NamedCommands.registerCommand("RetractHood", m_launcherSubsystem.RetractHoodMM());
         // NamedCommands.registerCommand("MoveTurret", m_turretSubsystem.SetTurretPositionMM(null));
         NamedCommands.registerCommand("Launch", makeLaunch());
-        NamedCommands.registerCommand("LaunchLookup", makeLaunchLookup());
+        NamedCommands.registerCommand("LaunchLookup", new LaunchLookup(
+            m_conveyorSubsystem,
+            m_launcherSubsystem,
+            m_kickerSubsystem,
+            () -> drivetrain.getState().Pose,
+            this::getFieldRelativeVelocity));
+
         NamedCommands.registerCommand("Track", new TrackFieldPoseCommand(
                 m_turretSubsystem,
                 // Supplier<Pose2d>
@@ -272,14 +278,15 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         // auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp().andThen
         // (m_kickerSubsystem.RunKickerMM()));
         // auxXbox.start().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown().andThen(m_kickerSubsystem.RunKickerMM()));
-        // auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp().andThen(m_launcherSubsystem.RunLauncherMM()));
+        auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp().andThen(m_launcherSubsystem.RunLauncherMM()));
         // auxXbox.back().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown().andThen(m_launcherSubsystem.RunLauncherMM()));
         // auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM());
         // auxXbox.povRight().onTrue(m_intakeSubsystem.RetractIntakeMM());
         // auxXbox.povLeft().whileTrue(m_launcherSubsystem.RunLauncherMM());
         // auxXbox.povRight().whileTrue(m_launcherSubsystem.StopLauncherMM());
-        //auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
-        //auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
+        auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
+        auxXbox.b().onTrue(m_launcherSubsystem.MoveHoodUp());
+        auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
           //auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(2));
 //         auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(0
 //  ));
@@ -297,15 +304,20 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
                 this::getFieldRelativeVelocity,
                 TurretSubsystemConstants.ballSpeed));
 
-        auxXbox.povUp().onTrue(m_intakeSubsystem.DeployIntakeMM());
-        auxXbox.povDown().onTrue(m_intakeSubsystem.RetractIntakeMM());
+        auxXbox.povDown().onTrue(m_intakeSubsystem.DeployIntakeMM());
+        auxXbox.povUp().onTrue(m_intakeSubsystem.RetractIntakeMM());
 
-        auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
+        auxXbox.rightTrigger().whileTrue(new LaunchLookup(
+            m_conveyorSubsystem,
+            m_launcherSubsystem,
+            m_kickerSubsystem,
+            () -> drivetrain.getState().Pose,
+            this::getFieldRelativeVelocity));
 
-        auxXbox.leftTrigger().whileTrue(m_intakeSubsystem.AgitateIntakeCommand()
-        .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
-        .alongWith(m_kickerSubsystem.AgitateKickerCommand())
-        .alongWith(m_launcherSubsystem.agitateLauncherCommand()));
+        // auxXbox.leftTrigger().whileTrue(m_intakeSubsystem.AgitateIntakeCommand()
+        // .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
+        // .alongWith(m_kickerSubsystem.AgitateKickerCommand())
+        // .alongWith(m_launcherSubsystem.agitateLauncherCommand()));
       
 
 
