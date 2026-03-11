@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Algorithms.ShootingArc;
 import frc.robot.Constants.Constants.LauncherSubsystemConstants;
-import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
@@ -118,12 +117,11 @@ public class LaunchAman extends Command {
   private void updateShootingParams() {
     Pose2d        robotPose     = m_poseSupplier.get();
     Translation2d robotVelocity = m_velocitySupplier.get();
-    double exitSpeed = TurretSubsystemConstants.ballSpeed;
+    Translation2d robotAccel    = m_accelerationSupplier.get();
 
-    // ── Drag-compensated solver (ACTIVE) ─────────────────────────────────────
-    Translation2d robotAccel = m_accelerationSupplier.get();
+    // ── Drag-compensated solver (auto-solves exit speed) ─────────────────────
     ShootingArc.Shot dragShot = m_shootingArc.solveDragShotWithLead(
-        robotPose, robotVelocity, robotAccel, Optional.of(exitSpeed), true);
+        robotPose, robotVelocity, robotAccel, Optional.empty(), true);
 
     SmartDashboard.putNumber("Launch/Drag/PitchDeg",    Math.toDegrees(dragShot.pitchRad()));
     SmartDashboard.putNumber("Launch/Drag/YawDeg",      Math.toDegrees(dragShot.yawFieldRad()));
@@ -131,15 +129,11 @@ public class LaunchAman extends Command {
     SmartDashboard.putNumber("Launch/Drag/DistanceM",   dragShot.distanceM());
     SmartDashboard.putBoolean("Launch/Drag/OK",         dragShot.ok());
 
-    // ── No-drag solver (COMMENTED OUT) ───────────────────────────────────────
-    // ShootingArc.Shot noDragShot = m_shootingArc.solveNoDragWithLead(
-    //     robotPose, robotVelocity, new Translation2d(), exitSpeed, false);
-    //
-    // SmartDashboard.putNumber("Launch/NoDrag/PitchDeg",    Math.toDegrees(noDragShot.pitchRad()));
-    // SmartDashboard.putNumber("Launch/NoDrag/YawDeg",      Math.toDegrees(noDragShot.yawFieldRad()));
-    // SmartDashboard.putNumber("Launch/NoDrag/FlightTimeS", noDragShot.flightTimeS());
-    // SmartDashboard.putNumber("Launch/NoDrag/DistanceM",   noDragShot.distanceM());
-    // SmartDashboard.putBoolean("Launch/NoDrag/OK",         noDragShot.ok());
+    if (!dragShot.ok() || dragShot.launcherSpeedMps().isEmpty()) {
+      return; // No valid solution — keep previous hood/speed
+    }
+
+    double exitSpeed = dragShot.launcherSpeedMps().get();
 
     // ── Hood & speed from the active shot ────────────────────────────────────
     double launchAngleDeg = Math.toDegrees(dragShot.pitchRad());
@@ -151,8 +145,11 @@ public class LaunchAman extends Command {
     m_hoodPos = LauncherSubsystemConstants.kHoodMinRot
         + fraction * (LauncherSubsystemConstants.kHoodMaxRot - LauncherSubsystemConstants.kHoodMinRot);
 
-    m_speed = exitSpeed / (Math.PI * LauncherSubsystemConstants.kLauncherWheelDiameterM);
+    // Convert exit speed (m/s) → motor RPS: wheel RPS * gear ratio
+    m_speed = (exitSpeed / (Math.PI * LauncherSubsystemConstants.kLauncherWheelDiameterM))
+        * LauncherSubsystemConstants.kLauncherGearRatio;
 
+    SmartDashboard.putNumber("Launch/CalculatedExitSpeedMps", exitSpeed);
     SmartDashboard.putNumber("Launch/CalculatedHoodAngleDeg", launchAngleDeg);
     SmartDashboard.putNumber("Launch/CalculatedHoodRot", m_hoodPos);
     SmartDashboard.putNumber("Launch/CalculatedLauncherRPS", m_speed);

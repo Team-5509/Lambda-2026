@@ -191,8 +191,9 @@ public class Launch extends Command {
         + fraction * (LauncherSubsystemConstants.kHoodMaxRot - LauncherSubsystemConstants.kHoodMinRot);
 
     // ── Launcher speed ───────────────────────────────────────────────────────
-    // RPS = exit_speed / wheel_circumference = v / (π · diameter)
-    m_speed = v / (Math.PI * LauncherSubsystemConstants.kLauncherWheelDiameterM);
+    // motor RPS = (exit_speed / wheel_circumference) * gear_ratio
+    m_speed = (v / (Math.PI * LauncherSubsystemConstants.kLauncherWheelDiameterM))
+        * LauncherSubsystemConstants.kLauncherGearRatio;
     SmartDashboard.putNumber("Launch/CalculatedHoodAngleDeg", launchAngleDeg);
     SmartDashboard.putNumber("Launch/CalculatedHoodRot", m_hoodPos);
     SmartDashboard.putNumber("Launch/CalculatedLauncherRPS", m_speed);

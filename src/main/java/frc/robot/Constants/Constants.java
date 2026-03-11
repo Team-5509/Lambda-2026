@@ -99,6 +99,10 @@ public class Constants {
         // TODO: Measure actual max exit speed on the robot.
         public static final double kMaxExitSpeedMps = 25.0;
 
+        // Launcher gear ratio: motor rotations per flywheel rotation.
+        // TODO: Measure actual gear ratio on the robot.
+        public static final double kLauncherGearRatio = 1.0;
+
         // Flywheel diameter used to convert ball exit speed (m/s) → launcher RPS.
         // TODO: Measure actual flywheel diameter.
         public static final double kLauncherWheelDiameterM = 0.1016; // 4 in default
