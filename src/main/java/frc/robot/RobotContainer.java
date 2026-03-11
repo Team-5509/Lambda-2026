@@ -41,6 +41,7 @@ import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.Launch;
 import frc.robot.commands.LaunchLookup;
+import frc.robot.commands.ShootingLookupTuner;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
@@ -105,6 +106,14 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
             m_kickerSubsystem,
             () -> drivetrain.getState().Pose,
             this::getFieldRelativeVelocity);
+    }
+
+    private Command makeShootingTuner() {
+        return new ShootingLookupTuner(
+            m_launcherSubsystem,
+            m_kickerSubsystem,
+            m_conveyorSubsystem,
+            () -> drivetrain.getState().Pose);
     }
 
     
@@ -301,6 +310,11 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         auxXbox.povDown().onTrue(m_intakeSubsystem.RetractIntakeMM());
 
         auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
+
+        // Shooting lookup table tuner — hold B to enter tuning mode.
+        // Use SmartDashboard Tuner/* controls to adjust hood/speed, save entries,
+        // and fire test shots. Saved data publishes to NetworkTables "ShootingTuner".
+        auxXbox.b().whileTrue(makeShootingTuner());
 
         auxXbox.leftTrigger().whileTrue(m_intakeSubsystem.AgitateIntakeCommand()
         .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
