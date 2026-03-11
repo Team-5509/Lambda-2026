@@ -207,7 +207,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
                         ));
        
 
-        driverXbox.back().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
+        driverXbox.start().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
         driverXbox.rightTrigger().whileTrue(drivetrain.applyRequest(() -> brake)); 
         driverXbox.leftTrigger().whileTrue(m_intakeSubsystem.RunIntakeMM().andThen(m_intakeSubsystem.StopIntakeMM()));
         //driverXbox.b().onTrue(drivetrain.runOnce(() -> drivetrain.addFakeVisionReading()));
