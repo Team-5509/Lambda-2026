@@ -41,6 +41,12 @@ public class TurretSubsystem extends SubsystemBase {
     private static final double MM_ACCEL = 300.0; // rot/s^2 (was 6.0)
     private static final double MM_JERK = 1600.0; // rot/s^3 (was 60.0)
 
+    // Soft deceleration zone near limit switches
+    private static final double SOFT_ZONE_ROT =
+            (Constants.TurretSubsystemConstants.softZoneDegrees / 360.0) * GEAR_RATIO;
+    private static final double SOFT_ZONE_MIN_SCALE =
+            Constants.TurretSubsystemConstants.softZoneMinScale;
+
     /* ==================== Hardware ==================== */
     private final TalonFX turretMotor = new TalonFX(TURRET_MOTOR_ID);
 
@@ -156,6 +162,24 @@ public Command SetTurretPositionMinMM() {
 
     /* ==================== Control ==================== */
 
+    /**
+     * Returns a scale factor (SOFT_ZONE_MIN_SCALE .. 1.0) based on how close
+     * the given motor-rotation position is to either soft limit.
+     * 1.0 = far from limits (full speed), MIN_SCALE = right at the limit.
+     */
+    private double getSoftZoneScale(double motorRot) {
+        double distToMax = MAX_TURRET_ROT - motorRot;
+        double distToMin = motorRot - MIN_TURRET_ROT;
+        double distToNearest = Math.min(distToMax, distToMin);
+
+        if (distToNearest >= SOFT_ZONE_ROT) {
+            return 1.0;
+        }
+        // Linear ramp from MIN_SCALE at the limit to 1.0 at the zone edge
+        double t = Math.max(distToNearest, 0.0) / SOFT_ZONE_ROT;
+        return SOFT_ZONE_MIN_SCALE + (1.0 - SOFT_ZONE_MIN_SCALE) * t;
+    }
+
     public void setTurretAngleDegrees(double degrees) {
         // Wrap into the physical range (-270, 90]: limit switches are both at 90° from robot front
         while (degrees > 90.0)   degrees -= 360.0;
@@ -166,7 +190,29 @@ public Command SetTurretPositionMinMM() {
         double rotations = (degrees / 360.0) * GEAR_RATIO - (90.0 / 360.0) * GEAR_RATIO;
         SmartDashboard.putNumber("TurretSubsystem/SetpointRotations", rotations);
 
-        turretMotor.setControl(motionMagic.withPosition(rotations));
+        // Slow down near limits: scale cruise velocity based on proximity
+        double currentPos = turretMotor.getPosition().getValueAsDouble();
+        double scale = Math.min(getSoftZoneScale(currentPos), getSoftZoneScale(rotations));
+        SmartDashboard.putNumber("TurretSubsystem/SoftZoneScale", scale);
+
+        turretMotor.setControl(
+                motionMagic.withPosition(rotations)
+                        .withSlot(0));
+
+        // Dynamically adjust Motion Magic cruise velocity for soft zone
+        if (scale < 1.0) {
+            var mmConfig = new MotionMagicConfigs();
+            mmConfig.MotionMagicCruiseVelocity = MM_CRUISE_VEL * scale;
+            mmConfig.MotionMagicAcceleration = MM_ACCEL * scale;
+            mmConfig.MotionMagicJerk = MM_JERK * scale;
+            turretMotor.getConfigurator().apply(mmConfig);
+        } else {
+            var mmConfig = new MotionMagicConfigs();
+            mmConfig.MotionMagicCruiseVelocity = MM_CRUISE_VEL;
+            mmConfig.MotionMagicAcceleration = MM_ACCEL;
+            mmConfig.MotionMagicJerk = MM_JERK;
+            turretMotor.getConfigurator().apply(mmConfig);
+        }
     }
 
     public void stop() {
@@ -174,7 +220,19 @@ public Command SetTurretPositionMinMM() {
     }
 
       public void setSpeed(double speed) {
-                 turretMotor.set(speed);
+          // Scale manual speed down when near limits
+          double currentPos = turretMotor.getPosition().getValueAsDouble();
+          double scale = getSoftZoneScale(currentPos);
+
+          // Only slow down if moving toward the nearer limit
+          if (speed > 0 && (MAX_TURRET_ROT - currentPos) < SOFT_ZONE_ROT) {
+              speed *= scale;
+          } else if (speed < 0 && (currentPos - MIN_TURRET_ROT) < SOFT_ZONE_ROT) {
+              speed *= scale;
+          }
+
+          SmartDashboard.putNumber("TurretSubsystem/SoftZoneScale", scale);
+          turretMotor.set(speed);
       }
 
     /* ==================== State ==================== */
