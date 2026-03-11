@@ -75,6 +75,11 @@ public class Constants {
         public static final double minNegTurretMotorRot = (-270.0 / 360.0) * (5000.0 / 120.0); // ~-31.25 rot
         public static final int kTurretMotorId = 17;
         public static final Double ballSpeed = 22.0;
+
+        // Soft deceleration zone near limit switches (degrees from each limit)
+        public static final double softZoneDegrees = 30.0;
+        // Minimum speed scale when at the very edge of the soft zone (0.0–1.0)
+        public static final double softZoneMinScale = 0.15;
     }
 
     // Launcher
