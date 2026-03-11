@@ -44,7 +44,6 @@ public class Launch extends Command {
 
   // Updated each execute() call
   private double m_speed   = 50.0;
-  private double m_hoodPos = LauncherSubsystemConstants.kHoodMinRot;
 
   /**
    * @param conveyorSubsystem  Conveyor subsystem
@@ -77,7 +76,7 @@ public class Launch extends Command {
   public void execute() {
     updateShootingParams();
 
-    m_launcherSubsystem.extendHoodMM(m_hoodPos);
+    // Hood is set inside updateShootingParams via setHoodAngleDeg
     m_launcherSubsystem.runLauncherMM(m_speed);
 
     if (m_timer.hasElapsed(LauncherSubsystemConstants.kShootSpinUpSeconds)) {
@@ -99,16 +98,8 @@ public class Launch extends Command {
     return false;
   }
 
-  public double getHoodRotationsFromHoodAngleDeg(double hoodAngleDeg) {
-    // Linear map  [kHoodMinAngleDeg, kHoodMaxAngleDeg] → [kHoodMinRot, kHoodMaxRot]
-    double fraction = (hoodAngleDeg - LauncherSubsystemConstants.kHoodMinAngleDeg)
-        / (LauncherSubsystemConstants.kHoodMaxAngleDeg - LauncherSubsystemConstants.kHoodMinAngleDeg);
-    return LauncherSubsystemConstants.kHoodMinRot
-        + fraction * (LauncherSubsystemConstants.kHoodMaxRot - LauncherSubsystemConstants.kHoodMinRot);
-  }
-
   /**
-   * Recomputes m_hoodPos and m_speed from the current robot state.
+   * Recomputes hood angle and launcher speed from the current robot state.
    *
    * Lead compensation (mirrors TrackFieldPoseCommand.aimFieldRelativeWithPrediction):
    *   1. Estimate flight time  =  current_distance / ballSpeed
@@ -167,34 +158,24 @@ public class Launch extends Command {
 
     double launchAngleDeg;
     if (dx < 0.01) {
-      // Robot is essentially on top of the hub — use minimum angle
       launchAngleDeg = LauncherSubsystemConstants.kHoodMinAngleDeg;
     } else {
       double discriminant = v2 * v2 - g * (g * dx * dx + 2.0 * dz * v2);
       if (discriminant < 0.0) {
-        // Target is out of range at this ball speed — aim as steeply as possible
         launchAngleDeg = LauncherSubsystemConstants.kHoodMaxAngleDeg;
       } else {
         launchAngleDeg = Math.toDegrees(Math.atan((v2 - Math.sqrt(discriminant)) / (g * dx)));
       }
     }
 
-    // Clamp to the physical hood travel range
-    launchAngleDeg = Math.max(LauncherSubsystemConstants.kHoodMinAngleDeg,
-                     Math.min(LauncherSubsystemConstants.kHoodMaxAngleDeg, launchAngleDeg));
-
-    // Linear map  [kHoodMinAngleDeg, kHoodMaxAngleDeg] → [kHoodMinRot, kHoodMaxRot]
-    // TODO: Calibrate kHoodMinAngleDeg and kHoodMaxAngleDeg on the robot.
-    double fraction = (launchAngleDeg - LauncherSubsystemConstants.kHoodMinAngleDeg)
-        / (LauncherSubsystemConstants.kHoodMaxAngleDeg - LauncherSubsystemConstants.kHoodMinAngleDeg);
-    m_hoodPos = LauncherSubsystemConstants.kHoodMinRot
-        + fraction * (LauncherSubsystemConstants.kHoodMaxRot - LauncherSubsystemConstants.kHoodMinRot);
+    // ── Set hood via LauncherSubsystem (handles clamping + conversion) ───────
+    m_launcherSubsystem.setHoodAngleDeg(launchAngleDeg);
 
     // ── Launcher speed ───────────────────────────────────────────────────────
-    // RPS = exit_speed / wheel_circumference = v / (π · diameter)
-    m_speed = v / (Math.PI * LauncherSubsystemConstants.kLauncherWheelDiameterM);
+    m_speed = (v / (Math.PI * LauncherSubsystemConstants.kLauncherWheelDiameterM))
+        * LauncherSubsystemConstants.kLauncherGearRatio;
     SmartDashboard.putNumber("Launch/CalculatedHoodAngleDeg", launchAngleDeg);
-    SmartDashboard.putNumber("Launch/CalculatedHoodRot", m_hoodPos);
+    SmartDashboard.putNumber("Launch/CalculatedHoodRot", LauncherSubsystem.hoodAngleToRotations(launchAngleDeg));
     SmartDashboard.putNumber("Launch/CalculatedLauncherRPS", m_speed);
   }
 }

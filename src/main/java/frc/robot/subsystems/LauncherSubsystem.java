@@ -270,6 +270,27 @@ private void configureHoodMotor() {
               .withSlot(0));
   }
 
+  /**
+   * Converts a hood angle in degrees to motor rotations using a linear mapping
+   * from [kHoodMinAngleDeg, kHoodMaxAngleDeg] to [kHoodMinRot, kHoodMaxRot].
+   */
+  public static double hoodAngleToRotations(double angleDeg) {
+    double fraction = (angleDeg - LauncherSubsystemConstants.kHoodMinAngleDeg)
+        / (LauncherSubsystemConstants.kHoodMaxAngleDeg - LauncherSubsystemConstants.kHoodMinAngleDeg);
+    return LauncherSubsystemConstants.kHoodMinRot
+        + fraction * (LauncherSubsystemConstants.kHoodMaxRot - LauncherSubsystemConstants.kHoodMinRot);
+  }
+
+  /**
+   * Sets the hood position from a launch angle in degrees.
+   * Clamps the angle to physical hood limits before converting.
+   */
+  public void setHoodAngleDeg(double angleDeg) {
+    angleDeg = Math.max(LauncherSubsystemConstants.kHoodMinAngleDeg,
+               Math.min(LauncherSubsystemConstants.kHoodMaxAngleDeg, angleDeg));
+    extendHoodMM(hoodAngleToRotations(angleDeg));
+  }
+
   public Command reverseLauncherCommand() {
     return runOnce(() -> {
       launcherMotor.setControl(

@@ -38,8 +38,10 @@ import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
+import frc.robot.Algorithms.ShootingArc;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.Launch;
+import frc.robot.commands.LaunchAman;
 import frc.robot.commands.LaunchLookup;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.Constants.Constants.TurretSubsystemConstants;
@@ -79,6 +81,9 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
     public final Vision visionR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_R);
     public final Vision visionRR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RR);
 
+    private final ShootingArc.FieldAccelEstimator m_accelEstimator =
+        new ShootingArc().new FieldAccelEstimator();
+
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
     private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
@@ -96,6 +101,16 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
             m_kickerSubsystem,
             () -> drivetrain.getState().Pose,
             this::getFieldRelativeVelocity);
+    }
+
+    private Command makeLaunchAman() {
+        return new LaunchAman(
+            m_conveyorSubsystem,
+            m_launcherSubsystem,
+            m_kickerSubsystem,
+            () -> drivetrain.getState().Pose,
+            this::getFieldRelativeVelocity,
+            this::getFieldRelativeAcceleration);
     }
 
     private Command makeLaunchLookup() {
@@ -136,6 +151,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         NamedCommands.registerCommand("RetractHood", m_launcherSubsystem.RetractHoodMM());
         // NamedCommands.registerCommand("MoveTurret", m_turretSubsystem.SetTurretPositionMM(null));
         NamedCommands.registerCommand("Launch", makeLaunch());
+        NamedCommands.registerCommand("LaunchAman", makeLaunchAman());
         NamedCommands.registerCommand("LaunchLookup", makeLaunchLookup());
         NamedCommands.registerCommand("Track", new TrackFieldPoseCommand(
                 m_turretSubsystem,
@@ -321,6 +337,10 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
         return autoChooser.getSelected();
+    }
+
+    private Translation2d getFieldRelativeAcceleration() {
+        return m_accelEstimator.update(getFieldRelativeVelocity());
     }
 
     private Translation2d getFieldRelativeVelocity() {

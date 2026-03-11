@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Algorithms.ShootingArc;
 import frc.robot.Constants.Constants.LauncherSubsystemConstants;
-import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
@@ -37,33 +36,36 @@ public class LaunchAman extends Command {
   private final LauncherSubsystem m_launcherSubsystem;
   private final KickerSubsystem   m_kickerSubsystem;
   private final Supplier<Pose2d>        m_poseSupplier;
-  private final Supplier<Translation2d> m_velocitySupplier; // field-relative, m/s
+  private final Supplier<Translation2d> m_velocitySupplier;     // field-relative, m/s
+  private final Supplier<Translation2d> m_accelerationSupplier; // field-relative, m/s²
 
   private final Timer m_timer = new Timer();
   private final ShootingArc m_shootingArc = new ShootingArc();
 
   // Updated each execute() call
   private double m_speed   = 50.0;
-  private double m_hoodPos = LauncherSubsystemConstants.kHoodMinRot;
 
   /**
    * @param conveyorSubsystem  Conveyor subsystem
    * @param launcherSubsystem  Launcher subsystem
    * @param kickerSubsystem    Kicker subsystem
-   * @param poseSupplier       Field-relative robot pose (e.g. drivetrain::getState().Pose)
-   * @param velocitySupplier   Field-relative robot velocity in m/s (e.g. getFieldRelativeVelocity)
+   * @param poseSupplier         Field-relative robot pose (e.g. drivetrain::getState().Pose)
+   * @param velocitySupplier     Field-relative robot velocity in m/s (e.g. getFieldRelativeVelocity)
+   * @param accelerationSupplier Field-relative robot acceleration in m/s²
    */
   public LaunchAman(
       ConveyorSubsystem conveyorSubsystem,
       LauncherSubsystem launcherSubsystem,
       KickerSubsystem kickerSubsystem,
       Supplier<Pose2d> poseSupplier,
-      Supplier<Translation2d> velocitySupplier) {
-    m_conveyorSubsystem = conveyorSubsystem;
-    m_launcherSubsystem = launcherSubsystem;
-    m_kickerSubsystem   = kickerSubsystem;
-    m_poseSupplier      = poseSupplier;
-    m_velocitySupplier  = velocitySupplier;
+      Supplier<Translation2d> velocitySupplier,
+      Supplier<Translation2d> accelerationSupplier) {
+    m_conveyorSubsystem  = conveyorSubsystem;
+    m_launcherSubsystem  = launcherSubsystem;
+    m_kickerSubsystem    = kickerSubsystem;
+    m_poseSupplier       = poseSupplier;
+    m_velocitySupplier   = velocitySupplier;
+    m_accelerationSupplier = accelerationSupplier;
 
     addRequirements(conveyorSubsystem, launcherSubsystem, kickerSubsystem);
   }
@@ -77,7 +79,7 @@ public class LaunchAman extends Command {
   public void execute() {
     updateShootingParams();
 
-    m_launcherSubsystem.extendHoodMM(m_hoodPos);
+    // Hood is set inside updateShootingParams via setHoodAngleDeg
     m_launcherSubsystem.runLauncherMM(m_speed);
 
     if (m_timer.hasElapsed(LauncherSubsystemConstants.kShootSpinUpSeconds)) {
@@ -99,26 +101,18 @@ public class LaunchAman extends Command {
     return false;
   }
 
-  public double getHoodRotationsFromHoodAngleDeg(double hoodAngleDeg) {
-    // Linear map  [kHoodMinAngleDeg, kHoodMaxAngleDeg] → [kHoodMinRot, kHoodMaxRot]
-    double fraction = (hoodAngleDeg - LauncherSubsystemConstants.kHoodMinAngleDeg)
-        / (LauncherSubsystemConstants.kHoodMaxAngleDeg - LauncherSubsystemConstants.kHoodMinAngleDeg);
-    return LauncherSubsystemConstants.kHoodMinRot
-        + fraction * (LauncherSubsystemConstants.kHoodMaxRot - LauncherSubsystemConstants.kHoodMinRot);
-  }
-
   /**
-   * Recomputes m_hoodPos and m_speed from the current robot state using ShootingArc,
-   * and publishes both drag and no-drag solutions to SmartDashboard.
+   * Recomputes hood angle and launcher speed from the current robot state using ShootingArc,
+   * and publishes diagnostics to SmartDashboard.
    */
   private void updateShootingParams() {
     Pose2d        robotPose     = m_poseSupplier.get();
     Translation2d robotVelocity = m_velocitySupplier.get();
-    double exitSpeed = TurretSubsystemConstants.ballSpeed;
+    Translation2d robotAccel    = m_accelerationSupplier.get();
 
-    // ── Drag-compensated solver (ACTIVE) ─────────────────────────────────────
+    // ── Drag-compensated solver (auto-solves exit speed) ─────────────────────
     ShootingArc.Shot dragShot = m_shootingArc.solveDragShotWithLead(
-        robotPose, robotVelocity, null, Optional.of(exitSpeed), false);
+        robotPose, robotVelocity, robotAccel, Optional.empty(), true);
 
     SmartDashboard.putNumber("Launch/Drag/PitchDeg",    Math.toDegrees(dragShot.pitchRad()));
     SmartDashboard.putNumber("Launch/Drag/YawDeg",      Math.toDegrees(dragShot.yawFieldRad()));
@@ -126,30 +120,23 @@ public class LaunchAman extends Command {
     SmartDashboard.putNumber("Launch/Drag/DistanceM",   dragShot.distanceM());
     SmartDashboard.putBoolean("Launch/Drag/OK",         dragShot.ok());
 
-    // ── No-drag solver (COMMENTED OUT) ───────────────────────────────────────
-    // ShootingArc.Shot noDragShot = m_shootingArc.solveNoDragWithLead(
-    //     robotPose, robotVelocity, new Translation2d(), exitSpeed, false);
-    //
-    // SmartDashboard.putNumber("Launch/NoDrag/PitchDeg",    Math.toDegrees(noDragShot.pitchRad()));
-    // SmartDashboard.putNumber("Launch/NoDrag/YawDeg",      Math.toDegrees(noDragShot.yawFieldRad()));
-    // SmartDashboard.putNumber("Launch/NoDrag/FlightTimeS", noDragShot.flightTimeS());
-    // SmartDashboard.putNumber("Launch/NoDrag/DistanceM",   noDragShot.distanceM());
-    // SmartDashboard.putBoolean("Launch/NoDrag/OK",         noDragShot.ok());
+    if (!dragShot.ok() || dragShot.launcherSpeedMps().isEmpty()) {
+      return; // No valid solution — keep previous hood/speed
+    }
 
-    // ── Hood & speed from the active shot ────────────────────────────────────
+    double exitSpeed = dragShot.launcherSpeedMps().get();
+
+    // ── Hood angle — use LauncherSubsystem conversion ────────────────────────
     double launchAngleDeg = Math.toDegrees(dragShot.pitchRad());
-    launchAngleDeg = Math.max(LauncherSubsystemConstants.kHoodMinAngleDeg,
-                     Math.min(LauncherSubsystemConstants.kHoodMaxAngleDeg, launchAngleDeg));
+    m_launcherSubsystem.setHoodAngleDeg(launchAngleDeg);
 
-    double fraction = (launchAngleDeg - LauncherSubsystemConstants.kHoodMinAngleDeg)
-        / (LauncherSubsystemConstants.kHoodMaxAngleDeg - LauncherSubsystemConstants.kHoodMinAngleDeg);
-    m_hoodPos = LauncherSubsystemConstants.kHoodMinRot
-        + fraction * (LauncherSubsystemConstants.kHoodMaxRot - LauncherSubsystemConstants.kHoodMinRot);
+    // Convert exit speed (m/s) → motor RPS: wheel RPS * gear ratio
+    m_speed = (exitSpeed / (Math.PI * LauncherSubsystemConstants.kLauncherWheelDiameterM))
+        * LauncherSubsystemConstants.kLauncherGearRatio;
 
-    m_speed = exitSpeed / (Math.PI * LauncherSubsystemConstants.kLauncherWheelDiameterM);
-
+    SmartDashboard.putNumber("Launch/CalculatedExitSpeedMps", exitSpeed);
     SmartDashboard.putNumber("Launch/CalculatedHoodAngleDeg", launchAngleDeg);
-    SmartDashboard.putNumber("Launch/CalculatedHoodRot", m_hoodPos);
+    SmartDashboard.putNumber("Launch/CalculatedHoodRot", LauncherSubsystem.hoodAngleToRotations(launchAngleDeg));
     SmartDashboard.putNumber("Launch/CalculatedLauncherRPS", m_speed);
   }
 }

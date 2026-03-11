@@ -1,7 +1,6 @@
 package frc.robot.Algorithms;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -49,39 +48,86 @@ public class ShootingArc {
     }
   }
 
-  private final double hubX;
-  private final double hubY;
+  // -------------------------------------------------------------------------
+  // Target selection — mirrors Launch.java hub/home logic
+  // -------------------------------------------------------------------------
 
-  public ShootingArc() {
-    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-      hubX = Constants.TurretSubsystemConstants.redHubPose.getX();
-      hubY = Constants.TurretSubsystemConstants.redHubPose.getY();
+  /** Holds the resolved target position and height difference for a shot. */
+  public static record TargetInfo(Translation2d target, double dz) {}
+
+  /**
+   * Dynamically resolves the correct target (hub or nearest home) and height
+   * difference based on the robot's current field position and alliance.
+   * This mirrors the target-selection logic from Launch.java so that
+   * ShootingArc is a single source of truth for shooting physics.
+   */
+  public static TargetInfo resolveTarget(Pose2d robotPose) {
+    Translation2d robotTranslation = robotPose.getTranslation();
+    boolean isBlue = DriverStation.getAlliance()
+        .orElse(Alliance.Blue) == Alliance.Blue;
+
+    if (isBlue && robotTranslation.getX() < Constants.TurretSubsystemConstants.blueLineZone) {
+      return new TargetInfo(Constants.TurretSubsystemConstants.blueHubPose,
+                            Constants.TurretSubsystemConstants.dz);
+    } else if (!isBlue && robotTranslation.getX() > Constants.TurretSubsystemConstants.redLineZone) {
+      return new TargetInfo(Constants.TurretSubsystemConstants.redHubPose,
+                            Constants.TurretSubsystemConstants.dz);
     } else {
-      hubX = Constants.TurretSubsystemConstants.blueHubPose.getX();
-      hubY = Constants.TurretSubsystemConstants.blueHubPose.getY();
+      var homePoses = isBlue
+          ? Constants.TurretSubsystemConstants.blueHomePoses
+          : Constants.TurretSubsystemConstants.redHomePoses;
+      Translation2d closest = homePoses.stream()
+          .min((a, b) -> Double.compare(
+              a.getDistance(robotTranslation),
+              b.getDistance(robotTranslation)))
+          .orElse(isBlue ? Constants.TurretSubsystemConstants.blueHubPose
+                         : Constants.TurretSubsystemConstants.redHubPose);
+      return new TargetInfo(closest, Constants.TurretSubsystemConstants.homeDz);
     }
   }
 
+  public ShootingArc() {
+    // No-arg constructor; target is resolved dynamically per-shot via resolveTarget()
+  }
+
+  /**
+   * Returns the shooter's field-relative position by rotating the shooter
+   * offset (robot-relative) by the robot heading and adding to the robot
+   * translation.
+   *
+   * Note: the previous implementation used Transform2d with robotPose.getRotation()
+   * as the transform rotation, which doubled the heading in the resulting Pose2d.
+   * This version returns just the Translation2d, which is all callers need.
+   */
+  public static Translation2d getShooterFieldPosition(Pose2d robotPose) {
+    return robotPose.getTranslation().plus(
+        Constants.TurretSubsystemConstants.shooterOffsetRobot.rotateBy(robotPose.getRotation()));
+  }
+
+  /** @deprecated Use {@link #getShooterFieldPosition(Pose2d)} instead. */
+  @Deprecated
   public Pose2d getShooterPosition(Pose2d robotPose) {
-    return robotPose.transformBy(
-        new Transform2d(Constants.TurretSubsystemConstants.shooterOffsetRobot, robotPose.getRotation()));
+    Translation2d pos = getShooterFieldPosition(robotPose);
+    return new Pose2d(pos, robotPose.getRotation());
   }
 
-  public Translation2d getHubTranslation() {
-    return new Translation2d(hubX, hubY);
+  public Translation2d getTargetTranslation(Pose2d robotPose) {
+    return resolveTarget(robotPose).target();
   }
 
-  public double getDistanceToHub(Pose2d robotPose) {
-    double dx = hubX - robotPose.getX();
-    double dy = hubY - robotPose.getY();
-    double distance = Math.sqrt(dx * dx + dy * dy);
+  public double getDistanceToTarget(Pose2d robotPose) {
+    Translation2d shooterPos = getShooterFieldPosition(robotPose);
+    Translation2d target = resolveTarget(robotPose).target();
+    double distance = shooterPos.getDistance(target);
     SmartDashboard.putNumber("ShootingArc/DistanceToGoal", distance);
     return distance;
   }
 
-  public double getYawToHub(Pose2d robotPose) {
-    double dx = hubX - robotPose.getX();
-    double dy = hubY - robotPose.getY();
+  public double getYawToTarget(Pose2d robotPose) {
+    Translation2d shooterPos = getShooterFieldPosition(robotPose);
+    Translation2d target = resolveTarget(robotPose).target();
+    double dx = target.getX() - shooterPos.getX();
+    double dy = target.getY() - shooterPos.getY();
     double angle = Math.atan2(dy, dx);
     SmartDashboard.putNumber("ShootingArc/YawToGoalDeg", Math.toDegrees(angle));
     return angle;
@@ -104,15 +150,20 @@ public class ShootingArc {
   // No-drag solver (with lead)
   // -------------------------------------------------------------------------
 
-  /** Full signature with all parameters. */
+  /** Full signature with all parameters. Uses dynamic target selection (hub/home). */
   public Shot solveNoDragWithLead(
       Pose2d robotPose,
       Translation2d robotVelField,
       Translation2d robotAccelField,
       double exitSpeedMps,
       boolean preferHighArc) {
-    Translation2d goal = getHubTranslation();
-    Translation2d robotPos = getShooterPosition(robotPose).getTranslation();
+    // Apply launcher efficiency to get effective exit velocity
+    exitSpeedMps *= LauncherSubsystemConstants.kLauncherEfficiency;
+
+    TargetInfo targetInfo = resolveTarget(robotPose);
+    Translation2d goal = targetInfo.target();
+    double dz = targetInfo.dz();
+    Translation2d robotPos = getShooterFieldPosition(robotPose);
 
     Translation2d r0 = goal.minus(robotPos);
     double t = r0.getNorm() / Math.max(exitSpeedMps, 0.1);
@@ -126,7 +177,7 @@ public class ShootingArc {
       yaw = Math.atan2(r.getY(), r.getX());
 
       double R = r.getNorm();
-      var pitchOpt = solvePitchNoDrag(R, Constants.TurretSubsystemConstants.dz, exitSpeedMps, preferHighArc);
+      var pitchOpt = solvePitchNoDrag(R, dz, exitSpeedMps, preferHighArc);
 
       if (pitchOpt == null) {
         SmartDashboard.putBoolean("ShootingArc/HasSolution", false);
@@ -197,18 +248,22 @@ public class ShootingArc {
   // Drag-compensated solver
   // -------------------------------------------------------------------------
 
-  /** Simple drag shot — stationary robot, known exit speed. */
+  /** Simple drag shot — stationary robot, known exit speed. Uses dynamic target. */
   public Shot solveDragShot(Pose2d robotPose, double exitSpeedMps) {
-    Pose2d shooterPose = getShooterPosition(robotPose);
-    double distanceM = getDistanceToHub(shooterPose);
-    return solvePitchWithQuadraticDrag(distanceM, Constants.TurretSubsystemConstants.dz, exitSpeedMps, 0.03, true);
+    // Apply launcher efficiency to get effective exit velocity
+    exitSpeedMps *= LauncherSubsystemConstants.kLauncherEfficiency;
+    TargetInfo targetInfo = resolveTarget(robotPose);
+    Translation2d shooterPos = getShooterFieldPosition(robotPose);
+    double distanceM = shooterPos.getDistance(targetInfo.target());
+    return solvePitchWithQuadraticDrag(distanceM, targetInfo.dz(), exitSpeedMps, 0.03, true);
   }
 
-  /** Simple drag shot — stationary robot, auto-solve for exit speed. */
+  /** Simple drag shot — stationary robot, auto-solve for exit speed. Uses dynamic target. */
   public Shot solveDragShot(Pose2d robotPose) {
-    Pose2d shooterPose = getShooterPosition(robotPose);
-    double distanceM = getDistanceToHub(shooterPose);
-    return solveSpeedAndPitchWithDrag(distanceM, Constants.TurretSubsystemConstants.dz, 0.03, true);
+    TargetInfo targetInfo = resolveTarget(robotPose);
+    Translation2d shooterPos = getShooterFieldPosition(robotPose);
+    double distanceM = shooterPos.getDistance(targetInfo.target());
+    return solveSpeedAndPitchWithDrag(distanceM, targetInfo.dz(), 0.03, true);
   }
 
   /**
@@ -233,21 +288,29 @@ public class ShootingArc {
     Translation2d vel   = (robotVelField   != null) ? robotVelField   : ZERO_VEC;
     Translation2d accel = (robotAccelField != null) ? robotAccelField : ZERO_VEC;
 
-    Translation2d goal       = getHubTranslation();
-    Translation2d shooterPos = getShooterPosition(robotPose).getTranslation();
+    // Dynamic target selection: hub when in scoring zone, nearest home otherwise
+    TargetInfo targetInfo = resolveTarget(robotPose);
+    Translation2d goal = targetInfo.target();
+    double dz = targetInfo.dz();
+
+    Translation2d shooterPos = getShooterFieldPosition(robotPose);
     Translation2d r0         = goal.minus(shooterPos);
 
-    // If no exit speed provided, solve for it first
+    SmartDashboard.putString("ShootingArc/Target",
+        String.format("(%.2f, %.2f) dz=%.3f", goal.getX(), goal.getY(), dz));
+
+    // If no exit speed provided, solve for it first; apply efficiency to get effective velocity
     double speed;
     if (exitSpeedMps.isPresent()) {
-      speed = Math.min(exitSpeedMps.get(), LauncherSubsystemConstants.kMaxExitSpeedMps);
+      speed = Math.min(exitSpeedMps.get() * LauncherSubsystemConstants.kLauncherEfficiency,
+                       LauncherSubsystemConstants.kMaxExitSpeedMps);
     } else {
       // Estimate lead-compensated distance for the speed solver
       double roughT = r0.getNorm() / 10.0;
       Translation2d roughDelta = vel.times(roughT).plus(accel.times(0.5 * roughT * roughT));
       double roughR = r0.minus(roughDelta).getNorm();
 
-      Shot speedShot = solveSpeedAndPitchWithDrag(roughR, Constants.TurretSubsystemConstants.dz, 0.03, preferHighArc);
+      Shot speedShot = solveSpeedAndPitchWithDrag(roughR, dz, 0.03, preferHighArc);
       if (!speedShot.ok() || speedShot.launcherSpeedMps().isEmpty()) {
         return new Shot(0.0, Math.atan2(r0.getY(), r0.getX()), Optional.empty(), 0, roughR, false);
       }
@@ -266,7 +329,7 @@ public class ShootingArc {
       yaw = Math.atan2(r.getY(), r.getX());
       double R = r.getNorm();
 
-      Shot dragShot = solvePitchWithQuadraticDrag(R, Constants.TurretSubsystemConstants.dz, speed, 0.03, preferHighArc);
+      Shot dragShot = solvePitchWithQuadraticDrag(R, dz, speed, 0.03, preferHighArc);
 
       if (!dragShot.ok()) {
         SmartDashboard.putBoolean("ShootingArc/HasSolution", false);
