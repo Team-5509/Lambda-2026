@@ -66,7 +66,9 @@ public class TunerConstants {
         );
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
     // Configs for the Pigeon 2;
-    // Mount pose set to (0,0,0) to indicate Pigeon 2 is mounted flat, facing forward, at center of robot
+    // Pigeon 2 is physically mounted ~1m forward of robot center, but translational offset
+    // does not affect gyro heading readings (rigid body rotation is uniform).
+    // Mount pose (0,0,0) = mounted flat, facing forward.
     private static final Pigeon2Configuration pigeonConfigs = new Pigeon2Configuration()
         .withMountPose(new MountPoseConfigs()
             .withMountPoseYaw(0)
