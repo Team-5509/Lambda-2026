@@ -43,6 +43,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     /* ==================== Hardware ==================== */
     private final TalonFX turretMotor = new TalonFX(TURRET_MOTOR_ID);
+
     //private final CANcoder turretEncoder = new CANcoder(TURRET_CANCODER_ID);
 
     private final DigitalInput negLimit = new DigitalInput(LIMIT_NEG_ID);
@@ -53,6 +54,7 @@ public class TurretSubsystem extends SubsystemBase {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public TurretSubsystem() {
+
         //configureEncoder();
         configureMotor();
     }
@@ -224,6 +226,10 @@ public Command SetTurretPositionMinMM() {
         SmartDashboard.putNumber("TurretSubsystem/TurretPosition", turretMotor.getPosition().getValueAsDouble());
         SmartDashboard.putBoolean("TurretSubsystem.PosReached", isAtPositiveLimit());
         SmartDashboard.putBoolean("TurretSubsystem/NegReached", isAtNegativeLimit());
+        Translation2d robotPos = drivetrain.getState().Pose.getTranslation();
+
+        SmartDashboard.putNumber("TurretSubsystem/DistanceToHub", robotPos.getDistance(Constants.TurretSubsystemConstants.blueHubPose));
+
         if (!isAtNegativeLimit()) {
             // Re-zero encoder at the known -270° position
             turretMotor.setPosition(Constants.TurretSubsystemConstants.minNegTurretMotorRot);

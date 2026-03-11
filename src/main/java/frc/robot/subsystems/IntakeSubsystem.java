@@ -16,7 +16,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.IntakeSubsystemConstants;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -330,6 +330,9 @@ private void configureDeployMotor() {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("IntakeSubsystem/IntakeSpeed", intakeMotor.getVelocity().getValueAsDouble());
+     SmartDashboard.putNumber("IntakeSubsystem/IntakeCurrent", intakeMotor.getStatorCurrent().getValueAsDouble());
+     SmartDashboard.putBoolean("IntakeSubsystem/IsStalling", isStalling());
     // This method will be called once per scheduler run
       
   }

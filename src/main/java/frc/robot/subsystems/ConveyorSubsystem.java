@@ -13,6 +13,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants.Constants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -246,6 +247,9 @@ public class ConveyorSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("ConveyorSubsystem/ConveyorSpeed", conveyorMotor.getVelocity().getValueAsDouble());
+     SmartDashboard.putNumber("ConveyorSubsystem/ConveyorCurrent", conveyorMotor.getStatorCurrent().getValueAsDouble());
+     SmartDashboard.putBoolean("ConveyorSubsystem/IsStalling", isStalling());
     // This method will be called once per scheduler run
   }
 

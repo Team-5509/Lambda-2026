@@ -13,6 +13,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants.Constants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -212,6 +213,8 @@ public class KickerSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("KickerSubsystem/KickerSpeed", kickerMotor.getVelocity().getValueAsDouble());
+     SmartDashboard.putNumber("KickerSubsystem/KickerCurrent", kickerMotor.getStatorCurrent().getValueAsDouble());
     // This method will be called once per scheduler run
   }
 
