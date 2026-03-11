@@ -13,7 +13,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants.Constants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ConveyorSubsystem extends SubsystemBase {
@@ -22,13 +24,18 @@ public class ConveyorSubsystem extends SubsystemBase {
   private static final int CONVEYOR_MOTOR_ID = Constants.ConveyorSubsystemConstants.kConveyorMotorId;
 
   // Motion Magic
-  private static final double MM_CRUISE_VEL = 2.0; // rot/s
-  private static final double MM_ACCEL = 6.0; // rot/s^2
-  private static final double MM_JERK = 60.0; // rot/s^3
+  private static final double MM_CRUISE_VEL = 40.0; // rot/s
+  private static final double MM_ACCEL = 200.0; // rot/s^2
+  private static final double MM_JERK = 2000.0; // rot/s^3
 
   // Conveyor Speed
-  private double speed = 100.0;
-  private double speedIncrement = 10.0;
+  private double speed = -60;
+  private double speedIncrement = -10.0;
+
+  // Stall detection
+  private static final double STALL_CURRENT_THRESHOLD_A = 40.0; // stator amps above this = stalling
+  private static final double STALL_VELOCITY_THRESHOLD_RPS = 0.5; // |velocity| below this = near-stopped
+  private boolean isRunning = false;
   /* ==================== Hardware ==================== */
   private TalonFX conveyorMotor = new TalonFX(CONVEYOR_MOTOR_ID);
 
@@ -48,10 +55,11 @@ public class ConveyorSubsystem extends SubsystemBase {
     config.MotionMagic.MotionMagicJerk = MM_JERK;
 
     /* ---- PID ---- */
-    config.Slot0.kP = 60.0;
+    config.Slot0.kP = 0.1;
     config.Slot0.kI = 0.0;
-    config.Slot0.kD = 5.0;
-    config.Slot0.kV = 0.0;
+    config.Slot0.kD = 0.0;
+    config.Slot0.kV = 2.0;
+    config.Slot0.kA = 1;
 
     /* ---- Motor ---- */
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -67,6 +75,7 @@ public class ConveyorSubsystem extends SubsystemBase {
    */
   public Command StopConveyorMM() {
     return runOnce(() -> {
+      isRunning = false;
       conveyorMotor.setControl(
           motionMagic.withVelocity(0)
               .withSlot(0));
@@ -81,6 +90,7 @@ public class ConveyorSubsystem extends SubsystemBase {
    */
   public Command RunConveyorMM() {
     return runOnce(() -> {
+      isRunning = true;
       conveyorMotor.setControl(
           motionMagic.withVelocity(speed)
               .withSlot(0));
@@ -95,6 +105,7 @@ public class ConveyorSubsystem extends SubsystemBase {
    */
   public Command RunConveyorMM(DoubleSupplier velocityRPS) {
     return runOnce(() -> {
+      isRunning = true;
       conveyorMotor.setControl(
           motionMagic.withVelocity(velocityRPS.getAsDouble())
               .withSlot(0));
@@ -112,6 +123,7 @@ public class ConveyorSubsystem extends SubsystemBase {
     return runOnce(
         () -> {
           /* one-time action goes here */
+          isRunning = true;
           conveyorMotor.set(speed);
         });
   }
@@ -127,6 +139,7 @@ public class ConveyorSubsystem extends SubsystemBase {
     return runOnce(
         () -> {
           /* one-time action goes here */
+          isRunning = false;
           conveyorMotor.set(0);
         });
   }
@@ -176,6 +189,51 @@ public class ConveyorSubsystem extends SubsystemBase {
         });
   }
 
+  // Agitation reverse speed (RPS) — flips sign of normal speed to run backward
+  private static final double AGITATE_REVERSE_DURATION_S = 0.3;
+
+  /**
+   * Agitation command: briefly reverses the conveyor motor to undo itself (clear
+   * any jam or reset), then resumes normal intake spin to pull game pieces in.
+   *
+   * <p>Sequence:
+   * <ol>
+   *   <li>Run motor in reverse at {@code -speed} RPS for {@value #AGITATE_REVERSE_DURATION_S} s
+   *   <li>Return to normal intake speed ({@code speed} RPS)
+   * </ol>
+   *
+   * @return a command
+   */
+  public Command AgitateConveyorCommand() {
+    return Commands.sequence(
+        // Step 1: clear isRunning so isStalling() goes false (allows trigger to re-fire if still jammed)
+        runOnce(() -> {
+          isRunning = false;
+          conveyorMotor.setControl(motionMagic.withVelocity(-speed).withSlot(0));
+        }),
+        // Step 2: hold reverse briefly
+        Commands.waitSeconds(AGITATE_REVERSE_DURATION_S),
+        // Step 3: resume normal intake spin; restore isRunning so stall detection is active again
+        runOnce(() -> {
+          isRunning = true;
+          conveyorMotor.setControl(motionMagic.withVelocity(speed).withSlot(0));
+        }));
+  }
+
+  /**
+   * Returns true when the conveyor motor is commanded to run but is stalling —
+   * i.e. stator current is above {@value #STALL_CURRENT_THRESHOLD_A} A and
+   * velocity is below {@value #STALL_VELOCITY_THRESHOLD_RPS} RPS.
+   *
+   * @return true if stalling while running
+   */
+  public boolean isStalling() {
+    if (!isRunning) return false;
+    double current = conveyorMotor.getStatorCurrent().getValueAsDouble();
+    double velocity = Math.abs(conveyorMotor.getVelocity().getValueAsDouble());
+    return current > STALL_CURRENT_THRESHOLD_A && velocity < STALL_VELOCITY_THRESHOLD_RPS;
+  }
+
   /**
    * An example method querying a boolean state of the subsystem (for example, a
    * digital sensor).
@@ -189,6 +247,9 @@ public class ConveyorSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("ConveyorSubsystem/ConveyorSpeed", conveyorMotor.getVelocity().getValueAsDouble());
+     SmartDashboard.putNumber("ConveyorSubsystem/ConveyorCurrent", conveyorMotor.getStatorCurrent().getValueAsDouble());
+     SmartDashboard.putBoolean("ConveyorSubsystem/IsStalling", isStalling());
     // This method will be called once per scheduler run
   }
 

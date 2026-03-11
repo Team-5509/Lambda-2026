@@ -51,9 +51,9 @@ public class ClimberSubsystem extends SubsystemBase {
   config.MotionMagic.MotionMagicJerk = MM_JERK;
 
   /* ---- PID ---- */
-  config.Slot0.kP = 60.0;
+  config.Slot0.kP = 0.1;
   config.Slot0.kI = 0.0;
-  config.Slot0.kD = 5.0;
+  config.Slot0.kD = 0;
   config.Slot0.kV = 0.0;
 
   /* ---- Motor ---- */
@@ -68,10 +68,10 @@ public class ClimberSubsystem extends SubsystemBase {
    *
    * @return a command
    */
-  public Command ExtendClimberMM(DoubleSupplier positionSupplier) {
+  public Command ExtendClimberMM(double positionSupplier) {
     return runOnce(() -> {
       climberMotor.setControl(
-          motionMagic.withPosition(positionSupplier.getAsDouble())
+          motionMagic.withPosition(positionSupplier)
               .withSlot(0));
     });
   }
@@ -81,10 +81,10 @@ public class ClimberSubsystem extends SubsystemBase {
    *
    * @return a command
    */
-  public Command LowerClimberMM(DoubleSupplier positionSupplier) {
+  public Command LowerClimberMM(double positionSupplier) {
     return runOnce(() -> {
       climberMotor.setControl(
-          motionMagic.withPosition(positionSupplier.getAsDouble())
+          motionMagic.withPosition(positionSupplier)
               .withSlot(0));
     });
   }

@@ -16,10 +16,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.IntakeSubsystemConstants;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -42,11 +43,17 @@ public class IntakeSubsystem extends SubsystemBase {
     private static final double MM_JERK       = 60.0;  // rot/s^3
 
   // Intake Speed
-  private double speed = 100.0;
+  private double speed = 10.0;
   private double speedIncrement = 10.0;
 
-  private static final double MIN_INTAKE_ROT = -0.5;
-    private static final double MAX_INTAKE_ROT = 0.5;
+  // Stall detection
+  private static final double STALL_CURRENT_THRESHOLD_A = 40.0;
+  private static final double STALL_VELOCITY_THRESHOLD_RPS = 0.5;
+  private static final double AGITATE_REVERSE_DURATION_S = 0.3;
+  private boolean isRunning = false;
+
+  private static final double MIN_INTAKE_ROT = 0.52;
+    private static final double MAX_INTAKE_ROT = .18;
   
 
     /* ==================== Hardware ==================== */
@@ -74,10 +81,11 @@ public class IntakeSubsystem extends SubsystemBase {
     config.MotionMagic.MotionMagicJerk = MM_JERK;
 
         /* ---- PID ---- */
-        config.Slot0.kP = 60.0;
+        config.Slot0.kP = 0.1;
         config.Slot0.kI = 0.0;
-        config.Slot0.kD = 5.0;
-        config.Slot0.kV = 0.0;
+        config.Slot0.kD = 0;//5.0;
+        config.Slot0.kV = 0.5;
+        config.Slot0.kA = 0;
 
                 /* ---- Motor ---- */
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -115,10 +123,12 @@ private void configureDeployMotor() {
   config.MotionMagic.MotionMagicJerk = MM_JERK;
 
   /* ---- PID ---- */
-  config.Slot0.kP = 60.0;
+  config.Slot0.kP = 1.0;
   config.Slot0.kI = 0.0;
-  config.Slot0.kD = 5.0;
+  config.Slot0.kD = 0.0;
   config.Slot0.kV = 0.0;
+  config.Slot0.kG = 1.0;
+  config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
   /* ---- Soft Limits ---- */
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
@@ -142,6 +152,7 @@ private void configureDeployMotor() {
    */
   public Command StopIntakeMM() {
     return runOnce(() -> {
+      isRunning = false;
       intakeMotor.setControl(
           motionMagic.withVelocity(0)
               .withSlot(0));
@@ -156,6 +167,7 @@ private void configureDeployMotor() {
    */
   public Command RunIntakeMM() {
     return runOnce(() -> {
+      isRunning = true;
       intakeMotor.setControl(
           motionMagic.withVelocity(speed)
               .withSlot(0));
@@ -183,10 +195,10 @@ private void configureDeployMotor() {
      *
      * @return a command
      */
-  public Command DeployIntakeMM(DoubleSupplier positionSupplier) {
+  public Command DeployIntakeMM() {
     return runOnce(() -> {
       deployIntakeMoter.setControl(
-          motionMagicPosistion.withPosition(positionSupplier.getAsDouble())
+          motionMagicPosistion.withPosition(MAX_INTAKE_ROT)
               .withSlot(0));
     });
   }
@@ -197,10 +209,10 @@ private void configureDeployMotor() {
      *
      * @return a command
      */
-  public Command RetractIntakeMM(DoubleSupplier positionSupplier) {
+  public Command RetractIntakeMM() {
     return runOnce(() -> {
       deployIntakeMoter.setControl(
-          motionMagicPosistion.withPosition(positionSupplier.getAsDouble())
+          motionMagicPosistion.withPosition(MIN_INTAKE_ROT)
               .withSlot(0));
     });
   }
@@ -281,6 +293,30 @@ private void configureDeployMotor() {
   }
 
 
+  public boolean isStalling() {
+    if (!isRunning) return false;
+    double current = intakeMotor.getStatorCurrent().getValueAsDouble();
+    double velocity = Math.abs(intakeMotor.getVelocity().getValueAsDouble());
+    return current > STALL_CURRENT_THRESHOLD_A && velocity < STALL_VELOCITY_THRESHOLD_RPS;
+  }
+
+  public Command AgitateIntakeCommand() {
+    return Commands.sequence(
+        reverseIntakeCommand(),
+        Commands.waitSeconds(AGITATE_REVERSE_DURATION_S),
+        runOnce(() -> {
+          isRunning = true;
+          intakeMotor.setControl(motionMagic.withVelocity(speed).withSlot(0));
+        }));
+  }
+ public Command reverseIntakeCommand() {
+    return runOnce(() -> {
+      isRunning = false;
+      intakeMotor.setControl(
+          motionMagic.withVelocity(-speed)
+              .withSlot(0));
+    });
+  }
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).
    *
@@ -294,6 +330,9 @@ private void configureDeployMotor() {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("IntakeSubsystem/IntakeSpeed", intakeMotor.getVelocity().getValueAsDouble());
+     SmartDashboard.putNumber("IntakeSubsystem/IntakeCurrent", intakeMotor.getStatorCurrent().getValueAsDouble());
+     SmartDashboard.putBoolean("IntakeSubsystem/IsStalling", isStalling());
     // This method will be called once per scheduler run
       
   }

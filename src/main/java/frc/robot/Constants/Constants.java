@@ -63,8 +63,17 @@ public class Constants {
     //TODO: Measure this from shooter exit to robot center 
     public static final Translation2d shooterOffsetRobot = new Translation2d(0.32, 0.18);
 
+        // Limit switches are physically at 90° from robot front.
+        // Full 360° range: -270° (neg limit) to +90° (pos limit).
+        public static final double gearRatio = 5000.0 / 120.0; // ~41.667 — must be double, not int
+
+        public static final double maxTurretRotation = 90.0;   // degrees, positive limit switch
+        public static final double minTurretRotation = -270.0; // degrees, negative limit switch
+
+        // Motor rotations at each physical limit (used for encoder re-zeroing)
+        public static final double maxPosTurretMotorRot = (90.0 / 360.0) * (5000.0 / 120.0);   // ~10.417 rot
+        public static final double minNegTurretMotorRot = (-270.0 / 360.0) * (5000.0 / 120.0); // ~-31.25 rot
         public static final int kTurretMotorId = 17;
-        public static final int kTurretEncoderId = 24;
         public static final Double ballSpeed = 22.0;
     }
 
@@ -75,7 +84,7 @@ public class Constants {
         public static final int kHoodEncoderId = 23;
         public static final double trueZero = -0.186523;
         public static final double hoodToEncoderRatio = 0.125;
-        public static final double kShootSpinUpSeconds = 0.2; // seconds to wait for launcher to spin up before feeding
+        public static final double kShootSpinUpSeconds = 1; // seconds to wait for launcher to spin up before feeding
 
         // Hood position limits (mechanism rotations) — must match soft limits in LauncherSubsystem
         public static final double kHoodMinRot = 0.05;
@@ -83,8 +92,8 @@ public class Constants {
 
         // Physical angle corresponding to the min/max hood rotation positions.
         // TODO: Measure both values on the actual robot.
-        public static final double kHoodMinAngleDeg = 20.0;
-        public static final double kHoodMaxAngleDeg = 70.0;
+        public static final double kHoodMinAngleDeg = 22.0;
+        public static final double kHoodMaxAngleDeg = 65.0;
 
         // Maximum ball exit speed the launcher can achieve (m/s).
         // TODO: Measure actual max exit speed on the robot.

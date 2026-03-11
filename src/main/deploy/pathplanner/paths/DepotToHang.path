@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.2432530120481924,
-        "y": 0.6774179743223976
+        "x": 0.49835463895903087,
+        "y": 4.928701448604934
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4928107866558964,
-        "y": 1.2725962910128383
+        "x": 1.498354638959031,
+        "y": 4.928701448604934
       },
       "isLocked": false,
-      "linkedName": "Shooting Right"
+      "linkedName": "DoneIntakeWalll"
     },
     {
       "anchor": {
-        "x": 1.140798858773181,
-        "y": 2.7734807417974334
+        "x": 1.8335783132530121,
+        "y": 5.247975903614458
       },
       "prevControl": {
-        "x": 1.839486447931526,
-        "y": 2.2041797432239663
+        "x": 1.2085022653997315,
+        "y": 5.232349002418125
+      },
+      "nextControl": {
+        "x": 2.270686746987952,
+        "y": 5.258903614457832
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.5822409638554213,
+        "y": 3.6853132530120476
+      },
+      "prevControl": {
+        "x": 1.8223046082313274,
+        "y": 4.384686746987951
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "RightHang"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -42,13 +58,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "reversed": false,
-  "folder": "RightUnderTrenchPaths",
+  "folder": "DepotPaths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.4887262000306655
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

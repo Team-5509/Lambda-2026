@@ -5,34 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "sequential",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "TrackHub"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "StartToShootMiddle"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Launch"
-                }
-              }
-            ]
+            "name": "Track"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ShootToCloseWall"
+            "pathName": "StartToRightIntake"
           }
         },
         {
@@ -42,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Intake"
+                  "pathName": "IntakeOnRight1"
                 }
               },
               {
@@ -55,32 +36,13 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CloseWallToDroper"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Launch"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "DropperToClimb"
+                  "pathName": "CollectToShoot1"
                 }
               },
               {
@@ -97,15 +59,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "ExtendClimber"
+                  "pathName": "ShootRightToDropper"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "LowerClimber"
+                  "name": "Launch"
                 }
               }
             ]
@@ -114,7 +76,7 @@
       ]
     }
   },
-  "resetOdom": false,
-  "folder": "CloseAutons(Dont Cross Trench Line)",
+  "resetOdom": true,
+  "folder": "RightDropper",
   "choreoAuto": false
 }

@@ -13,7 +13,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants.Constants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class KickerSubsystem extends SubsystemBase {
@@ -25,9 +27,11 @@ public class KickerSubsystem extends SubsystemBase {
   private static final double MM_ACCEL = 6.0; // rot/s^2
   private static final double MM_JERK = 60.0; // rot/s^3
 
+  private static final double AGITATE_REVERSE_DURATION_S = 0.3; // seconds to run kicker in reverse for agitation
+
   // Kicker Speed
-  private double speed = 100.0;
-  private double speedIncrement = 10.0;
+  private double speed = -30;
+  private double speedIncrement = -5;
 
   /* ==================== Hardware ==================== */
   private TalonFX kickerMotor = new TalonFX(KICKER_MOTOR_ID);
@@ -51,7 +55,7 @@ public class KickerSubsystem extends SubsystemBase {
     config.Slot0.kP = 0.36;//60.0;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0; //5.0;
-    config.Slot0.kV = 0.145;//0.0;
+    config.Slot0.kV = 0.375;//0.0;
     config.Slot0.kA = 0.15;
 
     /* ---- Motor ---- */
@@ -177,6 +181,25 @@ public class KickerSubsystem extends SubsystemBase {
         });
   }
 
+     /**
+     * Command that reverses the kicker motor.
+     *
+     * @return a command
+     */
+    public Command reverseKickerCommand() {
+      return runOnce(() -> {
+        kickerMotor.setControl(
+            motionMagic.withVelocity(-speed)
+                .withSlot(0));
+      });
+    }
+  
+    public Command AgitateKickerCommand() {
+      return Commands.sequence(
+          reverseKickerCommand(),
+          Commands.waitSeconds(AGITATE_REVERSE_DURATION_S),
+        RunKickerCommand());
+  }
   /**
    * An example method querying a boolean state of the subsystem (for example, a
    * digital sensor).
@@ -190,6 +213,8 @@ public class KickerSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("KickerSubsystem/KickerSpeed", kickerMotor.getVelocity().getValueAsDouble());
+     SmartDashboard.putNumber("KickerSubsystem/KickerCurrent", kickerMotor.getStatorCurrent().getValueAsDouble());
     // This method will be called once per scheduler run
   }
 
