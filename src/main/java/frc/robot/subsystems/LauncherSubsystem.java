@@ -24,6 +24,7 @@ import frc.robot.Constants.Constants.LauncherSubsystemConstants;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LauncherSubsystem extends SubsystemBase {
@@ -32,34 +33,33 @@ public class LauncherSubsystem extends SubsystemBase {
    private static final int HOOD_MOTOR_ID = Constants.LauncherSubsystemConstants.kHoodMotorId;
     private static final int HOOD_CANCODER_ID = Constants.LauncherSubsystemConstants.kHoodEncoderId;
 
-    private static final int LIMIT_NEG_ID = 4; // -180 deg
-    private static final int LIMIT_POS_ID = 5; // +180 deg
-    private static final int HOME_SWITCH_ID = 6;
+    private static final int LIMIT_NEG_ID = 0; // -180 deg
+
 
   private static final double MM_CRUISE_VEL = 2.0; // rot/s
   private static final double MM_ACCEL = 6.0; // rot/s^2
   private static final double MM_JERK = 60.0; // rot/s^3
  
-  private static final double MM_CRUISE_VEL_HOOD = 2.0; // rot/s
-  private static final double MM_ACCEL_HOOD = 6.0; // rot/s^2
+  private static final double MM_CRUISE_VEL_HOOD = 40; // rot/s
+  private static final double MM_ACCEL_HOOD = 20; // rot/s^2
   private static final double MM_JERK_HOOD = 60.0; // rot/s^3
 
   // Launcher Speed
-  private double speed = 100.0;
-  private double speedIncrement = 10.0;
+  private double speed = -60.0;
+  private double speedIncrement = -5.0;
 
-   private static final double MIN_HOOD_ROT = 0.05;
-   private static final double MAX_HOOD_ROT = 1.7;
+   private static final double MIN_HOOD_ROT = Constants.LauncherSubsystemConstants.kHoodMinRot;
+   private static final double MAX_HOOD_ROT = Constants.LauncherSubsystemConstants.kHoodMaxRot;
 
-  private double retractPosistion = 0;
-  private double extendPosistion = 0.5;
+  private double retractPosistion = -0.5;
+  private double extendPosistion = 0;
   private double posistionIncrement = .05;
 
   /* ==================== Hardware ==================== */
   private TalonFX launcherMotor = new TalonFX(LAUNCHER_MOTOR_ID);
   private TalonFX hoodMotor = new TalonFX(HOOD_MOTOR_ID);
 
-  private final DigitalInput homeSwitch = new DigitalInput(HOME_SWITCH_ID);
+  private final DigitalInput lowLimitSwitch = new DigitalInput(LIMIT_NEG_ID);
 
   private final CANcoder hoodEncoder = new CANcoder(LauncherSubsystemConstants.kHoodEncoderId);
   private final MotionMagicVelocityVoltage motionMagic = new MotionMagicVelocityVoltage(0);
@@ -83,8 +83,8 @@ public class LauncherSubsystem extends SubsystemBase {
     /* ---- PID ---- */
     config.Slot0.kP = 0;//60.0;
     config.Slot0.kI = 0.0;
-    config.Slot0.kD = 5.0;
-    config.Slot0.kV = 0.125;//0.0;
+    config.Slot0.kD = 0.0;
+    config.Slot0.kV = 0.375;//0.0;
 
     /* ---- Motor ---- */
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -114,7 +114,7 @@ private void configureHoodMotor() {
   config.Feedback.FeedbackRemoteSensorID = HOOD_CANCODER_ID;
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
         config.Feedback.RotorToSensorRatio = 1;
-        config.Feedback.SensorToMechanismRatio = 144;
+        config.Feedback.SensorToMechanismRatio = 8;
         //config.Feedback.FeedbackRotorOffset = 0.01;
 
   /* ---- Motion Magic ---- */
@@ -123,7 +123,7 @@ private void configureHoodMotor() {
   config.MotionMagic.MotionMagicJerk = MM_JERK_HOOD;
 
   /* ---- PID ---- */
-  config.Slot0.kP = 50;//60.0;
+  config.Slot0.kP = 100;//60.0;
   config.Slot0.kI = 0.0;
   config.Slot0.kD = 0;//5.0;
   config.Slot0.kV = 1;//0.0;
@@ -270,6 +270,22 @@ private void configureHoodMotor() {
               .withSlot(0));
   }
 
+  public Command reverseLauncherCommand() {
+    return runOnce(() -> {
+      launcherMotor.setControl(
+          motionMagic.withVelocity(-speed)
+              .withSlot(0));
+    });
+  }
+
+  public Command agitateLauncherCommand() {
+    return Commands.sequence(
+        reverseLauncherCommand(),
+        Commands.waitSeconds(0.3),
+        RunLauncherMM()
+    );
+  }
+
 /**
    * Command extends the hood with magic motion (closed loop control)
    *
@@ -359,14 +375,8 @@ private void configureHoodMotor() {
         });
   }
 
-  public void homeHood() {
-        if (isHomePressed()) {
-            hoodMotor.setPosition(0.0);
-        }
-    }
-
     public boolean isHomePressed() {
-        return !homeSwitch.get();
+        return !lowLimitSwitch.get();
     }
 
   /**
@@ -386,8 +396,12 @@ private void configureHoodMotor() {
     // Optional: auto-zero if home switch hit
       SmartDashboard.putNumber("LauncherSubsystem/LauncherRPS", launcherMotor.getVelocity().getValueAsDouble());
       SmartDashboard.putNumber("LauncherSubsystem/HoodPosition", hoodMotor.getPosition().getValueAsDouble());
+      SmartDashboard.putBoolean("LauncherSubsystem/PosReached", isHomePressed());
         if (isHomePressed()) {
-            hoodMotor.setPosition(0.0);
+          hoodMotor.setPosition(0.05);
+          if (hoodMotor.getVelocity().getValueAsDouble() < 0) {
+                hoodMotor.stopMotor();
+            }
             // hoodMotor.setPosition((hoodEncoder.getAbsolutePosition().getValueAsDouble()
             // -Constants.LauncherSubsystemConstants.trueZero)*1/Constants.LauncherSubsystemConstants.hoodToEncoderRatio);
         }

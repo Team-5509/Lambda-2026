@@ -10,31 +10,40 @@ import edu.wpi.first.math.numbers.N3;
 
 public class CameraManager {
     public enum CameraProperties {
-        // Front Left Camera
+
+        // // Back Center Camera
+        // CAM_FL("",
+        //     // Cam mounted facing forward, half a meter forward of center, half a meter up from center. 
+        //     new Transform3d(new Translation3d(7.468*0.0254, -11.965*0.0254, 12.672*0.0254), new Rotation3d(0, Math.toRadians(10), Math.toRadians(-180))), 
+        //     VecBuilder.fill(4, 4, 8), 
+        //     VecBuilder.fill(0.5, 0.5, 1)),
         
-        CAM_FL("Apple",
-            // Cam mounted facing forward, half a meter forward of center, half a meter up from center. 
-            new Transform3d(new Translation3d(0.276225, 0.276225, 0.19), new Rotation3d(0, Math.toRadians(-20), Math.toRadians(45))), 
-            VecBuilder.fill(4, 4, 8), 
-            VecBuilder.fill(0.5, 0.5, 1)),
+        // Back Left Up Camera
+        // CAM_FR("", 
+        //     new Transform3d(new Translation3d(9.566*0.0254, -9.020*0.0254, 10.501*0.0254), new Rotation3d(0, 0, Math.toRadians(-55))), 
+        //     VecBuilder.fill(4, 4, 8), 
+        //     VecBuilder.fill(0.5, 0.5, 1)),
         
-        // Front Right Camera
-        CAM_FR("Basil", 
-            new Transform3d(new Translation3d(0.276225, -0.276225, 0.19), new Rotation3d(0, Math.toRadians(-20), Math.toRadians(-45))), 
-            VecBuilder.fill(4, 4, 8), 
-            VecBuilder.fill(0.5, 0.5, 1)),
-        
-        // Rear Left Camera
+        // Rear Left Swerve Camera
         CAM_RL("Dragonfruit", 
-            new Transform3d(new Translation3d(-0.276225, 0.276225, 0.19), new Rotation3d(0, Math.toRadians(20), Math.toRadians(135))), 
-            VecBuilder.fill(4, 4, 8), 
-            VecBuilder.fill(0.5, 0.5, 1)),
+            new Transform3d(new Translation3d(10.772*0.0254, -10.572*0.0254, 5.771*0.0254), new Rotation3d(0, Math.toRadians(35), Math.toRadians(-115))), 
+            VecBuilder.fill(4, 4, 9999999), 
+            VecBuilder.fill(0.5, 0.5,9999999)),
         
-        // Rear Right Camera
-        CAM_RR("Banana", 
-            new Transform3d(new Translation3d(-0.276225, -0.276225, 0.19), new Rotation3d(0, Math.toRadians(20), Math.toRadians(-135))), 
-            VecBuilder.fill(4, 4, 8), 
-            VecBuilder.fill(0.5, 0.5, 1));
+         // Rear Right Swerve Camera
+         CAM_RR("Apple", 
+             new Transform3d(new Translation3d(-10.771*0.0254, -10.529*0.0254, 5.771*0.0254), new Rotation3d(0, Math.toRadians(35), Math.toRadians(115))), 
+             VecBuilder.fill(4, 4, 99999999), 
+             VecBuilder.fill(0.5, 0.5, 9999999)),
+
+         // Back Right Up Camera
+         CAM_R("Banana", 
+             new Transform3d(new Translation3d(-9.566*0.0254, -9.020*0.0254, 10.499*0.0254), new Rotation3d(0, 0, Math.toRadians(55))), 
+             VecBuilder.fill(4, 4, 9999999), 
+             VecBuilder.fill(0.5, 0.5, 99999999));
+
+        
+
 
         public final String name;
         public final Transform3d transform;

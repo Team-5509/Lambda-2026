@@ -3,14 +3,22 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
+    "BasicPaths",
     "ClosePaths(Dont Cross Trench Line)",
+    "DepotPaths",
     "LeftUnderTrenchPaths",
-    "RightUnderTrenchPaths"
+    "RightUnderTrenchPaths",
+    "SpinPaths"
   ],
   "autoFolders": [
     "CloseAutons(Dont Cross Trench Line)",
+    "LeftMessUpBalls",
     "LeftUnderTrench",
-    "RightUnderTrench"
+    "LeftDepot",
+    "RightDropper",
+    "RightMessUpBalls",
+    "RightUnderTrench",
+    "SimpleShoot"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,

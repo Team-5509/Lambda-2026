@@ -5,19 +5,32 @@
     "data": {
       "commands": [
         {
-          "type": "sequential",
+          "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "named",
                 "data": {
-                  "name": "TrackHub"
+                  "name": "RunIntake"
                 }
               },
               {
                 "type": "path",
                 "data": {
-                  "pathName": "StartToShootMiddle"
+                  "pathName": "IntakeMiddleleft"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "IntakeMiddleLeftToShoot"
                 }
               },
               {
@@ -32,7 +45,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ShootToCloseWall"
+            "pathName": "ShootToDepot"
           }
         },
         {
@@ -61,7 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CloseWallToDroper"
+                  "pathName": "DepotToHang"
                 }
               },
               {
@@ -69,52 +82,26 @@
                 "data": {
                   "name": "Launch"
                 }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "DropperToClimb"
-                }
               },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Launch"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
               {
                 "type": "named",
                 "data": {
                   "name": "ExtendClimber"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "LowerClimber"
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LowerClimber"
           }
         }
       ]
     }
   },
   "resetOdom": false,
-  "folder": "CloseAutons(Dont Cross Trench Line)",
+  "folder": "LeftDepot",
   "choreoAuto": false
 }

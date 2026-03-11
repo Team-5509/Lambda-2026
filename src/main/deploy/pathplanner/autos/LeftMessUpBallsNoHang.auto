@@ -5,25 +5,19 @@
     "data": {
       "commands": [
         {
-          "type": "sequential",
+          "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "named",
                 "data": {
-                  "name": "TrackHub"
+                  "name": "RunIntake"
                 }
               },
               {
                 "type": "path",
                 "data": {
-                  "pathName": "StartToShootMiddle"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Launch"
+                  "pathName": "IntakeMiddleleft"
                 }
               }
             ]
@@ -32,36 +26,17 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ShootToCloseWall"
+            "pathName": "SpinLeft"
           }
         },
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Intake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "RunIntake"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CloseWallToDroper"
+                  "pathName": "SpinLeftToShoot"
                 }
               },
               {
@@ -77,6 +52,6 @@
     }
   },
   "resetOdom": false,
-  "folder": "CloseAutons(Dont Cross Trench Line)",
+  "folder": "LeftMessUpBalls",
   "choreoAuto": false
 }

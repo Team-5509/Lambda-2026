@@ -42,7 +42,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot"
+                  "name": "Launch"
                 }
               },
               {
@@ -82,7 +82,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "Launch"
           }
         }
       ]

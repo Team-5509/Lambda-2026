@@ -16,11 +16,11 @@
     },
     {
       "anchor": {
-        "x": 3.560328102710413,
+        "x": 3.2432530120481924,
         "y": 0.6774179743223976
       },
       "prevControl": {
-        "x": 7.90771754636234,
+        "x": 7.59064245570012,
         "y": 0.6127246790299581
       },
       "nextControl": null,
@@ -47,7 +47,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 0.4887262000306655
   },
   "reversed": false,
   "folder": "RightUnderTrenchPaths",
