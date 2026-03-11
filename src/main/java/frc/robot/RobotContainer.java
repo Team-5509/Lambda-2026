@@ -208,7 +208,8 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
        
 
         driverXbox.back().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
-        driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        driverXbox.rightTrigger().whileTrue(drivetrain.applyRequest(() -> brake)); 
+        driverXbox.leftTrigger().whileTrue(m_intakeSubsystem.RunIntakeMM().andThen(m_intakeSubsystem.StopIntakeMM()));
         //driverXbox.b().onTrue(drivetrain.runOnce(() -> drivetrain.addFakeVisionReading()));
 
         
@@ -300,9 +301,6 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         auxXbox.povDown().onTrue(m_intakeSubsystem.RetractIntakeMM());
 
         auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
-
-        auxXbox.rightBumper().onTrue(m_intakeSubsystem.RunIntakeMM());
-        auxXbox.leftBumper().onTrue(m_intakeSubsystem.StopIntakeMM());
 
         auxXbox.leftTrigger().whileTrue(m_intakeSubsystem.AgitateIntakeCommand()
         .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
