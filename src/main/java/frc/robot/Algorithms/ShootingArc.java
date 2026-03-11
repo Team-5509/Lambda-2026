@@ -157,6 +157,9 @@ public class ShootingArc {
       Translation2d robotAccelField,
       double exitSpeedMps,
       boolean preferHighArc) {
+    // Apply launcher efficiency to get effective exit velocity
+    exitSpeedMps *= LauncherSubsystemConstants.kLauncherEfficiency;
+
     TargetInfo targetInfo = resolveTarget(robotPose);
     Translation2d goal = targetInfo.target();
     double dz = targetInfo.dz();
@@ -247,6 +250,8 @@ public class ShootingArc {
 
   /** Simple drag shot — stationary robot, known exit speed. Uses dynamic target. */
   public Shot solveDragShot(Pose2d robotPose, double exitSpeedMps) {
+    // Apply launcher efficiency to get effective exit velocity
+    exitSpeedMps *= LauncherSubsystemConstants.kLauncherEfficiency;
     TargetInfo targetInfo = resolveTarget(robotPose);
     Translation2d shooterPos = getShooterFieldPosition(robotPose);
     double distanceM = shooterPos.getDistance(targetInfo.target());
@@ -294,10 +299,11 @@ public class ShootingArc {
     SmartDashboard.putString("ShootingArc/Target",
         String.format("(%.2f, %.2f) dz=%.3f", goal.getX(), goal.getY(), dz));
 
-    // If no exit speed provided, solve for it first
+    // If no exit speed provided, solve for it first; apply efficiency to get effective velocity
     double speed;
     if (exitSpeedMps.isPresent()) {
-      speed = Math.min(exitSpeedMps.get(), LauncherSubsystemConstants.kMaxExitSpeedMps);
+      speed = Math.min(exitSpeedMps.get() * LauncherSubsystemConstants.kLauncherEfficiency,
+                       LauncherSubsystemConstants.kMaxExitSpeedMps);
     } else {
       // Estimate lead-compensated distance for the speed solver
       double roughT = r0.getNorm() / 10.0;

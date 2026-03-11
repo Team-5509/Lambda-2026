@@ -99,6 +99,10 @@ public class Constants {
         // TODO: Measure actual max exit speed on the robot.
         public static final double kMaxExitSpeedMps = 25.0;
 
+        // Efficiency factor applied to exit velocity to account for energy losses.
+        // 1.0 = ideal (no loss), lower values reduce effective exit speed.
+        public static final double kLauncherEfficiency = 0.85;
+
         // Launcher gear ratio: motor rotations per flywheel rotation.
         // TODO: Measure actual gear ratio on the robot.
         public static final double kLauncherGearRatio = 1.0;
