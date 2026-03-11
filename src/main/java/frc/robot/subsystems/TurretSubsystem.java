@@ -233,13 +233,13 @@ public Command SetTurretPositionMinMM() {
 
         SmartDashboard.putNumber("TurretSubsystem/DistanceToHub", robotPos.getDistance(Constants.TurretSubsystemConstants.blueHubPose));
 
-        if (!isAtNegativeLimit()) {
+        if (isAtNegativeLimit()) {
             // Re-zero encoder at the known -270° position
             turretMotor.setPosition(Constants.TurretSubsystemConstants.minNegTurretMotorRot);
             if (turretMotor.getVelocity().getValueAsDouble() < 0) {
                 turretMotor.stopMotor();
             }
-        } else if (!isAtPositiveLimit()) {
+        } else if (isAtPositiveLimit()) {
             // Re-zero encoder at the known +90° position
             turretMotor.setPosition(Constants.TurretSubsystemConstants.maxPosTurretMotorRot);
             if (turretMotor.getVelocity().getValueAsDouble() > 0) {

@@ -41,6 +41,7 @@ import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.Launch;
 import frc.robot.commands.LaunchLookup;
+import frc.robot.commands.SlowClockwiseToSwitch;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
@@ -285,7 +286,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         // auxXbox.povLeft().whileTrue(m_launcherSubsystem.RunLauncherMM());
         // auxXbox.povRight().whileTrue(m_launcherSubsystem.StopLauncherMM());
         auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
-        auxXbox.b().onTrue(m_launcherSubsystem.MoveHoodUp());
+        // auxXbox.b().onTrue(m_launcherSubsystem.MoveHoodUp());
         auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
           //auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(2));
 //         auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(0
@@ -314,12 +315,29 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
             () -> drivetrain.getState().Pose,
             this::getFieldRelativeVelocity));
 
-        // auxXbox.leftTrigger().whileTrue(m_intakeSubsystem.AgitateIntakeCommand()
-        // .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
-        // .alongWith(m_kickerSubsystem.AgitateKickerCommand())
-        // .alongWith(m_launcherSubsystem.agitateLauncherCommand()));
+
+        // Slow clockwise turret rotation until a limit switch is hit
+        auxXbox.b().whileTrue(new SlowClockwiseToSwitch(m_turretSubsystem));
+
+//         auxXbox.leftTrigger().whileTrue(m_intakeSubsystem.AgitateIntakeCommand()
+//         .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
+//         .alongWith(m_kickerSubsystem.AgitateKickerCommand())
+//         .alongWith(m_launcherSubsystem.agitateLauncherCommand()));
+// =======
+//         // auxXbox.leftTrigger().whileTrue(m_intakeSubsystem.AgitateIntakeCommand()
+//         // .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
+//         // .alongWith(m_kickerSubsystem.AgitateKickerCommand())
+//         // .alongWith(m_launcherSubsystem.agitateLauncherCommand()));
       
 
+
+        // Uncomment to auto-home turret clockwise on match start (autonomous)
+        // RobotModeTriggers.autonomous()
+        //         .onTrue(new SlowClockwiseToSwitch(m_turretSubsystem));
+
+        // Uncomment to auto-home turret clockwise on teleop start
+        // RobotModeTriggers.teleop()
+        //         .onTrue(new SlowClockwiseToSwitch(m_turretSubsystem));
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode) is applied to the drive motors while disabled.
