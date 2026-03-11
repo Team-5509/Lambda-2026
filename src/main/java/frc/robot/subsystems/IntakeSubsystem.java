@@ -52,8 +52,8 @@ public class IntakeSubsystem extends SubsystemBase {
   private static final double AGITATE_REVERSE_DURATION_S = 0.3;
   private boolean isRunning = false;
 
-  private static final double MIN_INTAKE_ROT = 0.0;
-    private static final double MAX_INTAKE_ROT = -0.3;
+  private static final double MIN_INTAKE_ROT = 0.52;
+    private static final double MAX_INTAKE_ROT = .18;
   
 
     /* ==================== Hardware ==================== */

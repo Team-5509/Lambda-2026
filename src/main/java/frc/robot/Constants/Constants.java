@@ -84,7 +84,7 @@ public class Constants {
         public static final int kHoodEncoderId = 23;
         public static final double trueZero = -0.186523;
         public static final double hoodToEncoderRatio = 0.125;
-        public static final double kShootSpinUpSeconds = 0.2; // seconds to wait for launcher to spin up before feeding
+        public static final double kShootSpinUpSeconds = 1; // seconds to wait for launcher to spin up before feeding
 
         // Hood position limits (mechanism rotations) — must match soft limits in LauncherSubsystem
         public static final double kHoodMinRot = 0.05;

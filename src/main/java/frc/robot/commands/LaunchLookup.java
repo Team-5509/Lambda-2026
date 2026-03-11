@@ -101,7 +101,7 @@ public class LaunchLookup extends Command {
   private final Supplier<Translation2d> m_velocitySupplier; // field-relative, m/s
 
   private final Timer m_timer = new Timer();
-
+  // m_timer = 1;
   // Updated each execute() call
   private double m_speed   = 50.0;
   private double m_hoodPos = LauncherSubsystemConstants.kHoodMinRot;

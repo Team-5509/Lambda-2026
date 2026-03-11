@@ -28,8 +28,8 @@ public class TurretSubsystem extends SubsystemBase {
     /* ==================== Constants ==================== */
     // Limit switches at 90° from robot front → full 360° range: -270° to +90°
     private static final double GEAR_RATIO    = 5000.0 / 120.0;             // ~41.667
-    private static final double MIN_TURRET_ROT = (-270.0 / 360.0) * GEAR_RATIO; // ~-31.25 motor rot
-    private static final double MAX_TURRET_ROT = (90.0  / 360.0) * GEAR_RATIO;  // ~+10.42 motor rot
+    private static final double MIN_TURRET_ROT = (-270.0 / 360.0) * GEAR_RATIO + 0.5; // ~-31.25 motor rot
+    private static final double MAX_TURRET_ROT = (90.0  / 360.0) * GEAR_RATIO - 0.5;  // ~+10.42 motor rot
     double maxPosistion = MAX_TURRET_ROT;
     double minPosistion = MIN_TURRET_ROT;
 
@@ -37,9 +37,9 @@ public class TurretSubsystem extends SubsystemBase {
 
     // Motion Magic
     // Make Motion Magic very slow on purpose
-    private static final double MM_CRUISE_VEL = 250.0; // rot/s (was 2.0)
-    private static final double MM_ACCEL = 80.0; // rot/s^2 (was 6.0)
-    private static final double MM_JERK = 10.0; // rot/s^3 (was 60.0)
+    private static final double MM_CRUISE_VEL = 6 * GEAR_RATIO; // rot/s (was 2.0)
+    private static final double MM_ACCEL = 300.0; // rot/s^2 (was 6.0)
+    private static final double MM_JERK = 1600.0; // rot/s^3 (was 60.0)
 
     /* ==================== Hardware ==================== */
     private final TalonFX turretMotor = new TalonFX(TURRET_MOTOR_ID);
@@ -91,6 +91,7 @@ public class TurretSubsystem extends SubsystemBase {
         config.Slot0.kI = 0.0;
         config.Slot0.kD = 0.0;
         config.Slot0.kV = 0.05;
+        config.Slot0.kS = 0.15;
         
 
         /* ---- Soft Limits ---- */
@@ -162,7 +163,7 @@ public Command SetTurretPositionMinMM() {
 
         SmartDashboard.putNumber("TurretSubsystem/SetpointDegrees", degrees);
 
-        double rotations = (degrees / 360.0) * GEAR_RATIO;
+        double rotations = (degrees / 360.0) * GEAR_RATIO - (90.0 / 360.0) * GEAR_RATIO;
         SmartDashboard.putNumber("TurretSubsystem/SetpointRotations", rotations);
 
         turretMotor.setControl(motionMagic.withPosition(rotations));
