@@ -52,8 +52,8 @@ public class IntakeSubsystem extends SubsystemBase {
   private static final double AGITATE_REVERSE_DURATION_S = 0.3;
   private boolean isRunning = false;
 
-  private static final double MIN_INTAKE_ROT = 0.52;
-    private static final double MAX_INTAKE_ROT = .18;
+  private static final double MIN_INTAKE_ROT = 0.02;
+    private static final double MAX_INTAKE_ROT = 0.366;
   
 
     /* ==================== Hardware ==================== */
@@ -100,7 +100,10 @@ public class IntakeSubsystem extends SubsystemBase {
         CANcoderConfiguration config = new CANcoderConfiguration();
 
         // CANcoder always reports ±0.5 rotations (±180°) in Phoenix 6
-        config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+        config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
+        config.MagnetSensor.MagnetOffset = -0.45;
+
 
         deployEncoder.getConfigurator().apply(config);
     }
@@ -115,7 +118,7 @@ private void configureDeployMotor() {
   /* ---- Feedback ---- */
   config.Feedback.FeedbackRemoteSensorID = INTAKE_CANCODER_ID;
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        config.Feedback.SensorToMechanismRatio = 1.0;
+        config.Feedback.RotorToSensorRatio = 122.2222222222222;
 
   /* ---- Motion Magic ---- */
   config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL;
@@ -123,12 +126,15 @@ private void configureDeployMotor() {
   config.MotionMagic.MotionMagicJerk = MM_JERK;
 
   /* ---- PID ---- */
-  config.Slot0.kP = 1.0;
+  config.Slot0.kP = 20.0;
   config.Slot0.kI = 0.0;
   config.Slot0.kD = 0.0;
   config.Slot0.kV = 0.0;
-  config.Slot0.kG = 1.0;
+  config.Slot0.kG = 0.0;
   config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+  config.CurrentLimits.SupplyCurrentLimitEnable = true;
+  config.CurrentLimits.SupplyCurrentLimit = 20;
+  
 
   /* ---- Soft Limits ---- */
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
