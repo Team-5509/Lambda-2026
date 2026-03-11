@@ -46,6 +46,8 @@ import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 
 public class RobotContainer {
+    public final ShootingTurnDetector m_shootingTurnDetector;
+
 private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
     private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
     private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
@@ -112,6 +114,8 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
 
 
     public RobotContainer() {
+        m_shootingTurnDetector = new ShootingTurnDetector();
+
         autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
