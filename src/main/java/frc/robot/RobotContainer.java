@@ -313,6 +313,14 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
       
 
 
+        // Uncomment to auto-home turret clockwise on match start (autonomous)
+        // RobotModeTriggers.autonomous()
+        //         .onTrue(new SlowClockwiseToSwitch(m_turretSubsystem));
+
+        // Uncomment to auto-home turret clockwise on teleop start
+        // RobotModeTriggers.teleop()
+        //         .onTrue(new SlowClockwiseToSwitch(m_turretSubsystem));
+
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode) is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
