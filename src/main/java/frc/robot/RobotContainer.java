@@ -278,15 +278,29 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
         // auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp().andThen
         // (m_kickerSubsystem.RunKickerMM()));
         // auxXbox.start().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown().andThen(m_kickerSubsystem.RunKickerMM()));
-        auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp().andThen(m_launcherSubsystem.RunLauncherMM()));
+        //auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp().andThen(m_launcherSubsystem.RunLauncherMM()));
         // auxXbox.back().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown().andThen(m_launcherSubsystem.RunLauncherMM()));
         // auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM());
         // auxXbox.povRight().onTrue(m_intakeSubsystem.RetractIntakeMM());
         // auxXbox.povLeft().whileTrue(m_launcherSubsystem.RunLauncherMM());
         // auxXbox.povRight().whileTrue(m_launcherSubsystem.StopLauncherMM());
         auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
-        auxXbox.b().onTrue(m_launcherSubsystem.MoveHoodUp());
+        auxXbox.b().onTrue(m_launcherSubsystem.MoveHoodUp().andThen(m_launcherSubsystem.ExtendHoodMM()));
+        auxXbox.x().onTrue(m_launcherSubsystem.MoveHoodDown().andThen(m_launcherSubsystem.RetractHoodMM()));
+        auxXbox.povUp().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp().andThen(m_launcherSubsystem.RunLauncherMM()));
+        auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown().andThen(m_launcherSubsystem.RunLauncherMM()));
         auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
+        driverXbox.y().onTrue(m_launcherSubsystem.RunLauncherMM());
+        auxXbox.y().onTrue(m_kickerSubsystem.RunKickerMM());
+        auxXbox.povLeft().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp());
+        auxXbox.povRight().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown());
+        auxXbox.leftBumper().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedUp());
+        auxXbox.rightBumper().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedDown());
+        driverXbox.a().onTrue(m_conveyorSubsystem.RunConveyorMM());
+
+
+
+
           //auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(2));
 //         auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(0
 //  ));
@@ -304,15 +318,17 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
                 this::getFieldRelativeVelocity,
                 TurretSubsystemConstants.ballSpeed));
 
-        auxXbox.povDown().onTrue(m_intakeSubsystem.DeployIntakeMM());
-        auxXbox.povUp().onTrue(m_intakeSubsystem.RetractIntakeMM());
+        // auxXbox.povDown().onTrue(m_intakeSubsystem.DeployIntakeMM());
+        // auxXbox.povUp().onTrue(m_intakeSubsystem.RetractIntakeMM());
 
-        auxXbox.rightTrigger().whileTrue(new LaunchLookup(
-            m_conveyorSubsystem,
-            m_launcherSubsystem,
-            m_kickerSubsystem,
-            () -> drivetrain.getState().Pose,
-            this::getFieldRelativeVelocity));
+        auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
+
+        // auxXbox.rightTrigger().whileTrue(new LaunchLookup(
+        //     m_conveyorSubsystem,
+        //     m_launcherSubsystem,
+        //     m_kickerSubsystem,
+        //     () -> drivetrain.getState().Pose,
+        //     this::getFieldRelativeVelocity));
 
         // auxXbox.leftTrigger().whileTrue(m_intakeSubsystem.AgitateIntakeCommand()
         // .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())

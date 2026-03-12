@@ -30,7 +30,7 @@ public class ConveyorSubsystem extends SubsystemBase {
 
   // Conveyor Speed
   private double speed = -60;
-  private double speedIncrement = -10.0;
+  private double speedIncrement = -5.0;
 
   // Stall detection
   private static final double STALL_CURRENT_THRESHOLD_A = 40.0; // stator amps above this = stalling
@@ -82,6 +82,15 @@ public class ConveyorSubsystem extends SubsystemBase {
     });
   }
 
+   public void stopConveyorMM() {
+    
+      isRunning = false;
+      conveyorMotor.setControl(
+          motionMagic.withVelocity(0)
+              .withSlot(0));
+    
+  }
+
   /**
    * Command that runs the kicker motor with magic motion (closed loop control) at
    * speed from constants.
@@ -95,6 +104,15 @@ public class ConveyorSubsystem extends SubsystemBase {
           motionMagic.withVelocity(speed)
               .withSlot(0));
     });
+  }
+
+  public void runConveyorMM() {
+   
+      isRunning = true;
+      conveyorMotor.setControl(
+          motionMagic.withVelocity(speed)
+              .withSlot(0));
+    
   }
 
   /**

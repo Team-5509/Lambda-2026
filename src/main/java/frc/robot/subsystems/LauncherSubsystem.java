@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -17,6 +18,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.fasterxml.jackson.databind.ser.VirtualBeanPropertyWriter;
 
 import frc.robot.Constants.Constants;
 import frc.robot.Constants.Constants.IntakeSubsystemConstants;
@@ -36,9 +38,9 @@ public class LauncherSubsystem extends SubsystemBase {
     private static final int LIMIT_NEG_ID = 0; // -180 deg
 
 
-  private static final double MM_CRUISE_VEL = 2.0; // rot/s
-  private static final double MM_ACCEL = 6.0; // rot/s^2
-  private static final double MM_JERK = 60.0; // rot/s^3
+  // private static final double MM_CRUISE_VEL = 2.0; // rot/s
+  // private static final double MM_ACCEL = 6.0; // rot/s^2
+  // private static final double MM_JERK = 60.0; // rot/s^3
  
   private static final double MM_CRUISE_VEL_HOOD = 40; // rot/s
   private static final double MM_ACCEL_HOOD = 20; // rot/s^2
@@ -46,7 +48,7 @@ public class LauncherSubsystem extends SubsystemBase {
 
   // Launcher Speed
   private double speed = -60.0;
-  private double speedIncrement = -5.0;
+  private double speedIncrement = -2.5;
 
    private static final double MIN_HOOD_ROT = Constants.LauncherSubsystemConstants.kHoodMinRot;
    private static final double MAX_HOOD_ROT = Constants.LauncherSubsystemConstants.kHoodMaxRot;
@@ -62,7 +64,8 @@ public class LauncherSubsystem extends SubsystemBase {
   private final DigitalInput lowLimitSwitch = new DigitalInput(LIMIT_NEG_ID);
 
   private final CANcoder hoodEncoder = new CANcoder(LauncherSubsystemConstants.kHoodEncoderId);
-  private final MotionMagicVelocityVoltage motionMagic = new MotionMagicVelocityVoltage(0);
+  // private final MotionMagicVelocityVoltage motionMagic = new MotionMagicVelocityVoltage(0);
+  private final VelocityVoltage velocityVoltage = new VelocityVoltage(0);
   private final MotionMagicVoltage motionMagicHood = new MotionMagicVoltage(0);
 
   /** Creates a new ExampleSubsystem. */
@@ -76,15 +79,15 @@ public class LauncherSubsystem extends SubsystemBase {
     TalonFXConfiguration config = new TalonFXConfiguration();
 
     /* ---- Motion Magic ---- */
-    config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL;
-    config.MotionMagic.MotionMagicAcceleration = MM_ACCEL;
-    config.MotionMagic.MotionMagicJerk = MM_JERK;
+    // config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL;
+    // config.MotionMagic.MotionMagicAcceleration = MM_ACCEL;
+    // config.MotionMagic.MotionMagicJerk = MM_JERK;
 
     /* ---- PID ---- */
-    config.Slot0.kP = 0;//60.0;
+    config.Slot0.kP = 1;//60.0;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
-    config.Slot0.kV = 0.375;//0.0;
+    config.Slot0.kV = 0.1;//0.0;
 
     /* ---- Motor ---- */
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -152,9 +155,17 @@ private void configureHoodMotor() {
   public Command StopLauncherMM() {
     return runOnce(() -> {
       launcherMotor.setControl(
-          motionMagic.withVelocity(0)
+          velocityVoltage.withVelocity(0)
               .withSlot(0));
     });
+  }
+
+    public void stopLauncherMM() {
+    launcherMotor.stopMotor();
+      // launcherMotor.setControl(
+      //    velocityVoltage.withVelocity(0)
+      //         .withSlot(0));
+
   }
 
   /**
@@ -167,7 +178,7 @@ private void configureHoodMotor() {
     return runOnce(() -> {
       // SmartDashboard.putNumber("LauncherSubsystem/LauncherMMSetpointRPS", speed);
       launcherMotor.setControl(
-          motionMagic.withVelocity(speed)
+          velocityVoltage.withVelocity(speed)
               .withSlot(0));
     });
   }
@@ -182,9 +193,16 @@ private void configureHoodMotor() {
     return runOnce(() -> {
       SmartDashboard.putNumber("LauncherSubsystem/LauncherMMSetpointRPS", velocityRPS.getAsDouble());
       launcherMotor.setControl(
-          motionMagic.withVelocity(velocityRPS.getAsDouble())
+          velocityVoltage.withVelocity(velocityRPS.getAsDouble())
               .withSlot(0));
     });
+  }
+
+  public void runLauncherMM(DoubleSupplier velocityRPS) {
+    SmartDashboard.putNumber("LauncherSubsystem/LauncherMMSetpointRPS", velocityRPS.getAsDouble());
+      launcherMotor.setControl(
+          velocityVoltage.withVelocity(velocityRPS.getAsDouble())
+              .withSlot(0));
   }
 
     /**
@@ -196,7 +214,7 @@ private void configureHoodMotor() {
   public void runLauncherMM(double velocityRPS) {
       SmartDashboard.putNumber("LauncherSubsystem/LauncherMMSetpointRPS", velocityRPS);
       launcherMotor.setControl(
-          motionMagic.withVelocity(velocityRPS)
+          velocityVoltage.withVelocity(velocityRPS)
               .withSlot(0));
   }
 
@@ -212,6 +230,15 @@ private void configureHoodMotor() {
           motionMagicHood.withPosition(retractPosistion)
               .withSlot(0));
     });
+  }
+
+    public void retractHoodMM() {
+  
+
+      hoodMotor.setControl(
+          motionMagicHood.withPosition(retractPosistion)
+              .withSlot(0));
+  
   }
 
    /**
@@ -273,7 +300,7 @@ private void configureHoodMotor() {
   public Command reverseLauncherCommand() {
     return runOnce(() -> {
       launcherMotor.setControl(
-          motionMagic.withVelocity(-speed)
+          velocityVoltage.withVelocity(-speed)
               .withSlot(0));
     });
   }
@@ -300,6 +327,12 @@ private void configureHoodMotor() {
     });
   }
 
+  public void runExtendHood(DoubleSupplier positionSupplier){
+      SmartDashboard.putNumber("LauncherSubsystem/HoodPositionSupplier", positionSupplier.getAsDouble());
+      hoodMotor.setControl(
+          motionMagicHood.withPosition(positionSupplier.getAsDouble())
+              .withSlot(0));
+  }
   /**
    * Command that runs the launcher motor at a certain speed.
    *

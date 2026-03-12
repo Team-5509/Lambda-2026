@@ -50,38 +50,39 @@ public class LaunchLookup extends Command {
 
   static {
     // Hub: distance (m) → hood position (mechanism rotations)
-    HOOD_TABLE.put(1.5, 0.40);
-    HOOD_TABLE.put(2.5, 0.65);
-    HOOD_TABLE.put(3.5, 0.95);
-    HOOD_TABLE.put(4.5, 1.20);
-    HOOD_TABLE.put(5.5, 1.45);
-    HOOD_TABLE.put(6.5, 1.65);
+    HOOD_TABLE.put(1.5, 0.05);
+    HOOD_TABLE.put(2.09, 0.05);
+    HOOD_TABLE.put(3.15, 0.05);
+    HOOD_TABLE.put(4.15, 0.94);
+    //HOOD_TABLE.put(5.5, 1.45);
+    //HOOD_TABLE.put(6.5, 1.65);
 
     // Hub: distance (m) → launcher speed (RPS)
-    SPEED_TABLE.put(1.5, 42.0);
-    SPEED_TABLE.put(2.5, 55.0);
-    SPEED_TABLE.put(3.5, 68.0);
-    SPEED_TABLE.put(4.5, 78.0);
-    SPEED_TABLE.put(5.5, 88.0);
-    SPEED_TABLE.put(6.5, 96.0);
+    SPEED_TABLE.put(1.5, -55.0);
+    SPEED_TABLE.put(2.09, -60.0);
+    SPEED_TABLE.put(3.15, -75.0);
+    SPEED_TABLE.put(4.25, -70.0);
+    //SPEED_TABLE.put(5.5, 88.0);
+    //SPEED_TABLE.put(6.5, 96.0);
 
     // Home: distance (m) → hood position (mechanism rotations)
     // TODO: Replace placeholder values with data measured at the home goal.
-    HOOD_TABLE_HOME.put(1.5, 0.35);
-    HOOD_TABLE_HOME.put(2.5, 0.55);
-    HOOD_TABLE_HOME.put(3.5, 0.80);
-    HOOD_TABLE_HOME.put(4.5, 1.05);
-    HOOD_TABLE_HOME.put(5.5, 1.30);
-    HOOD_TABLE_HOME.put(6.5, 1.50);
+    HOOD_TABLE_HOME.put(3.15, 0.05);
+    HOOD_TABLE_HOME.put(4.15, 0.94);
+    // HOOD_TABLE_HOME.put(3.5, 0.80);
+    // HOOD_TABLE_HOME.put(4.5, 1.05);
+    // HOOD_TABLE_HOME.put(5.5, 1.30);
+    // HOOD_TABLE_HOME.put(6.5, 1.50);
 
     // Home: distance (m) → launcher speed (RPS)
     // TODO: Replace placeholder values with data measured at the home goal.
-    SPEED_TABLE_HOME.put(1.5, 38.0);
-    SPEED_TABLE_HOME.put(2.5, 50.0);
-    SPEED_TABLE_HOME.put(3.5, 62.0);
-    SPEED_TABLE_HOME.put(4.5, 72.0);
-    SPEED_TABLE_HOME.put(5.5, 82.0);
-    SPEED_TABLE_HOME.put(6.5, 90.0);
+    SPEED_TABLE_HOME.put(3.15, -75.0);
+    SPEED_TABLE_HOME.put(4.25, -70.0);
+    // SPEED_TABLE_HOME.put(3.5, 62.0);     
+
+    // SPEED_TABLE_HOME.put(4.5, 72.0);
+    // SPEED_TABLE_HOME.put(5.5, 82.0);
+    // SPEED_TABLE_HOME.put(6.5, 90.0);
   }
 
   // ── Motion lead compensation constant ────────────────────────────────────
@@ -130,6 +131,7 @@ public class LaunchLookup extends Command {
 
   @Override
   public void initialize() {
+    
     m_timer.restart();
   }
 
@@ -137,21 +139,22 @@ public class LaunchLookup extends Command {
   public void execute() {
     updateShootingParams();
 
-    m_launcherSubsystem.ExtendHoodMM(() -> m_hoodPos);
-    m_launcherSubsystem.RunLauncherMM(() -> m_speed);
+    m_launcherSubsystem.runExtendHood(() -> m_hoodPos);
+    m_launcherSubsystem.runLauncherMM(() -> m_speed);
 
+    m_kickerSubsystem.runKickerMM();
     if (m_timer.hasElapsed(LauncherSubsystemConstants.kShootSpinUpSeconds)) {
-      m_kickerSubsystem.RunKickerMM();
-      m_conveyorSubsystem.RunConveyorMM();
+      
+      m_conveyorSubsystem.runConveyorMM();
     }
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_launcherSubsystem.StopLauncherMM();
-    m_kickerSubsystem.StopKickerMM();
-    m_conveyorSubsystem.StopConveyorMM();
-    m_launcherSubsystem.RetractHoodMM();
+    m_launcherSubsystem.stopLauncherMM();
+    m_kickerSubsystem.stopKickerMM();
+    m_conveyorSubsystem.stopConveyorMM();
+    m_launcherSubsystem.retractHoodMM();
   }
 
   @Override
