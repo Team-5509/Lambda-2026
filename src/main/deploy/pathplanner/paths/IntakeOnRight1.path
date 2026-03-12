@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 7.8255952523739385,
-        "y": 1.6405726804794598
+        "y": 1.6405726804794596
       },
       "isLocked": false,
       "linkedName": "Pickup Far Right"
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 1.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
