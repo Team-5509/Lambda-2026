@@ -51,11 +51,19 @@ public class TurretSubsystem extends SubsystemBase {
 
     private final MotionMagicVoltage motionMagic = new MotionMagicVoltage(0);
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public TurretSubsystem() {
 
         //configureEncoder();
+        configureMotor();
+    }
+
+    public TurretSubsystem(CommandSwerveDrivetrain inp) {
+
+        //configureEncoder();
+        drivetrain = inp;
+        
         configureMotor();
     }
 

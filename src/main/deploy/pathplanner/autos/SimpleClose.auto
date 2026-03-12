@@ -5,6 +5,18 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "LeftStartCloseSimpleShoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "DeployIntake"
@@ -13,13 +25,19 @@
         {
           "type": "named",
           "data": {
-            "name": "LaunchLookup"
+            "name": "RunIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunchLookup"
           }
         }
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": "CloseAutons(Dont Cross Trench Line)",
   "choreoAuto": false
 }

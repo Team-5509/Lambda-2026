@@ -34,7 +34,7 @@ import frc.robot.subsystems.LauncherSubsystem;
  * launcher speed that produce the best results, then update HOOD_TABLE and
  * SPEED_TABLE below.
  */
-public class LaunchLookup extends Command {
+public class AutoLaunchLookup extends Command {
 
   // ── Lookup tables (distance m → output) ─────────────────────────────────
   // TODO: Replace placeholder values with data measured on the actual robot.
@@ -58,8 +58,8 @@ public class LaunchLookup extends Command {
     //HOOD_TABLE.put(6.5, 1.65);
 
     // Hub: distance (m) → launcher speed (RPS)
-    SPEED_TABLE.put(1.5, -50.0);
-    SPEED_TABLE.put(2.09, -55.0);
+    SPEED_TABLE.put(1.5, -55.0);
+    SPEED_TABLE.put(2.09, -60.0);
     SPEED_TABLE.put(3.15, -75.0);
     SPEED_TABLE.put(4.25, -70.0);
     //SPEED_TABLE.put(5.5, 88.0);
@@ -114,7 +114,7 @@ public class LaunchLookup extends Command {
    * @param poseSupplier       Field-relative robot pose
    * @param velocitySupplier   Field-relative robot velocity in m/s
    */
-  public LaunchLookup(
+  public AutoLaunchLookup(
       ConveyorSubsystem conveyorSubsystem,
       LauncherSubsystem launcherSubsystem,
       KickerSubsystem kickerSubsystem,
@@ -159,6 +159,9 @@ public class LaunchLookup extends Command {
 
   @Override
   public boolean isFinished() {
+    if(m_timer.hasElapsed(5)){
+      return true;
+    }
     return false;
   }
 

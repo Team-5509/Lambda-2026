@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.560328102710417,
-        "y": 6.331611982878616
+        "x": 0.8561483594864476,
+        "y": 6.0081455064194005
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.081597717546365,
-        "y": 6.357489300995592
+        "x": 1.1666761768901568,
+        "y": 6.034022824536376
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CloseIntake"
     },
     {
       "anchor": {
@@ -20,12 +20,12 @@
         "y": 6.163409415121254
       },
       "prevControl": {
-        "x": 2.499358059914411,
-        "y": 6.305734664761641
+        "x": 1.6195292439372322,
+        "y": 6.098716119828817
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "PostSimpleShoot"
     }
   ],
   "rotationTargets": [],
@@ -48,7 +48,7 @@
   "folder": "ClosePaths(Dont Cross Trench Line)",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": -1.576550055183735
   },
   "useDefaultConstraints": true
 }

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.735791726105562,
-        "y": 4.520199714693296
+        "x": 7.403109843081312,
+        "y": 4.688402282453637
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.800485021398002,
-        "y": 7.314950071326677
+        "x": 7.4678031383737515,
+        "y": 7.4831526390870176
       },
       "isLocked": false,
       "linkedName": "PostIntakeMiddleLeft2"
     },
     {
       "anchor": {
-        "x": 5.539942938659058,
-        "y": 7.405520684736091
+        "x": 6.5620970042796,
+        "y": 7.433518072292949
       },
       "prevControl": {
-        "x": 5.9927960057061345,
-        "y": 7.444336661911555
+        "x": 7.016601543235884,
+        "y": 7.436382419716889
       },
       "nextControl": {
-        "x": 4.957543113464187,
-        "y": 7.355600699719388
+        "x": 6.225691868758915,
+        "y": 7.431398002853067
       },
       "isLocked": false,
       "linkedName": null
@@ -44,7 +44,12 @@
       "linkedName": "ShootLeft"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -179.94359438739792
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
