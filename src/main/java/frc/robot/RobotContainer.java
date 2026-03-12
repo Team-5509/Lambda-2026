@@ -46,7 +46,8 @@ import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 
 public class RobotContainer {
-private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    private final TurretSubsystem m_turretSubsystem = new TurretSubsystem(drivetrain);
     private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
     private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
     private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
@@ -71,8 +72,6 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
     private final CommandXboxController driverXbox = new CommandXboxController(0);
     private final CommandXboxController auxXbox = new CommandXboxController(1);
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-        
     //public final Vision visionFL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_FL);
     //public final Vision visionFR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_FR);
 //     public final Vision visionRL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RL);

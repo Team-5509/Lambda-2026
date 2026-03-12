@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Constants;
-import frc.robot.generated.TunerConstants;
 
 public class TurretSubsystem extends SubsystemBase {
 
@@ -51,10 +50,10 @@ public class TurretSubsystem extends SubsystemBase {
 
     private final MotionMagicVoltage motionMagic = new MotionMagicVoltage(0);
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    private final CommandSwerveDrivetrain drivetrain;
 
-    public TurretSubsystem() {
-
+    public TurretSubsystem(CommandSwerveDrivetrain drivetrain) {
+        this.drivetrain = drivetrain;
         //configureEncoder();
         configureMotor();
     }
