@@ -112,14 +112,12 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
 
 
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
-        SmartDashboard.putData("Auto Mode", autoChooser);
-
         // Speed sliders for kicker and launcher (adjustable in SmartDashboard/Shuffleboard)
         SmartDashboard.putNumber("KickerSubsystem/SpeedRPS", -30.0);
         SmartDashboard.putNumber("LauncherSubsystem/SpeedRPS", -45.0);
 
-                // Register named commands after subsystem fields have been initialized
+        // Register named commands BEFORE building the auto chooser so PathPlanner
+        // can resolve them when it eagerly builds the command tree.
         NamedCommands.registerCommand("RunLauncher", m_launcherSubsystem.RunLauncherMM());
         NamedCommands.registerCommand("StopLauncher", m_launcherSubsystem.StopLauncherMM());
         NamedCommands.registerCommand("RunIntake", m_intakeSubsystem.RunIntakeMM());
@@ -151,6 +149,8 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
                 this::getFieldRelativeVelocity,
                 TurretSubsystemConstants.ballSpeed));
 
+        autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
+        SmartDashboard.putData("Auto Mode", autoChooser);
 
         configureBindings();
 
