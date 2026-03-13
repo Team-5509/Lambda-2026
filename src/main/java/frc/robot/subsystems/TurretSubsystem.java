@@ -41,6 +41,12 @@ public class TurretSubsystem extends SubsystemBase {
     private static final double MM_ACCEL = 300.0; // rot/s^2 (was 6.0)
     private static final double MM_JERK = 1600.0; // rot/s^3 (was 60.0)
 
+    private double manualPosition = -10.0;
+    private double manualIncrement = 0.01;
+    private double posistionUnderLeftTrench = 0;
+    private double posistionUnderRightTrench = -20;
+    
+
     /* ==================== Hardware ==================== */
     private final TalonFX turretMotor = new TalonFX(TURRET_MOTOR_ID);
 
@@ -63,7 +69,7 @@ public class TurretSubsystem extends SubsystemBase {
 
         //configureEncoder();
         drivetrain = inp;
-        
+
         configureMotor();
     }
 
@@ -126,10 +132,52 @@ public class TurretSubsystem extends SubsystemBase {
      *
      * @return a command
      */
-    public Command SetTurretPositionMM() {
+    public Command ManualTurretPositionMM() {
         return runOnce(() -> {
              turretMotor.setControl(
-                     motionMagic.withPosition(maxPosistion)
+                     motionMagic.withPosition(manualPosition)
+                             .withSlot(0));
+        });
+    }
+
+public Command ManualTurretPositionLeftMM() {
+        return runOnce(() -> {
+             turretMotor.setControl(
+                     motionMagic.withPosition(posistionUnderLeftTrench)
+                             .withSlot(0));
+        });
+    }
+
+    public Command ManualTurretPositionRightMM() {
+        return runOnce(() -> {
+             turretMotor.setControl(
+                     motionMagic.withPosition(posistionUnderRightTrench)
+                             .withSlot(0));
+        });
+    }
+
+    public Command IncrementTurretPositionUpMM() {
+        return runOnce(() -> {
+            manualPosition += manualIncrement;
+             turretMotor.setControl(
+                     motionMagic.withPosition(manualPosition)
+                             .withSlot(0));
+        });
+    }
+
+    public Command IncrementTurretPositionDownMM() {
+        return runOnce(() -> {
+            manualPosition -= manualIncrement;
+             turretMotor.setControl(
+                     motionMagic.withPosition(manualPosition)
+                             .withSlot(0));
+        });
+    }
+
+    public Command StopTurret(){
+        return runOnce(() -> {
+            turretMotor.setControl(
+                     motionMagic.withPosition(turretMotor.getPosition().getValueAsDouble())
                              .withSlot(0));
         });
     }

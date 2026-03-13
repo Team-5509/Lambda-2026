@@ -286,7 +286,7 @@ private void configureHoodMotor() {
   }
 
 /**
-   * Method to run extends the hood with magic motion (closed loop control)
+   * Method to run extends the hood with magic motion (closed loop control)  
    *
    * @return a void
    */

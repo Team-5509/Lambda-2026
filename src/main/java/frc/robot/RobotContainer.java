@@ -222,6 +222,10 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem(drivetrain
         driverXbox.start().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
         driverXbox.rightTrigger().whileTrue(drivetrain.applyRequest(() -> brake)); 
         driverXbox.leftTrigger().onTrue(m_intakeSubsystem.RunIntakeMM()).onFalse(m_intakeSubsystem.StopIntakeMM());
+        driverXbox.y().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp()
+        .andThen(m_launcherSubsystem.RunLauncherMM()));
+        driverXbox.a().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown()
+        .andThen(m_launcherSubsystem.RunLauncherMM()));
         //driverXbox.b().onTrue(drivetrain.runOnce(() -> drivetrain.addFakeVisionReading()));
 
         
@@ -323,18 +327,23 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem(drivetrain
                 // Supplier<Translation2d> (FIELD-RELATIVE)
                 this::getFieldRelativeVelocity,
                 TurretSubsystemConstants.ballSpeed));
+        auxXbox.b().onTrue(m_turretSubsystem.StopTurret());
+
+        auxXbox.y().onTrue(m_launcherSubsystem.RunLauncherMM()
+        .alongWith(m_conveyorSubsystem.RunConveyorCommand())
+        .alongWith(m_kickerSubsystem.RunKickerCommand())
+        .alongWith(m_intakeSubsystem.RunIntakeMM()));
+
+       auxXbox.x().onTrue(m_launcherSubsystem.StopLauncherMM()
+        .alongWith(m_conveyorSubsystem.StopConveyorMM())
+        .alongWith(m_kickerSubsystem.StopKickerMM())
+        .alongWith(m_intakeSubsystem.StopIntakeMM()));
+        
 
         auxXbox.povDown().onTrue(m_intakeSubsystem.DeployIntakeMM());
         auxXbox.povUp().onTrue(m_intakeSubsystem.RetractIntakeMM());
 
         auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
-
-        // auxXbox.rightTrigger().whileTrue(new LaunchLookup(
-        //     m_conveyorSubsystem,
-        //     m_launcherSubsystem,
-        //     m_kickerSubsystem,
-        //     () -> drivetrain.getState().Pose,
-        //     this::getFieldRelativeVelocity));
 
         auxXbox.leftTrigger().onTrue(
                 m_intakeSubsystem.AgitateIntakeCommand()
@@ -348,6 +357,11 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem(drivetrain
         .alongWith(Commands.runOnce(() -> m_launcherSubsystem.stopLauncherMM(), m_launcherSubsystem))
         .alongWith(m_intakeSubsystem.StopIntakeCommand())
         );
+
+        auxXbox.povLeft().onTrue(m_turretSubsystem.ManualTurretPositionMM());
+        auxXbox.leftBumper().onTrue(m_turretSubsystem.ManualTurretPositionLeftMM());
+        auxXbox.rightBumper().onTrue(m_turretSubsystem.ManualTurretPositionRightMM());
+
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode) is applied to the drive motors while disabled.
