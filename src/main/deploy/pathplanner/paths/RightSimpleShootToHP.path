@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.49835463895903087,
-        "y": 7.088495141417877
+        "x": 2.020627674750356,
+        "y": 1.7901426533523535
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.4947571241868469,
-        "y": 5.979761188620239
+        "x": 1.6065905848787447,
+        "y": 1.5054921540656196
       },
       "isLocked": false,
-      "linkedName": "ShootWall"
+      "linkedName": "RightCloseSimpleShoot"
     },
     {
       "anchor": {
-        "x": 0.49835463895903087,
-        "y": 4.928701448604934
+        "x": 0.8302710413694718,
+        "y": 0.6515406562054205
       },
       "prevControl": {
-        "x": 0.49845624347750445,
-        "y": 6.017225949254433
+        "x": 1.0890442225392294,
+        "y": 1.0267617689015673
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "DoneIntakeWalll"
+      "linkedName": "HumanPlayer"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "ClosePaths(Dont Cross Trench Line)",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": -139.9392155421262
   },
   "useDefaultConstraints": true
 }

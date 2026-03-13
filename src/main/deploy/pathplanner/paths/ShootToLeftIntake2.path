@@ -16,24 +16,29 @@
     },
     {
       "anchor": {
-        "x": 8.735791726105562,
-        "y": 6.810342368045649
+        "x": 7.403109843081312,
+        "y": 6.758587731811698
       },
       "prevControl": {
-        "x": 8.20530670470756,
-        "y": 7.573723252496434
+        "x": 6.87262482168331,
+        "y": 7.521968616262482
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "IntakeMiddleLeft2"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 179.5245389012641
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 1.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

@@ -5,25 +5,44 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Track"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "named",
                 "data": {
-                  "name": "RunIntake"
+                  "name": "Track"
                 }
               },
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "IntakeMiddleleft"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "LeftStartToMiddleIntake"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "DeployIntake"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "RunIntake"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "IntakeMiddleleft"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -42,7 +61,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Launch"
+                  "name": "AutoLaunchLookup"
                 }
               },
               {
@@ -82,7 +101,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Launch"
+            "name": "AutoLaunchLookup"
           }
         }
       ]

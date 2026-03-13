@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -23,21 +24,21 @@ public class KickerSubsystem extends SubsystemBase {
   private static final int KICKER_MOTOR_ID = Constants.KickerSubsystemConstants.kKickerMotorId;
 
   // Motion Magic
-  private static final double MM_CRUISE_VEL = 2.0; // rot/s
-  private static final double MM_ACCEL = 6.0; // rot/s^2
-  private static final double MM_JERK = 60.0; // rot/s^3
+  // private static final double MM_CRUISE_VEL = 2.0; // rot/s
+  // private static final double MM_ACCEL = 6.0; // rot/s^2
+  // private static final double MM_JERK = 60.0; // rot/s^3
 
   private static final double AGITATE_REVERSE_DURATION_S = 0.3; // seconds to run kicker in reverse for agitation
 
   // Kicker Speed
-  private double speed = -30;
+  private double speed = -20;
   private double speedIncrement = -5;
 
   /* ==================== Hardware ==================== */
   private TalonFX kickerMotor = new TalonFX(KICKER_MOTOR_ID);
 
-  private final MotionMagicVelocityVoltage motionMagic = new MotionMagicVelocityVoltage(0);
-
+  // private final MotionMagicVelocityVoltage motionMagic = new MotionMagicVelocityVoltage(0);
+  private final VelocityVoltage velocityVoltage = new VelocityVoltage(0);
   /** Creates a new ExampleSubsystem. */
   public KickerSubsystem() {
     configureMotor();
@@ -47,15 +48,15 @@ public class KickerSubsystem extends SubsystemBase {
     TalonFXConfiguration config = new TalonFXConfiguration();
 
     /* ---- Motion Magic ---- */
-    config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL;
-    config.MotionMagic.MotionMagicAcceleration = MM_ACCEL;
-    config.MotionMagic.MotionMagicJerk = MM_JERK;
+    // config.MotionMagic.MotionMagicCruiseVelocity = MM_CRUISE_VEL;
+    // config.MotionMagic.MotionMagicAcceleration = MM_ACCEL;
+    // config.MotionMagic.MotionMagicJerk = MM_JERK;
 
     /* ---- PID ---- */
     config.Slot0.kP = 0.36;//60.0;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0; //5.0;
-    config.Slot0.kV = 0.375;//0.0;
+    config.Slot0.kV = 0.15;//0.0;
     config.Slot0.kA = 0.15;
 
     /* ---- Motor ---- */
@@ -73,9 +74,17 @@ public class KickerSubsystem extends SubsystemBase {
   public Command StopKickerMM() {
     return runOnce(() -> {
       kickerMotor.setControl(
-          motionMagic.withVelocity(0)
+          velocityVoltage.withVelocity(0)
               .withSlot(0));
     });
+  }
+
+   public void stopKickerMM() {
+    
+      kickerMotor.setControl(
+          velocityVoltage.withVelocity(0)
+              .withSlot(0));
+  
   }
 
   /**
@@ -87,9 +96,17 @@ public class KickerSubsystem extends SubsystemBase {
   public Command RunKickerMM() {
     return runOnce(() -> {
       kickerMotor.setControl(
-          motionMagic.withVelocity(speed)
+          velocityVoltage.withVelocity(speed)
               .withSlot(0));
     });
+  }
+
+  public void runKickerMM() {
+   
+      kickerMotor.setControl(
+          velocityVoltage.withVelocity(speed)
+              .withSlot(0));
+    
   }
 
   /**
@@ -101,7 +118,7 @@ public class KickerSubsystem extends SubsystemBase {
   public Command RunKickerMM(DoubleSupplier velocityRPS) {
     return runOnce(() -> {
       kickerMotor.setControl(
-          motionMagic.withVelocity(velocityRPS.getAsDouble())
+          velocityVoltage.withVelocity(velocityRPS.getAsDouble())
               .withSlot(0));
     });
   }
@@ -189,7 +206,7 @@ public class KickerSubsystem extends SubsystemBase {
     public Command reverseKickerCommand() {
       return runOnce(() -> {
         kickerMotor.setControl(
-            motionMagic.withVelocity(-speed)
+           velocityVoltage.withVelocity(-speed)
                 .withSlot(0));
       });
     }
