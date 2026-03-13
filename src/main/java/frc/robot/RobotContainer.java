@@ -359,6 +359,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem(drivetrain
         );
 
         auxXbox.povLeft().onTrue(m_turretSubsystem.ManualTurretPositionMM());
+        auxXbox.povRight().onTrue(m_launcherSubsystem.RetractHoodMM());
         auxXbox.leftBumper().onTrue(m_turretSubsystem.ManualTurretPositionLeftMM());
         auxXbox.rightBumper().onTrue(m_turretSubsystem.ManualTurretPositionRightMM());
 

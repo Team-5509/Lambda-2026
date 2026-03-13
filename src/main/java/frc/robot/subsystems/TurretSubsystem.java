@@ -281,7 +281,7 @@ public Command SetTurretPositionMinMM() {
     @Override
     public void periodic() {
         // Optional: auto-zero if home switch hit
-        SmartDashboard.putNumber("TurrentSubsystem/TurretPositionInDegrees", turretMotor.getPosition().getValue().in(Units.Degrees));
+        SmartDashboard.putNumber("TurretSubsystem/TurretPositionInDegrees", turretMotor.getPosition().getValue().in(Units.Degrees));
         SmartDashboard.putNumber("TurretSubsystem/TurretPosition", turretMotor.getPosition().getValueAsDouble());
         SmartDashboard.putBoolean("TurretSubsystem.PosReached", isAtPositiveLimit());
         SmartDashboard.putBoolean("TurretSubsystem/NegReached", isAtNegativeLimit());

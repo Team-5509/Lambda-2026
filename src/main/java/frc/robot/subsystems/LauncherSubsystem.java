@@ -53,7 +53,7 @@ public class LauncherSubsystem extends SubsystemBase {
    private static final double MIN_HOOD_ROT = Constants.LauncherSubsystemConstants.kHoodMinRot;
    private static final double MAX_HOOD_ROT = Constants.LauncherSubsystemConstants.kHoodMaxRot;
 
-  private double retractPosistion = -0.5;
+  private double retractPosistion = 0.05;
   private double extendPosistion = 0;
   private double posistionIncrement = .05;
 
