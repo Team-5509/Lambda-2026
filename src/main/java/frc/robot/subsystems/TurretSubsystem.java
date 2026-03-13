@@ -43,10 +43,10 @@ public class TurretSubsystem extends SubsystemBase {
     private static final double MM_ACCEL = 300.0; // rot/s^2 (was 6.0)
     private static final double MM_JERK = 1600.0; // rot/s^3 (was 60.0)
 
-    private double manualPosition = -10.0;
+    private double manualPosition = 0;
     private double manualIncrement = 0.01;
-    private double posistionUnderLeftTrench = 0;
-    private double posistionUnderRightTrench = -20;
+    private double posistionUnderLeftTrench = -10;
+    private double posistionUnderRightTrench = 10;
     
 
     /* ==================== Hardware ==================== */
