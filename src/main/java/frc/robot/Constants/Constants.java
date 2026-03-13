@@ -63,16 +63,18 @@ public class Constants {
     //TODO: Measure this from shooter exit to robot center 
     public static final Translation2d shooterOffsetRobot = new Translation2d(0.32, 0.18);
 
-        // Limit switches are physically at 90° from robot front.
-        // Full 360° range: -270° (neg limit) to +90° (pos limit).
+        // Limit switches are at -90° on the robot frame (left side), 13° apart.
+        // Activator tab is at +90° on the turret. Switches trigger at turret ≈ ±180°.
+        // Dead zone: ~13° centered at rear. Usable range: ~±173.5°.
         public static final double gearRatio = 5000.0 / 120.0; // ~41.667 — must be double, not int
 
-        public static final double maxTurretRotation = 90.0;   // degrees, positive limit switch
-        public static final double minTurretRotation = -270.0; // degrees, negative limit switch
+        public static final double limitSwitchGapDeg = 13.924;   // degrees between the two switches
+        public static final double maxTurretRotation = 180.0 - (limitSwitchGapDeg / 2.0);   // ~+173.5° positive limit
+        public static final double minTurretRotation = -180.0 + (limitSwitchGapDeg / 2.0);  // ~-173.5° negative limit
 
         // Motor rotations at each physical limit (used for encoder re-zeroing)
-        public static final double maxPosTurretMotorRot = (90.0 / 360.0) * (5000.0 / 120.0);   // ~10.417 rot
-        public static final double minNegTurretMotorRot = (-270.0 / 360.0) * (5000.0 / 120.0); // ~-31.25 rot
+        public static final double maxPosTurretMotorRot = (maxTurretRotation / 360.0) * gearRatio;   // ~+20.07 rot
+        public static final double minNegTurretMotorRot = (minTurretRotation / 360.0) * gearRatio;   // ~-20.07 rot
         public static final int kTurretMotorId = 17;
         public static final Double ballSpeed = 22.0;
     }

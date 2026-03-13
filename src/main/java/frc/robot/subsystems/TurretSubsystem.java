@@ -26,10 +26,12 @@ public class TurretSubsystem extends SubsystemBase {
     private static final int LIMIT_POS_ID = 1; // +180 deg
 
     /* ==================== Constants ==================== */
-    // Limit switches at 90° from robot front → full 360° range: -270° to +90°
+    // Limit switches at -90° on robot frame (left side), 13° apart. Trigger at turret ≈ ±180°.
+    // Usable range: ~±173.5° (347° total). Dead zone at rear.
     private static final double GEAR_RATIO    = 5000.0 / 120.0;             // ~41.667
-    private static final double MIN_TURRET_ROT = (-270.0 / 360.0) * GEAR_RATIO + 0.5; // ~-31.25 motor rot
-    private static final double MAX_TURRET_ROT = (90.0  / 360.0) * GEAR_RATIO - 0.5;  // ~+10.42 motor rot
+    private static final double LIMIT_GAP_DEG = 13.924;
+    private static final double MIN_TURRET_ROT = ((-180.0 + LIMIT_GAP_DEG / 2.0) / 360.0) * GEAR_RATIO + 0.5; // ~-19.57 motor rot
+    private static final double MAX_TURRET_ROT = ((180.0 - LIMIT_GAP_DEG / 2.0) / 360.0) * GEAR_RATIO - 0.5;  // ~+19.57 motor rot
     double maxPosistion = MAX_TURRET_ROT;
     double minPosistion = MIN_TURRET_ROT;
 
@@ -215,13 +217,12 @@ public Command SetTurretPositionMinMM() {
     /* ==================== Control ==================== */
 
     public void setTurretAngleDegrees(double degrees) {
-        // Wrap into the physical range (-270, 90]: limit switches are both at 90° from robot front
-        while (degrees > 90.0)   degrees -= 360.0;
-        while (degrees <= -270.0) degrees += 360.0;
+        // Wrap into (-180, 180]: dead zone is at rear (±180°)
+        degrees = wrapDegrees(degrees);
 
         SmartDashboard.putNumber("TurretSubsystem/SetpointDegrees", degrees);
 
-        double rotations = (degrees / 360.0) * GEAR_RATIO - (90.0 / 360.0) * GEAR_RATIO;
+        double rotations = (degrees / 360.0) * GEAR_RATIO;
         SmartDashboard.putNumber("TurretSubsystem/SetpointRotations", rotations);
 
         turretMotor.setControl(motionMagic.withPosition(rotations));
