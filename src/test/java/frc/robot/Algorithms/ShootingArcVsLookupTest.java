@@ -165,6 +165,47 @@ public class ShootingArcVsLookupTest {
         return angle;
     }
 
+    /**
+     * Solve for the required exit speed at a FIXED pitch angle with drag.
+     * Binary search: find the speed where the ball lands at height dz at range R.
+     * Returns {exitSpeedMps, flightTimeS} or null.
+     */
+    static double[] solveSpeedAtFixedAngle(double R, double dz, double thetaRad, double k) {
+        double speedLo = 1.0, speedHi = 80.0; // wide search range
+        // Check if max speed can even overshoot
+        double[] srHi = simulateToX(R, speedHi, thetaRad, k);
+        if (srHi == null) return null; // can't even reach R at max speed
+
+        // We want f(speed) = simY - dz = 0
+        // At low speed the ball falls short (y < dz), at high speed it overshoots (y > dz)
+        double[] srLo = simulateToX(R, speedLo, thetaRad, k);
+        double fHi = srHi[0] - dz;
+
+        // If even at 80 m/s the ball is below target, no solution
+        if (fHi < -0.01) return null;
+
+        for (int i = 0; i < 30; i++) {
+            double mid = 0.5 * (speedLo + speedHi);
+            double[] sr = simulateToX(R, mid, thetaRad, k);
+            if (sr == null) {
+                // Ball didn't reach R — need more speed
+                speedLo = mid;
+                continue;
+            }
+            double fMid = sr[0] - dz;
+            if (Math.abs(fMid) < 0.005) return new double[]{ mid, sr[1] }; // 5mm tolerance
+            if (fMid < 0) {
+                speedLo = mid; // too slow, ball drops below target
+            } else {
+                speedHi = mid; // too fast, ball is above target
+            }
+        }
+        double finalSpeed = 0.5 * (speedLo + speedHi);
+        double[] sr = simulateToX(R, finalSpeed, thetaRad, k);
+        if (sr != null && Math.abs(sr[0] - dz) < 0.10) return new double[]{ finalSpeed, sr[1] };
+        return null;
+    }
+
     // ═══════════════════════════════════════════════════════════════════════
     public static void main(String[] args) {
 
@@ -305,10 +346,75 @@ public class ShootingArcVsLookupTest {
                     d, lutMps, lutDeg, dragStr, noDragStr, deltaStr, timeStr);
         }
 
+        // ──────────────────────────────────────────────────────────────────
+        //  PART 5: MOTOR SPEED COMPARISON
+        //  Fix the hood angle to the LUT value, solve for required speed
+        // ──────────────────────────────────────────────────────────────────
+        System.out.println();
+        System.out.println("  " + "-".repeat(95));
+        System.out.println();
+        System.out.println("  PART 5: Motor speed comparison — at the LUT's hood angle, what speed does physics need?");
+        System.out.println("  (Fixes hood to LUT value, solves for required exit speed with drag)");
+        System.out.println();
+        System.out.printf("  %-7s | %8s | %16s | %16s | %16s%n",
+                "Dist", "Hood Deg", "LUT Motor", "Physics Motor", "DELTA");
+        System.out.printf("  %-7s | %8s | %7s %7s | %7s %7s | %7s %7s%n",
+                "", "", "RPS", "m/s", "RPS", "m/s", "dRPS", "dm/s");
+        System.out.println("  " + "-".repeat(95));
+
+        for (double d : distances) {
+            double lutRot = lerp(HOOD_LUT, d);
+            double lutRps = lerp(SPEED_LUT, d);
+            double lutDeg = rotToDeg(lutRot);
+            double lutMps = rpsToMps(lutRps);
+            double lutThetaRad = Math.toRadians(lutDeg);
+
+            double[] speedResult = solveSpeedAtFixedAngle(d, DZ, lutThetaRad, DRAG_K);
+
+            if (speedResult != null) {
+                double physMps = speedResult[0];
+                double physRps = mpsToRps(physMps);
+                System.out.printf("  %5.2f m | %6.1f   | %6.1f  %6.2f  | %6.1f  %6.2f  | %+6.1f  %+6.2f%n",
+                        d, lutDeg, lutRps, lutMps, physRps, physMps,
+                        physRps - lutRps, physMps - lutMps);
+            } else {
+                System.out.printf("  %5.2f m | %6.1f   | %6.1f  %6.2f  | [NO SOLUTION]   |%n",
+                        d, lutDeg, lutRps, lutMps);
+            }
+        }
+
+        // ── Part 5b: Fine-grained speed sweep ──
+        System.out.println();
+        System.out.println("  Fine-grained speed sweep (0.25 m steps):");
+        System.out.println();
+        System.out.printf("  %-7s | %7s | %7s | %7s | %7s | %7s%n",
+                "Dist", "HoodDeg", "LUT RPS", "Phys RPS", "dRPS", "Flight");
+        System.out.println("  " + "-".repeat(65));
+
+        for (double d = 1.50; d <= 4.30; d += 0.25) {
+            double lutRot = lerp(HOOD_LUT, d);
+            double lutRps = lerp(SPEED_LUT, d);
+            double lutDeg = rotToDeg(lutRot);
+            double lutThetaRad = Math.toRadians(lutDeg);
+
+            double[] speedResult = solveSpeedAtFixedAngle(d, DZ, lutThetaRad, DRAG_K);
+
+            if (speedResult != null) {
+                double physRps = mpsToRps(speedResult[0]);
+                System.out.printf("  %5.2f m | %5.1f   | %6.1f  | %6.1f   | %+6.1f  | %5.3fs%n",
+                        d, lutDeg, lutRps, physRps, physRps - lutRps, speedResult[1]);
+            } else {
+                System.out.printf("  %5.2f m | %5.1f   | %6.1f  | NO SOL  |    --   |   -- %n",
+                        d, lutDeg, lutRps);
+            }
+        }
+
         System.out.println();
         System.out.println("=".repeat(105));
         System.out.println("  + dHood means ShootingArc says aim HIGHER than lookup table");
         System.out.println("  - dHood means ShootingArc says aim LOWER than lookup table");
+        System.out.println("  + dRPS  means physics needs MORE motor speed than lookup table");
+        System.out.println("  - dRPS  means physics needs LESS motor speed than lookup table");
         System.out.println("=".repeat(105));
         System.out.println();
     }
