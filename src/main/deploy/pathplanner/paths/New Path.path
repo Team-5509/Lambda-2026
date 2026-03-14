@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.8561483594864476,
-        "y": 6.0081455064194005
+        "x": 3.526817780671297,
+        "y": 6.564
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.1666761768901568,
-        "y": 6.034022824536376
+        "x": 2.526817780671297,
+        "y": 6.564
       },
       "isLocked": false,
-      "linkedName": "CloseIntake"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.0,
-        "y": 6.163409415121254
+        "x": 1.7368312355324078,
+        "y": 6.563761140046297
       },
       "prevControl": {
-        "x": 1.6195292439372322,
-        "y": 6.098716119828817
+        "x": 2.736831235532408,
+        "y": 6.563761140046297
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "PostSimpleShoot"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -33,22 +33,22 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
+    "maxVelocity": 5.12,
     "maxAcceleration": 3.0,
-    "maxAngularVelocity": 540.0,
+    "maxAngularVelocity": 270.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 139.80553768860585
+    "rotation": -41.807730133079424
   },
   "reversed": false,
   "folder": "ClosePaths(Dont Cross Trench Line)",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -1.576550055183735
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
