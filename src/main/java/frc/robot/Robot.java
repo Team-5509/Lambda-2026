@@ -89,7 +89,10 @@ public class Robot extends LoggedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+    // Stop the drivetrain immediately so it doesn't coast into teleop
+    m_robotContainer.drivetrain.setControl(new com.ctre.phoenix6.swerve.SwerveRequest.SwerveDriveBrake());
+  }
 
   @Override
   public void teleopInit() {
