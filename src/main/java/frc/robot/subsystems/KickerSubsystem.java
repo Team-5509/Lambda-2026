@@ -63,6 +63,9 @@ public class KickerSubsystem extends SubsystemBase {
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = 10;
+
     kickerMotor.getConfigurator().apply(config);
   }
 

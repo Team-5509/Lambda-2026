@@ -90,6 +90,9 @@ public class IntakeSubsystem extends SubsystemBase {
                 /* ---- Motor ---- */
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = 20;
+
 
     
     intakeMotor.getConfigurator().apply(config);
@@ -144,7 +147,7 @@ private void configureDeployMotor() {
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MIN_INTAKE_ROT;
 
   /* ---- Motor ---- */
-  config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+  config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
   config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
   deployIntakeMoter.getConfigurator().apply(config);
@@ -159,9 +162,10 @@ private void configureDeployMotor() {
   public Command StopIntakeMM() {
     return runOnce(() -> {
       isRunning = false;
-      intakeMotor.setControl(
-          motionMagic.withVelocity(0)
-              .withSlot(0));
+      // intakeMotor.setControl(
+      //     motionMagic.withVelocity(0)
+      //         .withSlot(0));
+      intakeMoter.stopMotor();
     });
   }
 

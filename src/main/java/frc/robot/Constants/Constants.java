@@ -71,6 +71,9 @@ public class Constants {
         public static final double limitSwitchGapDeg = 13.924;   // degrees between the two switches
         public static final double maxTurretRotation = 180.0 - (limitSwitchGapDeg / 2.0);   // ~+173.5° positive limit
         public static final double minTurretRotation = -180.0 + (limitSwitchGapDeg / 2.0);  // ~-173.5° negative limit
+        public static final double MAX_TURRET_DEG = 170.076; // positive limit (CCW)
+        public static final double MIN_TURRET_DEG = -176.0; // negative limit (CW)
+
 
         // Motor rotations at each physical limit (used for encoder re-zeroing)
         public static final double maxPosTurretMotorRot = (maxTurretRotation / 360.0) * gearRatio;   // ~+20.07 rot

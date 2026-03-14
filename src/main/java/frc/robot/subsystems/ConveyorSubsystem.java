@@ -65,6 +65,9 @@ public class ConveyorSubsystem extends SubsystemBase {
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = 15;
+
     conveyorMotor.getConfigurator().apply(config);
   }
 

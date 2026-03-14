@@ -47,7 +47,7 @@ public class LauncherSubsystem extends SubsystemBase {
   private static final double MM_JERK_HOOD = 60.0; // rot/s^3
 
   // Launcher Speed
-  private double speed = -60.0;
+  private double speed = -75.0;
   private double speedIncrement = -2.5;
 
    private static final double MIN_HOOD_ROT = Constants.LauncherSubsystemConstants.kHoodMinRot;
@@ -93,7 +93,12 @@ public class LauncherSubsystem extends SubsystemBase {
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
+       config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = 20;
+
     launcherMotor.getConfigurator().apply(config);
+
+
   }
 
  //configures absolute encoder
@@ -143,6 +148,9 @@ private void configureHoodMotor() {
   /* ---- Motor ---- */
   config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
   config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+  config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = 20;
 
   hoodMotor.getConfigurator().apply(config);
   }

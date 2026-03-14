@@ -11,14 +11,7 @@
     "SpinPaths"
   ],
   "autoFolders": [
-    "CloseAutons(Dont Cross Trench Line)",
-    "LeftMessUpBalls",
-    "LeftUnderTrench",
-    "LeftDepot",
-    "RightDropper",
-    "RightMessUpBalls",
-    "RightUnderTrench",
-    "SimpleShoot"
+    "CloseAutons(Dont Cross Trench Line)"
   ],
   "defaultMaxVel": 1.0,
   "defaultMaxAccel": 3.0,
@@ -29,7 +22,7 @@
   "robotMOI": 6.883,
   "robotTrackwidth": 0.546,
   "driveWheelRadius": 0.048,
-  "driveGearing": 5.143,
+  "driveGearing": 6.027,
   "maxDriveSpeed": 5.45,
   "driveMotorType": "krakenX60",
   "driveCurrentLimit": 60.0,

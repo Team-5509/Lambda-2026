@@ -30,8 +30,11 @@ public class TurretSubsystem extends SubsystemBase {
     // Usable range: ~±173.5° (347° total). Dead zone at rear.
     private static final double GEAR_RATIO    = 5000.0 / 120.0;             // ~41.667
     private static final double LIMIT_GAP_DEG = 13.924;
-    private static final double MIN_TURRET_ROT = ((-180.0 + LIMIT_GAP_DEG / 2.0) / 360.0) * GEAR_RATIO + 0.5; // ~-19.57 motor rot
-    private static final double MAX_TURRET_ROT = ((180.0 - LIMIT_GAP_DEG / 2.0) / 360.0) * GEAR_RATIO - 0.5;  // ~+19.57 motor rot
+    //private static final double MIN_TURRET_ROT = ((-180.0 + LIMIT_GAP_DEG / 2.0) / 360.0) * GEAR_RATIO + 0.5; // ~-19.57 motor rot
+    //private static final double MAX_TURRET_ROT = ((180.0 - LIMIT_GAP_DEG / 2.0) / 360.0) * GEAR_RATIO - 0.5;  // ~+19.57 motor rot
+    private static final double MIN_TURRET_ROT = ((Constants.TurretSubsystemConstants.MAX_TURRET_DEG) / 360.0) * GEAR_RATIO + 0.5; //
+    private static final double MAX_TURRET_ROT = ((Constants.TurretSubsystemConstants.MIN_TURRET_DEG) / 360.0) * GEAR_RATIO - 0.5;  //
+    
     double maxPosistion = MAX_TURRET_ROT;
     double minPosistion = MIN_TURRET_ROT;
 

@@ -66,9 +66,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem(drivetrain
     private double FinesseAngularRateMult = 0.5;
 
     /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDriveRequestType(
-                    DriveRequestType.Velocity); // Use closed-loop velocity control for driving
+    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric(); // Use closed-loop velocity control for driving
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -226,6 +224,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem(drivetrain
         .andThen(m_launcherSubsystem.RunLauncherMM()));
         driverXbox.a().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown()
         .andThen(m_launcherSubsystem.RunLauncherMM()));
+        driverXbox.x().onTrue(m_intakeSubsystem.StopIntakeMM());
         //driverXbox.b().onTrue(drivetrain.runOnce(() -> drivetrain.addFakeVisionReading()));
 
         
@@ -346,7 +345,7 @@ private final TurretSubsystem m_turretSubsystem = new TurretSubsystem(drivetrain
         auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
 
         auxXbox.leftTrigger().onTrue(
-                m_intakeSubsystem.AgitateIntakeCommand()
+                m_intakeSubsystem.reverseIntakeCommand()
         .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
         .alongWith(m_kickerSubsystem.AgitateKickerCommand())
         .alongWith(m_launcherSubsystem.agitateLauncherCommand())

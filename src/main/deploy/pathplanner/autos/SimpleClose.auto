@@ -33,6 +33,12 @@
           "data": {
             "name": "AutoLaunchLookup"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIntake"
+          }
         }
       ]
     }
