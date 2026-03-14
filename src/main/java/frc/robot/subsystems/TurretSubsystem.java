@@ -1,9 +1,10 @@
 package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.Units;
@@ -20,15 +21,13 @@ public class TurretSubsystem extends SubsystemBase {
 
     /* ==================== Hardware IDs ==================== */
     private static final int TURRET_MOTOR_ID = Constants.TurretSubsystemConstants.kTurretMotorId;
-    //private static final int TURRET_CANCODER_ID = Constants.TurretSubsystemConstants.kTurretEncoderId;
-
     private static final int LIMIT_NEG_ID = 2; // -180 deg
     private static final int LIMIT_POS_ID = 1; // +180 deg
 
     /* ==================== Constants ==================== */
     // Limit switches at -90° on robot frame (left side), 13° apart. Trigger at turret ≈ ±180°.
     // Usable range: ~±173.5° (347° total). Dead zone at rear.
-    private static final double GEAR_RATIO    = 5000.0 / 120.0;             // ~41.667
+    private static final double GEAR_RATIO    = 5000.0 / 120.0; // ~41.667
     private static final double LIMIT_GAP_DEG = 13.924;
     //private static final double MIN_TURRET_ROT = ((-180.0 + LIMIT_GAP_DEG / 2.0) / 360.0) * GEAR_RATIO + 0.5; // ~-19.57 motor rot
     //private static final double MAX_TURRET_ROT = ((180.0 - LIMIT_GAP_DEG / 2.0) / 360.0) * GEAR_RATIO - 0.5;  // ~+19.57 motor rot
@@ -38,58 +37,35 @@ public class TurretSubsystem extends SubsystemBase {
     double maxPosistion = MAX_TURRET_ROT;
     double minPosistion = MIN_TURRET_ROT;
 
-     private DoubleSupplier robotHeadingDegSupplier = () -> 0.0;
-
     // Motion Magic
-    // Make Motion Magic very slow on purpose
     private static final double MM_CRUISE_VEL = 3 * GEAR_RATIO; // rot/s (was 2.0)
     private static final double MM_ACCEL = 300.0; // rot/s^2 (was 6.0)
     private static final double MM_JERK = 1600.0; // rot/s^3 (was 60.0)
 
     private double manualPosition = 0;
+    private double posistionUnderLeftTrench = -10; // CW left side of robot, CCW positive
+    private double posistionUnderRightTrench = 10; // CCW right side of robot, CCW positive
     private double manualIncrement = 0.01;
-    private double posistionUnderLeftTrench = -10;
-    private double posistionUnderRightTrench = 10;
     
-
     /* ==================== Hardware ==================== */
     private final TalonFX turretMotor = new TalonFX(TURRET_MOTOR_ID);
-
-    //private final CANcoder turretEncoder = new CANcoder(TURRET_CANCODER_ID);
-
     private final DigitalInput negLimit = new DigitalInput(LIMIT_NEG_ID);
     private final DigitalInput posLimit = new DigitalInput(LIMIT_POS_ID);
 
     private final MotionMagicVoltage motionMagic = new MotionMagicVoltage(0);
 
-    public CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    private final Supplier<Pose2d> robotPoseSupplier;
 
-    public TurretSubsystem() {
-
-        //configureEncoder();
+    public TurretSubsystem(Supplier<Pose2d> robotPoseSupplier) {
+        this.robotPoseSupplier = robotPoseSupplier;
         configureMotor();
     }
 
-    public TurretSubsystem(CommandSwerveDrivetrain inp) {
-
-        //configureEncoder();
-        drivetrain = inp;
-
-        configureMotor();
+    public Pose2d getRobotPose() {
+        return robotPoseSupplier.get();
     }
 
     /* ==================== Configuration ==================== */
-
-    //  private void configureEncoder() {
-    //      CANcoderConfiguration config = new CANcoderConfiguration();
-
-    //      // CANcoder always reports ±0.5 rotations (±180°) in Phoenix 6
-    //      config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-
-    //      turretEncoder.getConfigurator().apply(config);
-    //  }
-    //}
-
     private void configureMotor() {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
@@ -245,10 +221,10 @@ public Command SetTurretPositionMinMM() {
         return turretMotor.getPosition().getValue().in(Units.Degrees);
     }
 
-    /** Robot heading in field coordinates (CCW+, degrees, 0 = field forward) */
-     public void setRobotHeadingSupplier(DoubleSupplier supplier) {
-         this.robotHeadingDegSupplier = supplier;
-     }
+    // /** Robot heading in field coordinates (CCW+, degrees, 0 = field forward) */
+    //  public void setRobotHeadingSupplier(DoubleSupplier supplier) {
+    //      this.robotHeadingDegSupplier = supplier;
+    //  }
 
     /* ==================== Field-Oriented Control ==================== */
 
@@ -258,7 +234,7 @@ public Command SetTurretPositionMinMM() {
      * @param fieldAngleDeg CCW+, degrees
      */
     public void aimFieldRelative(double fieldAngleDeg) {
-        double robotHeading = drivetrain.getState().Pose.getRotation().getDegrees();
+        double robotHeading = robotPoseSupplier.get().getRotation().getDegrees();
         double turretAngle = fieldAngleDeg - robotHeading;
         SmartDashboard.putNumber("TurretSubsystem/FieldAngleDeg", turretAngle);
         SmartDashboard.putNumber("TurretSubsystem/RobotHeadingDeg", robotHeading);
@@ -289,7 +265,7 @@ public Command SetTurretPositionMinMM() {
         SmartDashboard.putNumber("TurretSubsystem/TurretPosition", turretMotor.getPosition().getValueAsDouble());
         SmartDashboard.putBoolean("TurretSubsystem.PosReached", isAtPositiveLimit());
         SmartDashboard.putBoolean("TurretSubsystem/NegReached", isAtNegativeLimit());
-        Translation2d robotPos = drivetrain.getState().Pose.getTranslation();
+        Translation2d robotPos = robotPoseSupplier.get().getTranslation();
 
         SmartDashboard.putNumber("TurretSubsystem/DistanceToHub", robotPos.getDistance(Constants.TurretSubsystemConstants.blueHubPose));
 

@@ -5,16 +5,11 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
-
-import java.util.function.DoubleSupplier;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
-
-
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -22,371 +17,256 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CameraManager.CameraProperties;
 import frc.robot.commands.TrackFieldPoseCommand;
-import frc.robot.commands.TrackTargetCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
-import frc.robot.Constants.CameraManager.CameraProperties;
-//import frc.robot.commands.RunKicker;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.commands.AutoLaunchLookup;
-import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.Launch;
 import frc.robot.commands.LaunchLookup;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.Constants.Constants.TurretSubsystemConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 
 public class RobotContainer {
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-private final TurretSubsystem m_turretSubsystem = new TurretSubsystem(drivetrain);
-    private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
-    private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
-    private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
-    private final LauncherSubsystem m_launcherSubsystem = new LauncherSubsystem();
-    private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
-    
- // CCW+, field-relative
+        private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top                                                                            // speed
+        private double MaxAngularRate = RotationsPerSecond.of(0.75)
+                        .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75)
-            .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-    private double FinesseSpeedMult = 0.5;
-    private double FinesseAngularRateMult = 0.5;
+        /* Setting up bindings for necessary control of the swerve drive platform */
+        private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric(); // Use closed-loop velocity
+        private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+        private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
+                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // control for driving
 
-    /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric(); // Use closed-loop velocity control for driving
+        private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final Telemetry logger = new Telemetry(MaxSpeed);
+        private final CommandXboxController driverXbox = new CommandXboxController(0);
+        private final CommandXboxController auxXbox = new CommandXboxController(1);
 
-    private final CommandXboxController driverXbox = new CommandXboxController(0);
-    private final CommandXboxController auxXbox = new CommandXboxController(1);
+        public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-        
-    //public final Vision visionFL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_FL);
-    //public final Vision visionFR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_FR);
-    public final Vision visionRL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RL);
-    public final Vision visionR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_R);
-    public final Vision visionRR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RR);
+        private final TurretSubsystem m_turretSubsystem = new TurretSubsystem(() -> drivetrain.getState().Pose);
+        private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
+        private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
+        private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+        private final LauncherSubsystem m_launcherSubsystem = new LauncherSubsystem();
+        private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+        private double FinesseSpeedMult = 0.5;
+        private double FinesseAngularRateMult = 0.5;
 
-    private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+        // public final Vision visionFL = new Vision(drivetrain::addVisionMeasurement,
+        // CameraProperties.CAM_FL);
+        // public final Vision visionFR = new Vision(drivetrain::addVisionMeasurement,
+        // CameraProperties.CAM_FR);
 
-    /* Path follower */
-    private final SendableChooser<Command> autoChooser;
+        public final Vision visionRL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RL);
+        public final Vision visionR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_R);
+        public final Vision visionRR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RR);
 
-    // This command will track the robot's pose on the field using vision
-    // measurements and drive the turret to point at the hub
-    private Command makeLaunch() {
-        return new Launch(
-            m_conveyorSubsystem,
-            m_launcherSubsystem,
-            m_kickerSubsystem,
-            () -> drivetrain.getState().Pose,
-            this::getFieldRelativeVelocity);
-    }
+        private Command makeLaunchLookup() {
+                return new LaunchLookup(
+                                m_conveyorSubsystem,
+                                m_launcherSubsystem,
+                                m_kickerSubsystem,
+                                () -> drivetrain.getState().Pose,
+                                this::getFieldRelativeVelocity);
+        }
 
-    private Command makeLaunchLookup() {
-        return new LaunchLookup(
-            m_conveyorSubsystem,
-            m_launcherSubsystem,
-            m_kickerSubsystem,
-            () -> drivetrain.getState().Pose,
-            this::getFieldRelativeVelocity);
-    }
+        private Command autoRunLaunchLookupWithTimeout() {
+                return new AutoLaunchLookup(
+                                m_conveyorSubsystem,
+                                m_launcherSubsystem,
+                                m_kickerSubsystem,
+                                () -> drivetrain.getState().Pose,
+                                this::getFieldRelativeVelocity).withTimeout(5); // seconds
+        }
 
-    private Command autoRunLaunchLookupWithTimeout() {
-        return new AutoLaunchLookup(
-            m_conveyorSubsystem,
-            m_launcherSubsystem,
-            m_kickerSubsystem,
-            () -> drivetrain.getState().Pose,
-            this::getFieldRelativeVelocity).withTimeout(5); // seconds
-    }
-    
-    boolean m_toggleRobotCentric = false;
+        boolean m_toggleRobotCentric = false;
 
+        /* Path follower */
+        private final SendableChooser<Command> autoChooser;
 
-    public RobotContainer() {
-
-
-        // Speed sliders for kicker and launcher (adjustable in SmartDashboard/Shuffleboard)
-        SmartDashboard.putNumber("KickerSubsystem/SpeedRPS", -30.0);
-        SmartDashboard.putNumber("LauncherSubsystem/SpeedRPS", -45.0);
-
+        public RobotContainer() {
                 // Register named commands after subsystem fields have been initialized
-        NamedCommands.registerCommand("RunLauncher", m_launcherSubsystem.RunLauncherMM());
-        NamedCommands.registerCommand("StopLauncher", m_launcherSubsystem.StopLauncherMM());
-        NamedCommands.registerCommand("RunIntake", m_intakeSubsystem.RunIntakeMM());
-        NamedCommands.registerCommand("StopIntake", m_intakeSubsystem.StopIntakeMM());
-        NamedCommands.registerCommand("DeployIntake", m_intakeSubsystem.DeployIntakeMM());
-        NamedCommands.registerCommand("RetractIntake", m_intakeSubsystem.RetractIntakeMM());
-        NamedCommands.registerCommand("RunConveyor", m_conveyorSubsystem.RunConveyorMM());
-        NamedCommands.registerCommand("StopConveyor", m_conveyorSubsystem.StopConveyorMM());
-        NamedCommands.registerCommand("RunKicker", m_kickerSubsystem.RunKickerMM());
-        NamedCommands.registerCommand("StopKicker", m_kickerSubsystem.StopKickerMM());
-        NamedCommands.registerCommand("ExtendClimber", m_climberSubsystem.ExtendClimberMM(2.3));
-        NamedCommands.registerCommand("LowerClimber", m_climberSubsystem.LowerClimberMM(0.3));
-        NamedCommands.registerCommand("ExtendHood", m_launcherSubsystem.ExtendHoodMM());
-        NamedCommands.registerCommand("RetractHood", m_launcherSubsystem.RetractHoodMM());
-        // NamedCommands.registerCommand("MoveTurret", m_turretSubsystem.SetTurretPositionMM(null));
-        NamedCommands.registerCommand("AutoLaunchLookup", autoRunLaunchLookupWithTimeout());
+                NamedCommands.registerCommand("RunLauncher", m_launcherSubsystem.RunLauncherMM());
+                NamedCommands.registerCommand("StopLauncher", m_launcherSubsystem.StopLauncherMM());
+                NamedCommands.registerCommand("RunIntake", m_intakeSubsystem.RunIntakeMM());
+                NamedCommands.registerCommand("StopIntake", m_intakeSubsystem.StopIntakeMM());
+                NamedCommands.registerCommand("DeployIntake", m_intakeSubsystem.DeployIntakeMM());
+                NamedCommands.registerCommand("RetractIntake", m_intakeSubsystem.RetractIntakeMM());
+                NamedCommands.registerCommand("RunConveyor", m_conveyorSubsystem.RunConveyorMM());
+                NamedCommands.registerCommand("StopConveyor", m_conveyorSubsystem.StopConveyorMM());
+                NamedCommands.registerCommand("RunKicker", m_kickerSubsystem.RunKickerMM());
+                NamedCommands.registerCommand("StopKicker", m_kickerSubsystem.StopKickerMM());
+                NamedCommands.registerCommand("ExtendClimber", m_climberSubsystem.ExtendClimberMM(2.3));
+                NamedCommands.registerCommand("LowerClimber", m_climberSubsystem.LowerClimberMM(0.3));
+                NamedCommands.registerCommand("ExtendHood", m_launcherSubsystem.ExtendHoodMM());
+                NamedCommands.registerCommand("RetractHood", m_launcherSubsystem.RetractHoodMM());
+                NamedCommands.registerCommand("AutoLaunchLookup", autoRunLaunchLookupWithTimeout());
 
-        NamedCommands.registerCommand("Track", new TrackFieldPoseCommand(
-                m_turretSubsystem,
-                // Supplier<Pose2d>
-                () -> drivetrain.getState().Pose,
-                // Supplier<Translation2d> (FIELD-RELATIVE)
-                this::getFieldRelativeVelocity,
-                TurretSubsystemConstants.ballSpeed));
+                NamedCommands.registerCommand("Track", new TrackFieldPoseCommand(
+                                m_turretSubsystem,
+                                // Supplier<Pose2d>
+                                () -> drivetrain.getState().Pose,
+                                // Supplier<Translation2d> (FIELD-RELATIVE)
+                                (this::getFieldRelativeVelocity),
+                                TurretSubsystemConstants.ballSpeed));
 
-        autoChooser = AutoBuilder.buildAutoChooser("PlsDontExplode");
-        SmartDashboard.putData("Auto Mode", autoChooser);
+                autoChooser = AutoBuilder.buildAutoChooser("New Auto");
+                SmartDashboard.putData("Auto Mode", autoChooser);
 
-        configureBindings();
+                configureBindings();
 
-        // Warmup PathPlanner to avoid Java pauses
-        FollowPathCommand.warmupCommand().schedule();
-    }
+                // Warmup PathPlanner to avoid Java pauses
+                FollowPathCommand.warmupCommand().schedule();
+        }
 
-    private void configureBindings() {
+        private void configureBindings() {
 
-        // Driver controls
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-
-        // Set the default command for the drivetrain. The drivetrain will automatically
-        // run the default command whenever no other command is using the drivetrain
-        // subsystem. This is where we set up the default behavior for the drivetrain,
-        // which is to drive with the left and right sticks of the Xbox controller, and
-        // to track the hub with vision. The applyRequest method is used to create a
-        // command that applies the given SwerveRequest to the drivetrain. The
-        // withVelocityX, withVelocityY, and withRotationalRate methods are used to
-        // specify the desired velocities for the drivetrain based on the Xbox
-        // controller inputs. The MathUtil.applyDeadband method is used to apply a
-        // deadband to the controller inputs, which helps to prevent small joystick
-        // movements from causing the robot to move. The MaxSpeed and MaxAngularRate
-        // variables are used to scale the joystick inputs to the desired maximum speeds
-        // for the drivetrain. The andThen(trackHub) part means that after applying the
-        // drive request, the drivetrain will also execute the trackHub command, which
-        // will use vision to track the hub and adjust the turret accordingly.
-
-        drivetrain.setDefaultCommand(
-                // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(
-                        () -> drive
-                                .withVelocityX(
-                                        -MathUtil.applyDeadband(driverXbox.getLeftY(), 0.05)
-                                                * MaxSpeed) // Drive forward with negative Y (forward)
-                                .withVelocityY(
-                                        -MathUtil.applyDeadband(driverXbox.getLeftX(), 0.05)
-                                                * MaxSpeed) // Drive left with negative X (left)
-                                .withRotationalRate(
-                                        -MathUtil.applyDeadband(driverXbox.getRightX(), 0.05)
-                                                * MaxAngularRate) // Drive counterclockwise with negative X (left)
-                ));
-
-                
-
-        driverXbox.rightBumper().whileTrue(
+                // Driver controls
+                drivetrain.setDefaultCommand(
                         // Drivetrain will execute this command periodically
-                        drivetrain.applyRequest(
-                                () -> drive
-                                        .withVelocityX(
-                                                -MathUtil.applyDeadband(driverXbox.getLeftY(), 0.05)
-                                                        * MaxSpeed * FinesseSpeedMult) // Drive forward with negative Y (forward)
-                                        .withVelocityY(
-                                                -MathUtil.applyDeadband(driverXbox.getLeftX(), 0.05)
-                                                        * MaxSpeed * FinesseSpeedMult) // Drive left with negative X (left)
-                                        .withRotationalRate(
-                                                -MathUtil.applyDeadband(driverXbox.getRightX(), 0.05)
-                                                        * MaxAngularRate * FinesseAngularRateMult) // Drive counterclockwise with negative X (left)
-                        ));
-       
+                        drivetrain.applyRequest(() -> drive
+                                .withVelocityX(
+                                        MathUtil.applyDeadband(-driverXbox.getLeftY(),0.05) * MaxSpeed) // Drive forward with negative Y (forward)
+                                .withVelocityY(
+                                        MathUtil.applyDeadband(-driverXbox.getLeftX(),0.05)* MaxSpeed) // Drive left with positive X (left)                                
+                                .withRotationalRate(MathUtil.applyDeadband(-driverXbox.getRightX(),0.05) * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                        )
+                );
 
-        driverXbox.start().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
-        driverXbox.rightTrigger().whileTrue(drivetrain.applyRequest(() -> brake)); 
-        driverXbox.leftTrigger().onTrue(m_intakeSubsystem.RunIntakeMM()).onFalse(m_intakeSubsystem.StopIntakeMM());
-        driverXbox.y().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp()
-        .andThen(m_launcherSubsystem.RunLauncherMM()));
-        driverXbox.a().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown()
-        .andThen(m_launcherSubsystem.RunLauncherMM()));
-        driverXbox.x().onTrue(m_intakeSubsystem.StopIntakeMM());
-        //driverXbox.b().onTrue(drivetrain.runOnce(() -> drivetrain.addFakeVisionReading()));
+                // Finesse mode for precision control, activated by right bumper
+                driverXbox.rightBumper().whileTrue(
+                        // Drivetrain will execute this command while right bumper is held
+                        drivetrain.applyRequest(() -> drive
+                                .withVelocityX(
+                                        MathUtil.applyDeadband(-driverXbox.getLeftY(),0.05) * MaxSpeed * FinesseSpeedMult) // Drive forward with negative Y (forward)
+                                .withVelocityY(
+                                        MathUtil.applyDeadband(-driverXbox.getLeftX(),0.05)* MaxSpeed * FinesseSpeedMult) // Drive left with positive X (left)                                
+                                .withRotationalRate(MathUtil.applyDeadband(-driverXbox.getRightX(),0.05) * MaxAngularRate * FinesseAngularRateMult) // Drive counterclockwise with negative X (left)
+                        )
+                );
 
-        
+                // Robot-centric control mode for precision maneuvering, activated by left bumper
                 driverXbox.leftBumper().whileTrue(
-                        drivetrain.applyRequest(
-                                () -> forwardStraight
-                                        .withVelocityX(
-                                                -MathUtil.applyDeadband(driverXbox.getLeftY(), 0.05)
-                                                        * -MaxSpeed) // Drive forward with negative Y (forward)
-                                        .withVelocityY(
-                                                -MathUtil.applyDeadband(driverXbox.getLeftX(), 0.05)
-                                                        * -MaxSpeed) // Drive left with negative X (left)
-                                        .withRotationalRate(
-                                                -MathUtil.applyDeadband(driverXbox.getRightX(), 0.05)
-                                                        * -MaxAngularRate) // Drive counterclockwise with negative X (left)
-                        ));
+                        // Drivetrain will execute this command while left bumper is held
+                        drivetrain.applyRequest(() -> forwardStraight
+                                .withVelocityX(
+                                        MathUtil.applyDeadband(-driverXbox.getLeftY(),0.05) * -MaxSpeed) // Drive forward with negative Y (forward)                                                            
+                                .withVelocityY(
+                                        MathUtil.applyDeadband(-driverXbox.getLeftX(), 0.05) * -MaxSpeed) // Drive left with negative X (left)
+                                .withRotationalRate(
+                                        MathUtil.applyDeadband(-driverXbox.getRightX(), 0.05) * -MaxAngularRate) // Drive counterclockwise with negative X (left)
+                        )                                                                     
+                );
+
+                // D-pad for field-centric cardinal direction movement at half speed
+                driverXbox.povUp()
+                                .whileTrue(drivetrain.applyRequest(() -> forwardStraight
+                                                .withVelocityX(0.5 * FinesseSpeedMult).withVelocityY(0)));
+                driverXbox.povDown()
+                                .whileTrue(drivetrain.applyRequest(() -> forwardStraight
+                                                .withVelocityX(-0.5 * FinesseSpeedMult).withVelocityY(0)));
+                driverXbox.povRight()
+                                .whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0)
+                                                .withVelocityY(-0.5 * FinesseSpeedMult)));
+                driverXbox.povLeft()
+                                .whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0)
+                                                .withVelocityY(0.5 * FinesseSpeedMult)));
+
+                driverXbox.start().onTrue((drivetrain.runOnce(() -> drivetrain.seedFieldCentric())));
+                driverXbox.rightTrigger().whileTrue(drivetrain.applyRequest(() -> brake));
+                driverXbox.leftTrigger().onTrue(m_intakeSubsystem.RunIntakeMM())
+                                .onFalse(m_intakeSubsystem.StopIntakeMM());
+                driverXbox.y().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp()
+                                .andThen(m_launcherSubsystem.RunLauncherMM()));
+                driverXbox.a().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown()
+                                .andThen(m_launcherSubsystem.RunLauncherMM()));
+                driverXbox.x().onTrue(m_intakeSubsystem.StopIntakeMM());
 
                 
-      
-       
-                driverXbox.povUp()
-                        .whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0.5 * FinesseSpeedMult).withVelocityY(0)));
-                driverXbox.povDown()
-                        .whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(-0.5 * FinesseSpeedMult).withVelocityY(0)));
-                driverXbox.povRight()
-                        .whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0).withVelocityY(-0.5 * FinesseSpeedMult)));
-                driverXbox.povLeft()
-                        .whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0).withVelocityY(0.5 * FinesseSpeedMult)));
-        
-                // driverXbox.povUp()
-                //         .whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0.5).withVelocityY(0)));
-                // driverXbox.povDown()
-                //         .whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(-0.5).withVelocityY(0)));
-                // driverXbox.povRight()
-                //         .whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0).withVelocityY(-0.5)));
-                // driverXbox.povLeft()
-                //         .whileTrue(drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0).withVelocityY(0.5)));
-        
-        
+                // COMPETITION AUX BINDINGS COMPETITION AUX BINDINGS COMPETITION AUX BINDINGS
+                // COMPETITION AUX BINDINGS
+                auxXbox.a().onTrue(new TrackFieldPoseCommand(
+                                m_turretSubsystem,
+                                // Supplier<Pose2d>
+                                () -> drivetrain.getState().Pose,
+                                // Supplier<Translation2d> (FIELD-RELATIVE)
+                                this::getFieldRelativeVelocity,
+                                TurretSubsystemConstants.ballSpeed));
+                auxXbox.b().onTrue(m_turretSubsystem.StopTurret());
 
-        
-// Aux driver controls Aux driver controls Aux driver controls Aux driver controls Aux driver controls Aux driver controls Aux driver controls Aux driver controls
-        //auxXbox.y().whileTrue(m_conveyorSubsystem.RunConveyorMM());
-        //auxXbox.axisMagnitudeGreaterThan(3 ,.2 ).whileTrue(m_kickerSubsystem.RunKickerMM());
-        //  auxXbox.rightBumper().whileTrue(m_intakeSubsystem.RunIntakeMM());
-        //  auxXbox.leftBumper().whileTrue(m_intakeSubsystem.StopIntakeMM());
-        // auxXbox.y().whileTrue(m_conveyorSubsystem.RunConveyorMM());
-        //auxXbox.x().whileTrue(m_conveyorSubsystem.StopConveyorMM());
-        // Auto-agitate: when conveyor is running and the motor stalls, reverse briefly
-        // then resume normal intake spin. Fires once per stall event (rising edge).
-        // new Trigger(m_conveyorSubsystem::isStalling)
-        //         .onTrue(m_conveyorSubsystem.AgitateConveyorCommand());
-        // Auto-agitate intake: same pattern for the intake motor.
-        // new Trigger(m_intakeSubsystem::isStalling)
-        //         .onTrue(m_intakeSubsystem.AgitateIntakeCommand());
-        //auxXbox.b().whileTrue(m_kickerSubsystem.RunKickerMM());
-        // auxXbox.b().whileTrue(m_kickerSubsystem.RunKickerMM(
-        //         () -> SmartDashboard.getNumber("KickerSubsystem/SpeedRPS", -30.0)));
-        //auxXbox.a().whileTrue(m_kickerSubsystem.StopKickerMM());
-        // auxXbox.povUp().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp().andThen
-        // (m_kickerSubsystem.RunKickerMM()));
-        // auxXbox.start().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown().andThen(m_kickerSubsystem.RunKickerMM()));
-        //auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp().andThen(m_launcherSubsystem.RunLauncherMM()));
-        // auxXbox.back().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown().andThen(m_launcherSubsystem.RunLauncherMM()));
-        // auxXbox.povLeft().onTrue(m_intakeSubsystem.DeployIntakeMM());
-        // auxXbox.povRight().onTrue(m_intakeSubsystem.RetractIntakeMM());
-        // auxXbox.povLeft().whileTrue(m_launcherSubsystem.RunLauncherMM());
-        // auxXbox.povRight().whileTrue(m_launcherSubsystem.StopLauncherMM());
-        // auxXbox.rightBumper().onTrue(m_launcherSubsystem.ExtendHoodMM());
-        // auxXbox.b().onTrue(m_launcherSubsystem.MoveHoodUp().andThen(m_launcherSubsystem.ExtendHoodMM()));
-        // auxXbox.x().onTrue(m_launcherSubsystem.MoveHoodDown().andThen(m_launcherSubsystem.RetractHoodMM()));
-        // auxXbox.povUp().onTrue(m_launcherSubsystem.IncrementLauncherSpeedUp().andThen(m_launcherSubsystem.RunLauncherMM()));
-        // auxXbox.povDown().onTrue(m_launcherSubsystem.IncrementLauncherSpeedDown().andThen(m_launcherSubsystem.RunLauncherMM()));
-        // auxXbox.leftBumper().onTrue(m_launcherSubsystem.RetractHoodMM());
-        // driverXbox.y().onTrue(m_launcherSubsystem.RunLauncherMM());
-        // auxXbox.y().onTrue(m_kickerSubsystem.RunKickerMM());
-        // auxXbox.povLeft().onTrue(m_kickerSubsystem.IncrementKickerSpeedUp());
-        // auxXbox.povRight().onTrue(m_kickerSubsystem.IncrementKickerSpeedDown());
-        // auxXbox.leftBumper().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedUp());
-        // auxXbox.rightBumper().onTrue(m_conveyorSubsystem.IncrementConveyorSpeedDown());
-        // driverXbox.a().onTrue(m_conveyorSubsystem.RunConveyorMM());
+                auxXbox.y().onTrue(m_launcherSubsystem.RunLauncherMM()
+                                .alongWith(m_conveyorSubsystem.RunConveyorCommand())
+                                .alongWith(m_kickerSubsystem.RunKickerCommand())
+                                .alongWith(m_intakeSubsystem.RunIntakeMM()));
 
+                auxXbox.x().onTrue(m_launcherSubsystem.StopLauncherMM()
+                                .alongWith(m_conveyorSubsystem.StopConveyorMM())
+                                .alongWith(m_kickerSubsystem.StopKickerMM())
+                                .alongWith(m_intakeSubsystem.StopIntakeMM()));
 
+                auxXbox.povDown().onTrue(m_intakeSubsystem.DeployIntakeMM());
+                auxXbox.povUp().onTrue(m_intakeSubsystem.RetractIntakeMM());
 
+                auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
 
-          //auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(2));
-//         auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(0
-//  ));
-// auxXbox.x().whileTrue(makeLaunch());
-       
-       
+                auxXbox.leftTrigger().onTrue(
+                                m_intakeSubsystem.reverseIntakeCommand()
+                                                .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
+                                                .alongWith(m_kickerSubsystem.AgitateKickerCommand())
+                                                .alongWith(m_launcherSubsystem.agitateLauncherCommand()))
+                                .onFalse(
+                                                Commands.runOnce(() -> m_conveyorSubsystem.stopConveyorMM(),
+                                                                m_conveyorSubsystem)
+                                                                .alongWith(Commands.runOnce(
+                                                                                () -> m_kickerSubsystem.stopKickerMM(),
+                                                                                m_kickerSubsystem))
+                                                                .alongWith(Commands.runOnce(
+                                                                                () -> m_launcherSubsystem
+                                                                                                .stopLauncherMM(),
+                                                                                m_launcherSubsystem))
+                                                                .alongWith(m_intakeSubsystem.StopIntakeCommand()));
 
+                auxXbox.povRight().onTrue(m_launcherSubsystem.RetractHoodMM());
+                
+                auxXbox.povLeft().onTrue(m_turretSubsystem.ManualTurretPositionMM());
+                auxXbox.leftBumper().onTrue(m_turretSubsystem.ManualTurretPositionLeftMM());
+                auxXbox.rightBumper().onTrue(m_turretSubsystem.ManualTurretPositionRightMM());
 
- //COMPETITION AUX BINDINGS COMPETITION AUX BINDINGS COMPETITION AUX BINDINGS COMPETITION AUX BINDINGS 
-        auxXbox.a().onTrue(new TrackFieldPoseCommand(
-                m_turretSubsystem,
-                // Supplier<Pose2d>
-                () -> drivetrain.getState().Pose,
-                // Supplier<Translation2d> (FIELD-RELATIVE)
-                this::getFieldRelativeVelocity,
-                TurretSubsystemConstants.ballSpeed));
-        auxXbox.b().onTrue(m_turretSubsystem.StopTurret());
+                // Idle while the robot is disabled. This ensures the configured
+                // neutral mode) is applied to the drive motors while disabled.
+                final var idle = new SwerveRequest.Idle();
+                RobotModeTriggers.disabled()
+                                .whileTrue(drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
-        auxXbox.y().onTrue(m_launcherSubsystem.RunLauncherMM()
-        .alongWith(m_conveyorSubsystem.RunConveyorCommand())
-        .alongWith(m_kickerSubsystem.RunKickerCommand())
-        .alongWith(m_intakeSubsystem.RunIntakeMM()));
+                drivetrain.registerTelemetry(logger::telemeterize);
+        }
 
-       auxXbox.x().onTrue(m_launcherSubsystem.StopLauncherMM()
-        .alongWith(m_conveyorSubsystem.StopConveyorMM())
-        .alongWith(m_kickerSubsystem.StopKickerMM())
-        .alongWith(m_intakeSubsystem.StopIntakeMM()));
-        
+        public Command getAutonomousCommand() {
+                /* Run the path selected from the auto chooser */
+                return autoChooser.getSelected();
+        }
 
-        auxXbox.povDown().onTrue(m_intakeSubsystem.DeployIntakeMM());
-        auxXbox.povUp().onTrue(m_intakeSubsystem.RetractIntakeMM());
+        private Translation2d getFieldRelativeVelocity() {
+                ChassisSpeeds robotRelative = drivetrain.getState().Speeds;
 
-        auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
+                ChassisSpeeds fieldRelative = ChassisSpeeds.fromRobotRelativeSpeeds(
+                                robotRelative,
+                                drivetrain.getState().Pose.getRotation());
 
-        auxXbox.leftTrigger().onTrue(
-                m_intakeSubsystem.reverseIntakeCommand()
-        .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
-        .alongWith(m_kickerSubsystem.AgitateKickerCommand())
-        .alongWith(m_launcherSubsystem.agitateLauncherCommand())
-        )
-        .onFalse(
-                Commands.runOnce(() -> m_conveyorSubsystem.stopConveyorMM(), m_conveyorSubsystem)
-        .alongWith(Commands.runOnce(() -> m_kickerSubsystem.stopKickerMM(), m_kickerSubsystem))
-        .alongWith(Commands.runOnce(() -> m_launcherSubsystem.stopLauncherMM(), m_launcherSubsystem))
-        .alongWith(m_intakeSubsystem.StopIntakeCommand())
-        );
-
-        auxXbox.povLeft().onTrue(m_turretSubsystem.ManualTurretPositionMM());
-        auxXbox.povRight().onTrue(m_launcherSubsystem.RetractHoodMM());
-        auxXbox.leftBumper().onTrue(m_turretSubsystem.ManualTurretPositionLeftMM());
-        auxXbox.rightBumper().onTrue(m_turretSubsystem.ManualTurretPositionRightMM());
-
-
-        // Idle while the robot is disabled. This ensures the configured
-        // neutral mode) is applied to the drive motors while disabled.
-        final var idle = new SwerveRequest.Idle();
-        RobotModeTriggers.disabled()
-                .whileTrue(drivetrain.applyRequest(() -> idle).ignoringDisable(true));
-
-        drivetrain.registerTelemetry(logger::telemeterize);
-    }
-
-    public Command getAutonomousCommand() {
-        /* Run the path selected from the auto chooser */
-        return autoChooser.getSelected();
-    }
-
-    private Translation2d getFieldRelativeVelocity() {
-        ChassisSpeeds robotRelative = drivetrain.getState().Speeds;
-
-        ChassisSpeeds fieldRelative = ChassisSpeeds.fromRobotRelativeSpeeds(
-                robotRelative,
-                drivetrain.getState().Pose.getRotation());
-
-        return new Translation2d(
-                fieldRelative.vxMetersPerSecond,
-                fieldRelative.vyMetersPerSecond);
-    }
-
+                return new Translation2d(
+                                fieldRelative.vxMetersPerSecond,
+                                fieldRelative.vyMetersPerSecond);
+        }
 }
