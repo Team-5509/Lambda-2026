@@ -37,9 +37,20 @@ import frc.robot.subsystems.ConveyorSubsystem;
 
 public class RobotContainer {
 
+<<<<<<< Updated upstream
         private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top                                                                            // speed
         private double MaxAngularRate = RotationsPerSecond.of(0.75)
                         .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+=======
+private final TurretSubsystem m_turretSubsystem = new TurretSubsystem(() -> drivetrain.getState().Pose);
+    private final ConveyorSubsystem m_conveyorSubsystem = new ConveyorSubsystem();
+    private final KickerSubsystem m_kickerSubsystem = new KickerSubsystem();
+    private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+    private final LauncherSubsystem m_launcherSubsystem = new LauncherSubsystem();
+    private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
+    
+ // CCW+, field-relative
+>>>>>>> Stashed changes
 
         /* Setting up bindings for necessary control of the swerve drive platform */
         private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric(); // Use closed-loop velocity
@@ -221,6 +232,7 @@ public class RobotContainer {
 
                 auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
 
+<<<<<<< Updated upstream
                 auxXbox.leftTrigger().onTrue(
                                 m_intakeSubsystem.reverseIntakeCommand()
                                                 .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
@@ -237,6 +249,28 @@ public class RobotContainer {
                                                                                                 .stopLauncherMM(),
                                                                                 m_launcherSubsystem))
                                                                 .alongWith(m_intakeSubsystem.StopIntakeCommand()));
+=======
+          //auxXbox.povUp().whileTrue(m_climberSubsystem.ExtendClimberMM(2));
+//         auxXbox.povDown().whileTrue(m_climberSubsystem.LowerClimberMM(0
+//  ));
+// auxXbox.x().whileTrue(makeLaunch());
+    m_turretSubsystem.setDefaultCommand(
+       m_turretSubsystem.run(() -> {
+                double joyX = -auxXbox.getRightX(); // left+
+                double joyY = -auxXbox.getRightY(); // forward+
+                double magnitude = Math.hypot(joyX, joyY);
+                if (magnitude > 0.5) {
+                    // 0° = field forward, CCW+
+                    double fieldAngleDeg = Math.toDegrees(Math.atan2(joyX, joyY));
+                    // Convert field-relative angle to robot-relative turret angle
+                    double robotHeading = drivetrain.getState().Pose.getRotation().getDegrees();
+                    double turretAngle = fieldAngleDeg - robotHeading;
+                    m_turretSubsystem.setTurretAngleDegrees(turretAngle);
+                }
+            })
+        );
+    
+>>>>>>> Stashed changes
 
                 auxXbox.povRight().onTrue(m_launcherSubsystem.RetractHoodMM());
                 
@@ -261,9 +295,59 @@ public class RobotContainer {
         private Translation2d getFieldRelativeVelocity() {
                 ChassisSpeeds robotRelative = drivetrain.getState().Speeds;
 
+<<<<<<< Updated upstream
                 ChassisSpeeds fieldRelative = ChassisSpeeds.fromRobotRelativeSpeeds(
                                 robotRelative,
                                 drivetrain.getState().Pose.getRotation());
+=======
+        auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
+
+        auxXbox.leftTrigger().onTrue(
+                m_intakeSubsystem.reverseIntakeCommand()
+        .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
+        .alongWith(m_kickerSubsystem.AgitateKickerCommand())
+        .alongWith(m_launcherSubsystem.agitateLauncherCommand())
+        )
+        .onFalse(
+                Commands.runOnce(() -> m_conveyorSubsystem.stopConveyorMM(), m_conveyorSubsystem)
+        .alongWith(Commands.runOnce(() -> m_kickerSubsystem.stopKickerMM(), m_kickerSubsystem))
+        .alongWith(Commands.runOnce(() -> m_launcherSubsystem.stopLauncherMM(), m_launcherSubsystem))
+        .alongWith(m_intakeSubsystem.StopIntakeCommand())
+        );
+
+        //auxXbox.povLeft().onTrue(m_turretSubsystem.ManualTurretPositionMM());
+        auxXbox.povLeft().onTrue(m_launcherSubsystem.MoveHoodUp().andThen(m_launcherSubsystem.ExtendHoodMM()));
+        auxXbox.povRight().onTrue(m_launcherSubsystem.MoveHoodDown().andThen(m_launcherSubsystem.RetractHoodMM()));
+        auxXbox.leftBumper().onTrue(m_turretSubsystem.ManualTurretPositionLeftMM());
+        auxXbox.rightBumper().onTrue(m_turretSubsystem.ManualTurretPositionRightMM());
+
+
+        // Idle while the robot is disabled. This ensures the configured
+        // neutral mode) is applied to the drive motors while disabled.
+        final var idle = new SwerveRequest.Idle();
+        RobotModeTriggers.disabled()
+                .whileTrue(drivetrain.applyRequest(() -> idle).ignoringDisable(true));
+
+        drivetrain.registerTelemetry(logger::telemeterize);
+    }
+
+    public Command getAutonomousCommand() {
+        /* Run the path selected from the auto chooser */
+        return autoChooser.getSelected();
+    }
+
+    private Translation2d getFieldRelativeVelocity() {
+        ChassisSpeeds robotRelative = drivetrain.getState().Speeds;
+
+        ChassisSpeeds fieldRelative = ChassisSpeeds.fromRobotRelativeSpeeds(
+                robotRelative,
+                drivetrain.getState().Pose.getRotation());
+
+        return new Translation2d(
+                fieldRelative.vxMetersPerSecond,
+                fieldRelative.vyMetersPerSecond);
+    }
+>>>>>>> Stashed changes
 
                 return new Translation2d(
                                 fieldRelative.vxMetersPerSecond,

@@ -76,9 +76,7 @@ public class KickerSubsystem extends SubsystemBase {
    */
   public Command StopKickerMM() {
     return runOnce(() -> {
-      kickerMotor.setControl(
-          velocityVoltage.withVelocity(0)
-              .withSlot(0));
+      kickerMotor.stopMotor();
     });
   }
 

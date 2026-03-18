@@ -51,17 +51,17 @@ public class LaunchLookup extends Command {
   static {
     // Hub: distance (m) → hood position (mechanism rotations)
     HOOD_TABLE.put(1.5, 0.05);
-    HOOD_TABLE.put(2.09, 0.05);
-    HOOD_TABLE.put(3.15, 0.05);
-    HOOD_TABLE.put(4.15, 0.94);
+    HOOD_TABLE.put(2.06, 0.05);
+    HOOD_TABLE.put(3.05, 0.05);
+    HOOD_TABLE.put(4.239, 0.5);
     //HOOD_TABLE.put(5.5, 1.45);
     //HOOD_TABLE.put(6.5, 1.65);
 
     // Hub: distance (m) → launcher speed (RPS)
     SPEED_TABLE.put(1.5, -50.0);
-    SPEED_TABLE.put(2.09, -55.0);
-    SPEED_TABLE.put(3.15, -75.0);
-    SPEED_TABLE.put(4.25, -70.0);
+    SPEED_TABLE.put(2.06, -60.0);
+    SPEED_TABLE.put(3.05, -80.0);
+    SPEED_TABLE.put(4.239, -80.0);
     //SPEED_TABLE.put(5.5, 88.0);
     //SPEED_TABLE.put(6.5, 96.0);
 

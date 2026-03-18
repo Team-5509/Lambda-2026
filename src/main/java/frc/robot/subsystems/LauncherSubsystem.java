@@ -35,7 +35,7 @@ public class LauncherSubsystem extends SubsystemBase {
    private static final int HOOD_MOTOR_ID = Constants.LauncherSubsystemConstants.kHoodMotorId;
     private static final int HOOD_CANCODER_ID = Constants.LauncherSubsystemConstants.kHoodEncoderId;
 
-    private static final int LIMIT_NEG_ID = 0; // -180 deg
+    private static final int LIMIT_NEG_ID = 2; // -180 deg
 
 
   // private static final double MM_CRUISE_VEL = 2.0; // rot/s
@@ -87,14 +87,14 @@ public class LauncherSubsystem extends SubsystemBase {
     config.Slot0.kP = 1;//60.0;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
-    config.Slot0.kV = 0.1;//0.0;
+    config.Slot0.kV = 0.2;//0.0;
 
     /* ---- Motor ---- */
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 20;
+        config.CurrentLimits.SupplyCurrentLimit = 35;
 
     launcherMotor.getConfigurator().apply(config);
 
