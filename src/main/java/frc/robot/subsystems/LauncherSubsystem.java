@@ -35,7 +35,7 @@ public class LauncherSubsystem extends SubsystemBase {
    private static final int HOOD_MOTOR_ID = Constants.LauncherSubsystemConstants.kHoodMotorId;
     private static final int HOOD_CANCODER_ID = Constants.LauncherSubsystemConstants.kHoodEncoderId;
 
-    private static final int LIMIT_NEG_ID = 2; // -180 deg
+    private static final int LIMIT_NEG_ID = 0; // -180 deg
 
 
   // private static final double MM_CRUISE_VEL = 2.0; // rot/s

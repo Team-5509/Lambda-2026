@@ -267,6 +267,26 @@ public class RobotContainer {
         auxXbox.leftBumper().onTrue(m_turretSubsystem.ManualTurretPositionLeftMM());
         auxXbox.rightBumper().onTrue(m_turretSubsystem.ManualTurretPositionRightMM());
 
+        auxXbox.leftTrigger().onTrue(
+                m_intakeSubsystem.reverseIntakeCommand()
+        .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
+        .alongWith(m_kickerSubsystem.AgitateKickerCommand())
+        .alongWith(m_launcherSubsystem.agitateLauncherCommand())
+        )
+        .onFalse(
+                Commands.runOnce(() -> m_conveyorSubsystem.stopConveyorMM(), m_conveyorSubsystem)
+        .alongWith(Commands.runOnce(() -> m_kickerSubsystem.stopKickerMM(), m_kickerSubsystem))
+        .alongWith(Commands.runOnce(() -> m_launcherSubsystem.stopLauncherMM(), m_launcherSubsystem))
+        .alongWith(m_intakeSubsystem.StopIntakeCommand())
+        );
+
+        auxXbox.povLeft().onTrue(m_turretSubsystem.ManualTurretPositionMM());
+        auxXbox.povLeft().onTrue(m_launcherSubsystem.MoveHoodUp().andThen(m_launcherSubsystem.ExtendHoodMM()));
+        auxXbox.povRight().onTrue(m_launcherSubsystem.MoveHoodDown().andThen(m_launcherSubsystem.RetractHoodMM()));
+        auxXbox.leftBumper().onTrue(m_turretSubsystem.ManualTurretPositionLeftMM());
+        auxXbox.rightBumper().onTrue(m_turretSubsystem.ManualTurretPositionRightMM());
+
+
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode) is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
@@ -275,37 +295,6 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
-
-    // auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
-
-    //     auxXbox.leftTrigger().onTrue(
-    //             m_intakeSubsystem.reverseIntakeCommand()
-    //     .alongWith(m_conveyorSubsystem.AgitateConveyorCommand())
-    //     .alongWith(m_kickerSubsystem.AgitateKickerCommand())
-    //     .alongWith(m_launcherSubsystem.agitateLauncherCommand())
-    //     )
-    //     .onFalse(
-    //             Commands.runOnce(() -> m_conveyorSubsystem.stopConveyorMM(), m_conveyorSubsystem)
-    //     .alongWith(Commands.runOnce(() -> m_kickerSubsystem.stopKickerMM(), m_kickerSubsystem))
-    //     .alongWith(Commands.runOnce(() -> m_launcherSubsystem.stopLauncherMM(), m_launcherSubsystem))
-    //     .alongWith(m_intakeSubsystem.StopIntakeCommand())
-    //     );
-
-    //     //auxXbox.povLeft().onTrue(m_turretSubsystem.ManualTurretPositionMM());
-    //     auxXbox.povLeft().onTrue(m_launcherSubsystem.MoveHoodUp().andThen(m_launcherSubsystem.ExtendHoodMM()));
-    //     auxXbox.povRight().onTrue(m_launcherSubsystem.MoveHoodDown().andThen(m_launcherSubsystem.RetractHoodMM()));
-    //     auxXbox.leftBumper().onTrue(m_turretSubsystem.ManualTurretPositionLeftMM());
-    //     auxXbox.rightBumper().onTrue(m_turretSubsystem.ManualTurretPositionRightMM());
-
-
-    //     // Idle while the robot is disabled. This ensures the configured
-    //     // neutral mode) is applied to the drive motors while disabled.
-    //     final var idle = new SwerveRequest.Idle();
-    //     RobotModeTriggers.disabled()
-    //             .whileTrue(drivetrain.applyRequest(() -> idle).ignoringDisable(true));
-
-    //     drivetrain.registerTelemetry(logger::telemeterize);
-    // }
 
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
