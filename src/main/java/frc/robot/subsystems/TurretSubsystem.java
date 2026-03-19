@@ -21,7 +21,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     /* ==================== Hardware IDs ==================== */
     private static final int TURRET_MOTOR_ID = Constants.TurretSubsystemConstants.kTurretMotorId;
-    private static final int LIMIT_NEG_ID = 2; // -180 deg
+    private static final int LIMIT_NEG_ID = 0; // -180 deg
     private static final int LIMIT_POS_ID = 1; // +180 deg
 
     /* ==================== Constants ==================== */
@@ -88,7 +88,7 @@ public class TurretSubsystem extends SubsystemBase {
         config.Slot0.kV = 0.05;
         config.Slot0.kS = 0.15;
         
-        config.CurrentLimits.SupplyCurrentLimit = 20;
+        config.CurrentLimits.SupplyCurrentLimit = 35;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         /* ---- Soft Limits ---- */

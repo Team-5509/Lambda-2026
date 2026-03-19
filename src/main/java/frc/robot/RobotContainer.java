@@ -68,8 +68,7 @@ public class RobotContainer {
 
     // public final Vision visionFL = new Vision(drivetrain::addVisionMeasurement,
     // CameraProperties.CAM_FL);
-    // public final Vision visionFR = new Vision(drivetrain::addVisionMeasurement,
-    // CameraProperties.CAM_FR);
+     public final Vision visionFR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_FR);
 
     public final Vision visionRL = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_RL);
     public final Vision visionR = new Vision(drivetrain::addVisionMeasurement, CameraProperties.CAM_R);
@@ -246,20 +245,20 @@ public class RobotContainer {
         auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
 
         // auxXbox.x().whileTrue(makeLaunch());
-        m_turretSubsystem.setDefaultCommand(
-                m_turretSubsystem.run(() -> {
-                    double joyX = -auxXbox.getRightX(); // left+
-                    double joyY = -auxXbox.getRightY(); // forward+
-                    double magnitude = Math.hypot(joyX, joyY);
-                    if (magnitude > 0.5) {
-                        // 0° = field forward, CCW+
-                        double fieldAngleDeg = Math.toDegrees(Math.atan2(joyX, joyY));
-                        // Convert field-relative angle to robot-relative turret angle
-                        double robotHeading = drivetrain.getState().Pose.getRotation().getDegrees();
-                        double turretAngle = fieldAngleDeg - robotHeading;
-                        m_turretSubsystem.setTurretAngleDegrees(turretAngle);
-                    }
-                }));
+        // m_turretSubsystem.setDefaultCommand(
+        //         m_turretSubsystem.run(() -> {
+        //             double joyX = -auxXbox.getRightX(); // left+
+        //             double joyY = -auxXbox.getRightY(); // forward+
+        //             double magnitude = Math.hypot(joyX, joyY);
+        //             if (magnitude > 0.5) {
+        //                 // 0° = field forward, CCW+
+        //                 double fieldAngleDeg = Math.toDegrees(Math.atan2(joyX, joyY));
+        //                 // Convert field-relative angle to robot-relative turret angle
+        //                 double robotHeading = drivetrain.getState().Pose.getRotation().getDegrees();
+        //                 double turretAngle = fieldAngleDeg - robotHeading;
+        //                 m_turretSubsystem.setTurretAngleDegrees(turretAngle);
+        //             }
+        //         }));
 
         auxXbox.povRight().onTrue(m_launcherSubsystem.RetractHoodMM());
 

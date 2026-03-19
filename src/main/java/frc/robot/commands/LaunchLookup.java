@@ -54,6 +54,7 @@ public class LaunchLookup extends Command {
     HOOD_TABLE.put(2.06, 0.05);
     HOOD_TABLE.put(3.05, 0.05);
     HOOD_TABLE.put(4.239, 0.5);
+    HOOD_TABLE.put(5.82, .6);
     //HOOD_TABLE.put(5.5, 1.45);
     //HOOD_TABLE.put(6.5, 1.65);
 
@@ -62,13 +63,18 @@ public class LaunchLookup extends Command {
     SPEED_TABLE.put(2.06, -60.0);
     SPEED_TABLE.put(3.05, -80.0);
     SPEED_TABLE.put(4.239, -80.0);
+    SPEED_TABLE.put(5.82, -85.0);
+
+
     //SPEED_TABLE.put(5.5, 88.0);
     //SPEED_TABLE.put(6.5, 96.0);
 
     // Home: distance (m) → hood position (mechanism rotations)
     // TODO: Replace placeholder values with data measured at the home goal.
     HOOD_TABLE_HOME.put(3.15, 0.05);
-    HOOD_TABLE_HOME.put(4.15, 0.94);
+    HOOD_TABLE_HOME.put(4.239, 0.5);
+    HOOD_TABLE_HOME.put(5.82, .6);
+
     // HOOD_TABLE_HOME.put(3.5, 0.80);
     // HOOD_TABLE_HOME.put(4.5, 1.05);
     // HOOD_TABLE_HOME.put(5.5, 1.30);
@@ -78,6 +84,8 @@ public class LaunchLookup extends Command {
     // TODO: Replace placeholder values with data measured at the home goal.
     SPEED_TABLE_HOME.put(3.15, -75.0);
     SPEED_TABLE_HOME.put(4.25, -70.0);
+    SPEED_TABLE.put(5.82, -85.0);
+
     // SPEED_TABLE_HOME.put(3.5, 62.0);     
 
     // SPEED_TABLE_HOME.put(4.5, 72.0);
@@ -216,8 +224,9 @@ public class LaunchLookup extends Command {
     double currentDist = shooterPos.getDistance(hub);
     double flightTime  = (currentDist > 0.01) ? currentDist / kApproxBallSpeedMPS : 0.0;
 
-    Translation2d predictedShooterPos = shooterPos.plus(robotVelocity.times(flightTime));
-    double effectiveDist = predictedShooterPos.getDistance(hub);
+    //Translation2d predictedShooterPos = shooterPos.plus(robotVelocity.times(flightTime));
+    Translation2d predictedShooterPos = shooterPos;//.plus(robotVelocity.times(flightTime));
+    double effectiveDist = robotPose.getTranslation().getDistance(hub);
     SmartDashboard.putNumber("LaunchLookup/DistanceToHubP2", effectiveDist);
 
     // ── Table lookup ─────────────────────────────────────────────────────────

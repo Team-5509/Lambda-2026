@@ -61,7 +61,7 @@ public class Constants {
     public static final double homeDz = homeGoalHeightM - shooterHeightM;
 
     //TODO: Measure this from shooter exit to robot center 
-    public static final Translation2d shooterOffsetRobot = new Translation2d(0.32, 0.18);
+    public static final Translation2d shooterOffsetRobot = new Translation2d(0.1, 0.0);
 
         // Limit switches are at -90° on the robot frame (left side), 13° apart.
         // Activator tab is at +90° on the turret. Switches trigger at turret ≈ ±180°.
