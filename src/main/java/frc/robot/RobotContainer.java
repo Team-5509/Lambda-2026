@@ -245,26 +245,20 @@ public class RobotContainer {
         auxXbox.rightTrigger().whileTrue(makeLaunchLookup());
 
         // auxXbox.x().whileTrue(makeLaunch());
-        // m_turretSubsystem.setDefaultCommand(
-        //         m_turretSubsystem.run(() -> {
-        //             double joyX = -auxXbox.getRightX(); // left+
-        //             double joyY = -auxXbox.getRightY(); // forward+
-        //             double magnitude = Math.hypot(joyX, joyY);
-        //             if (magnitude > 0.5) {
-        //                 // 0° = field forward, CCW+
-        //                 double fieldAngleDeg = Math.toDegrees(Math.atan2(joyX, joyY));
-        //                 // Convert field-relative angle to robot-relative turret angle
-        //                 double robotHeading = drivetrain.getState().Pose.getRotation().getDegrees();
-        //                 double turretAngle = fieldAngleDeg - robotHeading;
-        //                 m_turretSubsystem.setTurretAngleDegrees(turretAngle);
-        //             }
-        //         }));
-
-        auxXbox.povRight().onTrue(m_launcherSubsystem.RetractHoodMM());
-
-        auxXbox.povLeft().onTrue(m_turretSubsystem.ManualTurretPositionMM());
-        auxXbox.leftBumper().onTrue(m_turretSubsystem.ManualTurretPositionLeftMM());
-        auxXbox.rightBumper().onTrue(m_turretSubsystem.ManualTurretPositionRightMM());
+        m_turretSubsystem.setDefaultCommand(
+                m_turretSubsystem.run(() -> {
+                    double joyX = -auxXbox.getRightX(); // left+
+                    double joyY = -auxXbox.getRightY(); // forward+
+                    double magnitude = Math.hypot(joyX, joyY);
+                    if (magnitude > 0.5) {
+                        // 0° = field forward, CCW+
+                        double fieldAngleDeg = Math.toDegrees(Math.atan2(joyX, joyY));
+                        // Convert field-relative angle to robot-relative turret angle
+                        double robotHeading = drivetrain.getState().Pose.getRotation().getDegrees();
+                        double turretAngle = fieldAngleDeg - robotHeading;
+                        m_turretSubsystem.setTurretAngleDegrees(turretAngle);
+                    }
+                }));
 
         auxXbox.leftTrigger().onTrue(
                 m_intakeSubsystem.reverseIntakeCommand()
@@ -279,11 +273,14 @@ public class RobotContainer {
         .alongWith(m_intakeSubsystem.StopIntakeCommand())
         );
 
-        auxXbox.povLeft().onTrue(m_turretSubsystem.ManualTurretPositionMM());
-        auxXbox.povLeft().onTrue(m_launcherSubsystem.MoveHoodUp().andThen(m_launcherSubsystem.ExtendHoodMM()));
+        
+        //auxXbox.povRight().onTrue(m_launcherSubsystem.RetractHoodMM());
         auxXbox.povRight().onTrue(m_launcherSubsystem.MoveHoodDown().andThen(m_launcherSubsystem.RetractHoodMM()));
-        auxXbox.leftBumper().onTrue(m_turretSubsystem.ManualTurretPositionLeftMM());
-        auxXbox.rightBumper().onTrue(m_turretSubsystem.ManualTurretPositionRightMM());
+        //auxXbox.povLeft().onTrue(m_launcherSubsystem.MoveHoodUp().andThen(m_launcherSubsystem.ExtendHoodMM()));
+        
+        auxXbox.povLeft().whileTrue(m_turretSubsystem.ManualTurretPositionMM());
+        auxXbox.leftBumper().whileTrue(m_turretSubsystem.ManualTurretPositionLeftMM());
+        auxXbox.rightBumper().whileTrue(m_turretSubsystem.ManualTurretPositionRightMM());
 
 
         // Idle while the robot is disabled. This ensures the configured

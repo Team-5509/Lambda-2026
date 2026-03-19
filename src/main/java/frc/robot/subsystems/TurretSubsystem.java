@@ -11,6 +11,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -31,8 +32,8 @@ public class TurretSubsystem extends SubsystemBase {
     private static final double LIMIT_GAP_DEG = 13.924;
     //private static final double MIN_TURRET_ROT = ((-180.0 + LIMIT_GAP_DEG / 2.0) / 360.0) * GEAR_RATIO + 0.5; // ~-19.57 motor rot
     //private static final double MAX_TURRET_ROT = ((180.0 - LIMIT_GAP_DEG / 2.0) / 360.0) * GEAR_RATIO - 0.5;  // ~+19.57 motor rot
-    private static final double MIN_TURRET_ROT = ((Constants.TurretSubsystemConstants.MAX_TURRET_DEG) / 360.0) * GEAR_RATIO + 0.5; //
-    private static final double MAX_TURRET_ROT = ((Constants.TurretSubsystemConstants.MIN_TURRET_DEG) / 360.0) * GEAR_RATIO - 0.5;  //
+    private static final double MIN_TURRET_ROT = (-(Constants.TurretSubsystemConstants.MAX_TURRET_DEG) / 360.0) * GEAR_RATIO + 0.5; //
+    private static final double MAX_TURRET_ROT = (-(Constants.TurretSubsystemConstants.MIN_TURRET_DEG) / 360.0) * GEAR_RATIO - 0.5;  //
     
     double maxPosistion = MAX_TURRET_ROT;
     double minPosistion = MIN_TURRET_ROT;
@@ -85,8 +86,8 @@ public class TurretSubsystem extends SubsystemBase {
         config.Slot0.kP = 10.0;
         config.Slot0.kI = 0.0;
         config.Slot0.kD = 0.0;
-        config.Slot0.kV = 0.05;
-        config.Slot0.kS = 0.15;
+        config.Slot0.kV = 0.5;
+        config.Slot0.kS = 0.25;
         
         config.CurrentLimits.SupplyCurrentLimit = 35;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -118,6 +119,7 @@ public class TurretSubsystem extends SubsystemBase {
              turretMotor.setControl(
                      motionMagic.withPosition(manualPosition)
                              .withSlot(0));
+            SmartDashboard.putNumber("TurretSubsystem/SetpointRotations", manualPosition);
         });
     }
 
@@ -257,6 +259,7 @@ public Command SetTurretPositionMinMM() {
         return !posLimit.get();
     } 
 
+    private boolean hasZeroed = false;
 
     @Override
     public void periodic() {
@@ -269,18 +272,26 @@ public Command SetTurretPositionMinMM() {
 
         SmartDashboard.putNumber("TurretSubsystem/DistanceToHub", robotPos.getDistance(Constants.TurretSubsystemConstants.blueHubPose));
 
-        if (!isAtNegativeLimit()) {
-            // Re-zero encoder at the known -270° position
-            turretMotor.setPosition(Constants.TurretSubsystemConstants.minNegTurretMotorRot);
-            if (turretMotor.getVelocity().getValueAsDouble() < 0) {
-                turretMotor.stopMotor();
+        // Auto-zero encoder at limits when disabled. Rely on software limits in motor controller when enabled.
+        if (DriverStation.isDisabled()) {
+            
+            if (!isAtNegativeLimit() && !hasZeroed) {
+                // Re-zero encoder at the known -270° position
+                turretMotor.setPosition(Constants.TurretSubsystemConstants.minNegTurretMotorRot);
+                // if (turretMotor.getVelocity().getValueAsDouble() < 0) {
+                //     turretMotor.stopMotor();
+                // 
+                hasZeroed = true;    
+            } else if (isAtNegativeLimit()) {
+                hasZeroed = false;
             }
-        } else if (!isAtPositiveLimit()) {
-            // Re-zero encoder at the known +90° position
-            turretMotor.setPosition(Constants.TurretSubsystemConstants.maxPosTurretMotorRot);
-            if (turretMotor.getVelocity().getValueAsDouble() > 0) {
-                turretMotor.stopMotor();
-            }
+            SmartDashboard.putBoolean("TurretSubsystem/hasZeroed", hasZeroed);
+            // } else if (!isAtPositiveLimit()) {
+                // Re-zero encoder at the known +90° position
+                // turretMotor.setPosition(Constants.TurretSubsystemConstants.maxPosTurretMotorRot);
+                // if (turretMotor.getVelocity().getValueAsDouble() > 0) {
+                //     turretMotor.stopMotor();
+                // }
         }
     }
 }
