@@ -89,7 +89,7 @@ public class TurretSubsystem extends SubsystemBase {
         config.Slot0.kV = 0.5;
         config.Slot0.kS = 0.25;
         
-        config.CurrentLimits.SupplyCurrentLimit = 35;
+        config.CurrentLimits.SupplyCurrentLimit = 20;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         /* ---- Soft Limits ---- */
@@ -241,6 +241,10 @@ public Command SetTurretPositionMinMM() {
         SmartDashboard.putNumber("TurretSubsystem/FieldAngleDeg", turretAngle);
         SmartDashboard.putNumber("TurretSubsystem/RobotHeadingDeg", robotHeading);
         setTurretAngleDegrees(wrapDegrees(turretAngle));
+    }
+    
+    public void aimAtZero(){
+        
     }
 
     private double wrapDegrees(double degrees) {

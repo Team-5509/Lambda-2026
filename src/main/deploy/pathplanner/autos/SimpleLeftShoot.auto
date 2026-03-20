@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "TurretAtZero"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftMoveAndShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunchLookup"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": null,
+  "choreoAuto": false
+}

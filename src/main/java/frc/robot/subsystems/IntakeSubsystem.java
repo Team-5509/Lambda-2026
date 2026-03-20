@@ -54,6 +54,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private static final double MIN_INTAKE_ROT = 0.02;
     private static final double MAX_INTAKE_ROT = 0.366;
+    private static final double HALFWAY_INTAKE_ROT = .15;
   
 
     /* ==================== Hardware ==================== */
@@ -136,7 +137,7 @@ private void configureDeployMotor() {
   config.Slot0.kG = 0.0;
   config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
   config.CurrentLimits.SupplyCurrentLimitEnable = true;
-  config.CurrentLimits.SupplyCurrentLimit = 20;
+  config.CurrentLimits.SupplyCurrentLimit = 10;
   
 
   /* ---- Soft Limits ---- */
@@ -212,6 +213,15 @@ private void configureDeployMotor() {
               .withSlot(0));
     });
   }
+
+  public Command JiggleIntakeMM(){
+    return runOnce(() -> {
+        deployIntakeMoter.setControl(
+          motionMagicPosistion.withPosition(HALFWAY_INTAKE_ROT)
+          .withSlot(0));
+    });
+  }
+  
 
   /**
      * Command that sets the intake position with magic motion (closed loop

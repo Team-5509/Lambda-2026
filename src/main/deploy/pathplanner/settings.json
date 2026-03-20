@@ -3,7 +3,9 @@
   "robotLength": 0.8382,
   "holonomicMode": true,
   "pathFolders": [
-    "ClosePaths(Dont Cross Trench Line)"
+    "ClosePaths(Dont Cross Trench Line)",
+    "LeftTrench",
+    "RightTrench"
   ],
   "autoFolders": [
     "CloseAutons(Dont Cross Trench Line)"

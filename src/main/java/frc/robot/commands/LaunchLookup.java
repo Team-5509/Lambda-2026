@@ -60,8 +60,8 @@ public class LaunchLookup extends Command {
 
     // Hub: distance (m) → launcher speed (RPS)
     SPEED_TABLE.put(1.5, -50.0);
-    SPEED_TABLE.put(2.06, -60.0);
-    SPEED_TABLE.put(3.05, -80.0);
+    SPEED_TABLE.put(2.06, -50.0);
+    SPEED_TABLE.put(3.05, -70.0);
     SPEED_TABLE.put(4.239, -80.0);
     SPEED_TABLE.put(5.82, -85.0);
 
@@ -71,7 +71,7 @@ public class LaunchLookup extends Command {
 
     // Home: distance (m) → hood position (mechanism rotations)
     // TODO: Replace placeholder values with data measured at the home goal.
-    HOOD_TABLE_HOME.put(3.15, 0.05);
+    HOOD_TABLE_HOME.put(3.05, 0.05);
     HOOD_TABLE_HOME.put(4.239, 0.5);
     HOOD_TABLE_HOME.put(5.82, .6);
 
@@ -82,9 +82,9 @@ public class LaunchLookup extends Command {
 
     // Home: distance (m) → launcher speed (RPS)
     // TODO: Replace placeholder values with data measured at the home goal.
-    SPEED_TABLE_HOME.put(3.15, -75.0);
-    SPEED_TABLE_HOME.put(4.25, -70.0);
-    SPEED_TABLE.put(5.82, -85.0);
+    SPEED_TABLE_HOME.put(3.05, -80.0);
+    SPEED_TABLE_HOME.put(4.239, 80.0);
+    SPEED_TABLE_HOME.put(5.82, -85.0);
 
     // SPEED_TABLE_HOME.put(3.5, 62.0);     
 
