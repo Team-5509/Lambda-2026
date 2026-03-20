@@ -60,6 +60,7 @@ public class TurretSubsystem extends SubsystemBase {
     public TurretSubsystem(Supplier<Pose2d> robotPoseSupplier) {
         this.robotPoseSupplier = robotPoseSupplier;
         configureMotor();
+        turretMotor.setPosition(Constants.TurretSubsystemConstants.minNegTurretMotorRot);
     }
 
     public Pose2d getRobotPose() {
