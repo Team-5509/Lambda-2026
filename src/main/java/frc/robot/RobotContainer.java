@@ -99,6 +99,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         // Register named commands after subsystem fields have been initialized
+        NamedCommands.registerCommand("TurretAtZero", m_turretSubsystem.ManualTurretPositionMM());
         NamedCommands.registerCommand("RunLauncher", m_launcherSubsystem.RunLauncherMM());
         NamedCommands.registerCommand("StopLauncher", m_launcherSubsystem.StopLauncherMM());
         NamedCommands.registerCommand("RunIntake", m_intakeSubsystem.RunIntakeMM());
@@ -277,10 +278,11 @@ public class RobotContainer {
         //auxXbox.povRight().onTrue(m_launcherSubsystem.RetractHoodMM());
         auxXbox.povRight().onTrue(m_launcherSubsystem.MoveHoodDown().andThen(m_launcherSubsystem.RetractHoodMM()));
         //auxXbox.povLeft().onTrue(m_launcherSubsystem.MoveHoodUp().andThen(m_launcherSubsystem.ExtendHoodMM()));
-        
+        auxXbox.start().whileTrue(m_intakeSubsystem.JiggleIntakeMM());
+        auxXbox.back().onTrue(m_turretSubsystem.ManualTurretPositionMM());
         auxXbox.povLeft().whileTrue(m_turretSubsystem.ManualTurretPositionMM());
-        auxXbox.leftBumper().whileTrue(m_turretSubsystem.ManualTurretPositionLeftMM());
-        auxXbox.rightBumper().whileTrue(m_turretSubsystem.ManualTurretPositionRightMM());
+        auxXbox.rightBumper().whileTrue(m_turretSubsystem.ManualTurretPositionLeftMM());
+        auxXbox.leftBumper().whileTrue(m_turretSubsystem.ManualTurretPositionRightMM());
 
 
         // Idle while the robot is disabled. This ensures the configured

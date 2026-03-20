@@ -20,13 +20,13 @@ public class CameraManager {
         
          //Back Left Up Camera
          CAM_FR("Cherry", 
-             new Transform3d(new Translation3d(-9.566*0.0254, 9.020*0.0254, 10.501*0.0254), new Rotation3d(0, 0, Math.toRadians(-115))), 
+             new Transform3d(new Translation3d(9.566*0.0254, -9.020*0.0254, 10.501*0.0254), new Rotation3d(0, 0, Math.toRadians(-115))), 
              VecBuilder.fill(4, 4, 8), 
              VecBuilder.fill(0.5, 0.5, 1)),
         
         // Rear Left Swerve Camera
          CAM_RL("Dragonfruit", 
-             new Transform3d(new Translation3d(-10.772*0.0254, 10.529*0.0254, 5.771*0.0254), new Rotation3d(0, Math.toRadians(20), Math.toRadians(-35))), 
+             new Transform3d(new Translation3d(10.772*0.0254, -10.529*0.0254, 5.771*0.0254), new Rotation3d(0, Math.toRadians(20), Math.toRadians(-35))), 
              VecBuilder.fill(4, 4, 8), 
              VecBuilder.fill(0.5, 0.5,1)),
         
