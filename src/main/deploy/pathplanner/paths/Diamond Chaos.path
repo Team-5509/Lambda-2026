@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.6250213980028523,
-        "y": 0.5480313837375184
+        "x": 3.6120827389443653,
+        "y": 0.5221540656205423
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.625021398002855,
-        "y": 0.5480313837375184
+        "x": 4.612082738944368,
+        "y": 0.5221540656205423
       },
       "isLocked": false,
       "linkedName": null
@@ -17,15 +17,15 @@
     {
       "anchor": {
         "x": 7.390171184022824,
-        "y": 1.1043937232524967
+        "y": 0.8456205420827394
       },
       "prevControl": {
         "x": 7.264438388646246,
-        "y": 0.6879038385675773
+        "y": 0.42913065739781997
       },
       "nextControl": {
         "x": 7.565014557516799,
-        "y": 1.6835623979512926
+        "y": 1.4247892167815353
       },
       "isLocked": false,
       "linkedName": null
@@ -41,7 +41,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "EndChoasP1"
+      "linkedName": "EndDiamondChaosP1"
     }
   ],
   "rotationTargets": [],
@@ -64,7 +64,7 @@
   "folder": "ClosePaths(Dont Cross Trench Line)",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 91.60771267150788
+    "rotation": 88.71710965324533
   },
   "useDefaultConstraints": true
 }

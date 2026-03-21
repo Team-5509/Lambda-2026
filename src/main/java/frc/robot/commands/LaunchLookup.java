@@ -85,8 +85,8 @@ public class LaunchLookup extends Command {
     // Home: distance (m) → launcher speed (RPS)
     // TODO: Replace placeholder values with data measured at the home goal.
        SPEED_TABLE_HOME.put(1.5, -50.0);
-    SPEED_TABLE_HOME.put(2.06, -50.0);
-    SPEED_TABLE_HOME.put(3.05, -70.0);
+    SPEED_TABLE_HOME.put(2.06, -55.0);
+    SPEED_TABLE_HOME.put(3.05, -75.0);
     SPEED_TABLE_HOME.put(4.239, -80.0);
     SPEED_TABLE_HOME.put(5.82, -85.0);
 

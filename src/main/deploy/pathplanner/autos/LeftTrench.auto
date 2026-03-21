@@ -45,6 +45,18 @@
           "data": {
             "name": "AutoLaunchLookup"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "JiggleIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoLaunchLookup"
+          }
         }
       ]
     }

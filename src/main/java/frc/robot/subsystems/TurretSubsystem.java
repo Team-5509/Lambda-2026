@@ -204,6 +204,7 @@ public Command SetTurretPositionMinMM() {
 
         SmartDashboard.putNumber("TurretSubsystem/SetpointDegrees", degrees);
 
+        
         double rotations = (degrees / 360.0) * GEAR_RATIO;
         SmartDashboard.putNumber("TurretSubsystem/SetpointRotations", rotations);
 

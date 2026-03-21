@@ -5,33 +5,39 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "TurretAtZero"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "DeployIntake"
+            "pathName": "Diamond Chaos"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "MiddleMoveAndShoot"
+            "pathName": "Diamond Chaos p2"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "AutoLaunchLookup"
+            "pathName": "Diamond Chaos p3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Diamond Chaos p2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Diamond Chaos p3"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

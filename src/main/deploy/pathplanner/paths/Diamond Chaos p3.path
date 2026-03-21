@@ -3,29 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.6250213980028523,
-        "y": 0.5480313837375184
+        "x": 7.558373751783167,
+        "y": 0.7938659058487882
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.625021398002855,
-        "y": 0.5480313837375184
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 7.390171184022824,
-        "y": 1.1043937232524967
-      },
-      "prevControl": {
-        "x": 7.264438388646246,
-        "y": 0.6879038385675773
-      },
-      "nextControl": {
-        "x": 7.565014557516799,
-        "y": 1.6835623979512926
+        "x": 7.634867727686782,
+        "y": 1.6899381950054158
       },
       "isLocked": false,
       "linkedName": null
@@ -33,15 +17,15 @@
     {
       "anchor": {
         "x": 7.558373751783167,
-        "y": 7.35376604850214
+        "y": 7.302011412268189
       },
       "prevControl": {
-        "x": 7.372602667445818,
-        "y": 6.774597373803346
+        "x": 7.470952065036179,
+        "y": 6.438722255641683
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "EndChoasP1"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -58,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 141.34019174590992
+    "rotation": 146.56013079421777
   },
   "reversed": false,
   "folder": "ClosePaths(Dont Cross Trench Line)",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 91.60771267150788
+    "rotation": -40.962289379022906
   },
   "useDefaultConstraints": true
 }
