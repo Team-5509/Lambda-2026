@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.fasterxml.jackson.databind.util.Named;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -106,6 +107,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("StopIntake", m_intakeSubsystem.StopIntakeMM());
         NamedCommands.registerCommand("DeployIntake", m_intakeSubsystem.DeployIntakeMM());
         NamedCommands.registerCommand("RetractIntake", m_intakeSubsystem.RetractIntakeMM());
+        NamedCommands.registerCommand("JiggleIntake", m_intakeSubsystem.JiggleIntakeMM());
         NamedCommands.registerCommand("RunConveyor", m_conveyorSubsystem.RunConveyorMM());
         NamedCommands.registerCommand("StopConveyor", m_conveyorSubsystem.StopConveyorMM());
         NamedCommands.registerCommand("RunKicker", m_kickerSubsystem.RunKickerMM());

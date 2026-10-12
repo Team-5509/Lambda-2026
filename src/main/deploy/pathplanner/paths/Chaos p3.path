@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.461349397590361,
-        "y": 0.680192771084337
+        "x": 7.558373751783167,
+        "y": 0.7938659058487882
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.537843373493976,
-        "y": 1.5762650602409645
+        "x": 7.634867727686782,
+        "y": 1.6899381950054158
       },
       "isLocked": false,
       "linkedName": "EndChaosp2"
@@ -48,7 +48,7 @@
   "folder": "ClosePaths(Dont Cross Trench Line)",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -41.760299703897914
   },
   "useDefaultConstraints": true
 }

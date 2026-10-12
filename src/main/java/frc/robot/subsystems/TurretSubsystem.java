@@ -60,6 +60,7 @@ public class TurretSubsystem extends SubsystemBase {
     public TurretSubsystem(Supplier<Pose2d> robotPoseSupplier) {
         this.robotPoseSupplier = robotPoseSupplier;
         configureMotor();
+        turretMotor.setPosition(Constants.TurretSubsystemConstants.minNegTurretMotorRot);
     }
 
     public Pose2d getRobotPose() {
@@ -203,6 +204,7 @@ public Command SetTurretPositionMinMM() {
 
         SmartDashboard.putNumber("TurretSubsystem/SetpointDegrees", degrees);
 
+        
         double rotations = (degrees / 360.0) * GEAR_RATIO;
         SmartDashboard.putNumber("TurretSubsystem/SetpointRotations", rotations);
 
